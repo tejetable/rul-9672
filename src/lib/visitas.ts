@@ -4,13 +4,13 @@ export interface Visita {
   id: string;
   patrocinadorId: string;
   fechaHora: string;
-  numeroSocio?: number;
-  socioId?: string;
+  numeroSocio?: number | undefined;
+  socioId?: string | undefined;
   origen: "qr" | "numero" | "sin_carne";
   tipoCliente: "nueva" | "ya_era_clienta";
   repiteViaClub: boolean;
   verificada: boolean;
-  ventajaId?: string;
+  ventajaId?: string | undefined;
   anulada: boolean;
 }
 
