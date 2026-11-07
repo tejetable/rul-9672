@@ -44,7 +44,7 @@ export function NegocioApp() {
             <div className="animate-rise mx-5 mt-4 flex items-center gap-3 rounded-2xl bg-roto p-4">
               <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
               <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
-              <button onClick={() => { dataService.anularVisita(reciente); setReciente(null); setTab("registrar"); }} className="min-h-11 rounded-xl border-2 border-primary px-3 text-sm font-bold">Deshacer</button>
+              <button onClick={() => { dataService.anularVisita(reciente); setReciente(null); setTab("registrar"); }} className="min-h-11 rounded-xl btn-suave px-3 text-sm font-bold">Deshacer</button>
             </div>
           )}
           <TuMes key={reciente ?? "x"} neg={neg} />
@@ -156,7 +156,7 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
           <p className="font-bold">Ese número no está en el club. ¿Lo registramos sin número?</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <button onClick={() => guardar(noExiste, true)} className="min-h-14 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Sí</button>
-            <button onClick={() => { setNoExiste(null); setNum(""); setSocio(null); }} className="min-h-14 rounded-2xl border-2 border-primary bg-background font-black uppercase">Corregir</button>
+            <button onClick={() => { setNoExiste(null); setNum(""); setSocio(null); }} className="min-h-14 rounded-2xl btn-suave font-black uppercase">Corregir</button>
           </div>
         </div>
       )}
@@ -184,7 +184,7 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
         <p className="label-club mb-2 text-center text-accent">¿Ya era clienta tuya antes? Pulsa y queda registrada</p>
         <div className="grid grid-cols-2 gap-3">
           <button onClick={() => guardar("nueva")} disabled={!!aviso || !!noExiste} className={`${big} bg-primary text-primary-foreground`}>Nueva</button>
-          <button onClick={() => guardar("ya_era_clienta")} disabled={!!aviso || !!noExiste} className={`${big} border-2 border-primary bg-background text-lg`}>Ya era clienta</button>
+          <button onClick={() => guardar("ya_era_clienta")} disabled={!!aviso || !!noExiste} className={`${big} btn-suave text-lg`}>Ya era clienta</button>
         </div>
       </div>
     </section>

@@ -95,7 +95,7 @@ function Bienvenida() {
         >
           Únete a la familia
         </a>
-        <button onClick={() => setAyuda((a) => !a)} className="min-h-12 rounded-2xl border-2 border-primary px-6 font-bold transition-colors duration-200">
+        <button onClick={() => setAyuda((a) => !a)} className="min-h-12 rounded-2xl btn-suave px-6 font-bold transition-colors duration-200">
           Ya soy socia/o
         </button>
         {ayuda && (

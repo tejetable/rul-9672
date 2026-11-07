@@ -189,3 +189,10 @@
 @utility animate-check {
   animation: check-pop 420ms cubic-bezier(.2,.7,.2,1) both;
 }
+
+/* Botón secundario: verde suave en vez de blanco */
+@utility btn-suave {
+  background-color: color-mix(in oklab, var(--esmeralda, #28A073) 22%, var(--crema, #F3E4CF));
+  color: var(--primary);
+  border: 2px solid color-mix(in oklab, var(--esmeralda, #28A073) 35%, transparent);
+}
