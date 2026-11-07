@@ -1,0 +1,9 @@
+{
+  "name": "Real Unión Lucense F.S.",
+  "short_name": "R.U. Lucense",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0D4631",
+  "icons": [{ "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }]
+}
