@@ -3,6 +3,7 @@ import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, Home, Id
 import { ContactarClub } from "@/components/ContactarClub";
 import { ListaAvisos } from "@/components/Avisos";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
+import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { PhotoSlot } from "@/components/PhotoSlot";
@@ -99,7 +100,7 @@ function Inicio({ db, socio, irA }: { db: DB; socio: Socio; irA: (t: Tab) => voi
         </button>
       )}
 
-      <PhotoSlot label="el equipo en el pabellón de Guntín" className="mt-4 aspect-[4/3] w-full" />
+      <img src={pina.url} alt="El equipo en el pabellón de Guntín" width={1920} height={1280} className="mt-4 aspect-[3/2] w-full rounded-2xl object-cover" />
     </section>
   );
 }
