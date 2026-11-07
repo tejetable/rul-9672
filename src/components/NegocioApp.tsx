@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Check, Delete, LogOut, MessageCircle, QrCode } from "lucide-react";
+import { ContactarClub } from "@/components/ContactarClub";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { QrScanner } from "@/components/QrScanner";
 import { dataService, type Patrocinador, type Socio, type Visita } from "@/lib/dataService";
@@ -26,6 +27,7 @@ export function NegocioApp() {
           <LogOut size={20} strokeWidth={1.75} />
         </button>
       </header>
+      <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
       <div className="mx-5 mt-4 grid grid-cols-2 rounded-2xl bg-roto p-1">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"]] as const).map(([id, l]) => (
           <button key={id} onClick={() => { setTab(id); setReciente(null); }} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
