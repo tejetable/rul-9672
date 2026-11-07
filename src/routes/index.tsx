@@ -41,7 +41,7 @@ function Index() {
     if (r) setRole(r);
     setSesion(dataService.sesion());
     setReady(true);
-    const t = setTimeout(() => setEspera(false), 2500);
+    const t = setTimeout(() => setEspera(false), 1500);
     return () => clearTimeout(t);
   }, []);
 
