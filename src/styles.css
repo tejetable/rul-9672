@@ -169,11 +169,13 @@
 }
 
 @utility crest-blend {
-  -webkit-mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 78%, transparent 100%);
-  mask-image: radial-gradient(ellipse 72% 70% at 50% 50%, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 4%, #000 96%, transparent 100%), linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 4%, #000 96%, transparent 100%), linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  mask-composite: intersect;
 }
 
 @utility hero-crema {
   background:
-    radial-gradient(ellipse 80% 60% at 50% 30%, color-mix(in oklab, var(--crema) 85%, white) 0%, var(--crema) 70%);
+    radial-gradient(ellipse 80% 60% at 50% 30%, color-mix(in oklab, var(--crema) 70%, white) 0%, var(--crema) 75%);
 }
