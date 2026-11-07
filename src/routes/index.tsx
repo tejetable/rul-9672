@@ -39,19 +39,22 @@ function Index() {
 
 function Bienvenida() {
   return (
-    <section className="flex flex-1 flex-col items-center px-6 pb-24 pt-12 text-center">
+    <section className="flex flex-1 flex-col items-center pb-24 text-center">
+      <div className="hero-crema flex w-full flex-col items-center rounded-b-[2.5rem] px-6 pb-10 pt-12">
       <img
         src={escudo.url}
         alt="Escudo del Real Unión Lucense F.S."
         width={450}
         height={676}
-        className="crest animate-rise w-36"
+        className="crest crest-blend animate-rise w-44"
       />
       <h1 className="title-club animate-rise mt-8 text-[2.5rem]" style={{ animationDelay: "120ms" }}>
         Más que un club, un grupo de amigos.
       </h1>
       <span className="gold-rule mt-5" />
       <p className="mt-5 text-muted-foreground">Real Unión Lucense F.S. · Guntín (Lugo)</p>
+      </div>
+      <div className="flex w-full flex-col px-6">
 
       <PhotoSlot label="piña del equipo en el pabellón de Guntín" className="mt-8 aspect-[4/3] w-full" />
 
@@ -62,6 +65,7 @@ function Bienvenida() {
         <button className="min-h-12 rounded-2xl border-2 border-primary px-6 font-bold transition-colors duration-200 hover:bg-roto">
           Ya soy socia/o
         </button>
+      </div>
       </div>
     </section>
   );
