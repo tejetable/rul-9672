@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, Home, IdCard, MapPin } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
+import { ListaAvisos } from "@/components/Avisos";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
@@ -187,21 +188,6 @@ function Ventajas({ db }: { db: DB }) {
   );
 }
 
-function Avisos({ db }: { db: DB }) {
-  const avisos = [...db.avisos].sort((a, b) => b.fecha.localeCompare(a.fecha));
-  return (
-    <section className="px-5 pt-6">
-      <h1 className="title-club text-4xl">Avisos</h1>
-      <span className="gold-rule mt-4" />
-      <ul className="mt-6 space-y-3">
-        {avisos.map((a) => (
-          <li key={a.id} className="rounded-2xl bg-roto p-4">
-            <p className="label-club text-accent">{a.tipo}</p>
-            <p className="mt-1 font-black">{a.titulo}</p>
-            <p className="mt-1">{a.texto}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+function Avisos({ db: _db }: { db: DB }) {
+  return <ListaAvisos quien="socias" />;
 }
