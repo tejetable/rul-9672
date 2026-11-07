@@ -24,7 +24,7 @@ export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Rol
                 setOpen(false);
               }}
               className={`block min-h-11 w-full rounded-xl px-4 text-left font-bold transition-colors duration-200 ${
-                role === r.id ? "bg-primary text-primary-foreground" : "hover:bg-roto"
+                role === r.id ? "bg-primary text-primary-foreground" : "hover:bg-suave"
               }`}
             >
               {r.label}

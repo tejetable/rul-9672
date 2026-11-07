@@ -12,7 +12,7 @@ function enviar(s: Socio) {
 }
 
 const ESTADO: Record<Socio["estado"], { label: string; cls: string }> = {
-  invitada: { label: "Invitada", cls: "bg-roto text-muted-foreground border border-border" },
+  invitada: { label: "Invitada", cls: "bg-suave text-muted-foreground border border-border" },
   activa: { label: "Activa", cls: "bg-accent text-accent-foreground" },
   desactivada: { label: "Desactivada", cls: "border border-primary text-primary" },
 };
@@ -54,7 +54,7 @@ export function SociasPanel() {
       </p>
 
       {creada && (
-        <div className="animate-rise mt-5 rounded-2xl border-2 border-accent bg-roto p-4">
+        <div className="animate-rise mt-5 rounded-2xl border-2 border-accent bg-suave p-4">
           <p className="label-club text-accent">Nueva socia/o</p>
           <p className="mt-1 text-lg font-black">
             {creada.nombre} · nº {creada.numeroSocio}
@@ -71,7 +71,7 @@ export function SociasPanel() {
       )}
 
       {form ? (
-        <div className="mt-5 rounded-2xl bg-roto p-4">
+        <div className="mt-5 rounded-2xl bg-suave p-4">
           <label className="label-club">Nombre</label>
           <input value={nombre} onChange={(e) => setNombre(e.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-input bg-background px-3" />
           <label className="label-club mt-3 block">Teléfono</label>

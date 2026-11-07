@@ -29,7 +29,7 @@ export function NegocioApp() {
         </button>
       </header>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
-      <div className="mx-5 mt-4 grid grid-cols-3 rounded-2xl bg-roto p-1">
+      <div className="mx-5 mt-4 grid grid-cols-3 rounded-2xl bg-suave p-1">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
           <button key={id} onClick={() => { setTab(id); setReciente(null); }} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
             {l}
@@ -41,7 +41,7 @@ export function NegocioApp() {
       ) : (
         <>
           {reciente && (
-            <div className="animate-rise mx-5 mt-4 flex items-center gap-3 rounded-2xl bg-roto p-4">
+            <div className="animate-rise mx-5 mt-4 flex items-center gap-3 rounded-2xl bg-suave p-4">
               <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
               <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
               <button onClick={() => { dataService.anularVisita(reciente); setReciente(null); setTab("registrar"); }} className="min-h-11 rounded-xl btn-suave px-3 text-sm font-bold">Deshacer</button>
@@ -86,7 +86,7 @@ function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
       <div className="mt-2 grid w-full max-w-xs grid-cols-3 gap-3">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"].map((d) =>
           d === "" ? <span key="x" /> : (
-            <button key={d} onClick={() => (d === "⌫" ? setPin(pin.slice(0, -1)) : pulsar(d))} className="flex min-h-14 items-center justify-center rounded-2xl bg-roto text-2xl font-black active:scale-95">
+            <button key={d} onClick={() => (d === "⌫" ? setPin(pin.slice(0, -1)) : pulsar(d))} className="flex min-h-14 items-center justify-center rounded-2xl bg-suave text-2xl font-black active:scale-95">
               {d === "⌫" ? <Delete size={22} strokeWidth={1.75} /> : d}
             </button>
           ),
@@ -152,7 +152,7 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
       {num && !socio && !noExiste && <p className="mt-3 text-sm text-muted-foreground">Ese número no está en el club.</p>}
       {aviso && <p className="mt-3 rounded-xl border-2 border-gold p-3 font-bold">{aviso}</p>}
       {noExiste && (
-        <div className="mt-3 rounded-2xl bg-roto p-4">
+        <div className="mt-3 rounded-2xl bg-suave p-4">
           <p className="font-bold">Ese número no está en el club. ¿Lo registramos sin número?</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <button onClick={() => guardar(noExiste, true)} className="min-h-14 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Sí</button>
@@ -165,7 +165,7 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
       {hoy.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">Todavía ninguna hoy.</p>
       ) : (
-        <ul className="mt-2 divide-y divide-border rounded-2xl bg-roto px-4">
+        <ul className="mt-2 divide-y divide-border rounded-2xl bg-suave px-4">
           {hoy.map((v) => {
             const s = v.socioId ? dataService.get().socios.find((x) => x.id === v.socioId) : null;
             return (
@@ -205,7 +205,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
   return (
     <section className="px-5 pt-6">
       <span className="label-club inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
-      <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl bg-roto p-1">
+      <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl bg-suave p-1">
         {([["mes", "Este mes"], ["90", "90 días"], ["temporada", "Temporada"]] as const).map(([id, l]) => (
           <button key={id} onClick={() => setRango(id)} className={`min-h-11 rounded-xl text-sm font-bold ${rango === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</button>
         ))}
@@ -217,7 +217,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       </div>
       <div className="mt-3 grid grid-cols-3 gap-3">
         {[["Visitas por el club", s.visitas], ["Repiten por el club", s.repiten], ["% nuevas", `${s.pctNuevas}%`]].map(([l, n]) => (
-          <div key={l} className="rounded-2xl bg-roto p-3">
+          <div key={l} className="rounded-2xl bg-suave p-3">
             <p className="text-3xl font-black">{n}</p>
             <p className="label-club mt-1 text-[11px] text-muted-foreground">{l}</p>
           </div>
@@ -229,12 +229,12 @@ function TuMes({ neg }: { neg: Patrocinador }) {
           <span>5 clientas nuevas en 90 días</span>
           <span>{prog.nuevas}/{prog.objetivo}</span>
         </div>
-        <div className="mt-2 h-3 overflow-hidden rounded-full bg-roto">
+        <div className="mt-2 h-3 overflow-hidden rounded-full bg-suave">
           <div className="h-full rounded-full bg-accent transition-all duration-500" style={{ width: `${prog.pct}%` }} />
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl bg-roto p-4">
+      <div className="mt-6 rounded-2xl bg-suave p-4">
         <p className="label-club text-muted-foreground">Visitas por semana</p>
         <div className="mt-3 flex h-32 items-end gap-2">
           {sem.map((w) => (
