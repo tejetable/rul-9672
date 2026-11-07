@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { PhotoSlot } from "@/components/PhotoSlot";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
-import { dataService } from "@/lib/dataService";
+import { Carne } from "@/components/Carne";
+import { SociasPanel } from "@/components/SociasPanel";
+import { dataService, type Socio } from "@/lib/dataService";
+import { waLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,62 +23,118 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const ROLE_KEY = "rul-demo-role";
+type Sesion = ReturnType<typeof dataService.sesion>;
+
 function Index() {
   const [role, setRole] = useState<Role>("socia");
+  const [sesion, setSesion] = useState<Sesion>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    dataService.get(); // siembra los datos de demostración la primera vez
+    dataService.get();
+    const r = window.localStorage.getItem(ROLE_KEY) as Role | null;
+    if (r) setRole(r);
+    setSesion(dataService.sesion());
+    setReady(true);
   }, []);
 
+  const cambiar = (r: Role) => {
+    window.localStorage.setItem(ROLE_KEY, r);
+    setRole(r);
+    setSesion(dataService.sesion());
+  };
+
+  return (
+    <AppFrame>
+      {ready && role === "socia" && (sesion?.estado === "ok" ? <PantallaCarne socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
+      {ready && role === "directiva" && <SociasPanel />}
+      {ready && role === "negocio" && <Pendiente />}
+      <RoleSwitcher role={role} onChange={cambiar} />
+    </AppFrame>
+  );
+}
+
+export function AppFrame({ children, crema = false }: { children: React.ReactNode; crema?: boolean }) {
   return (
     <div className="min-h-screen bg-primary sm:py-6">
-      <main className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-background sm:min-h-[calc(100vh-3rem)] sm:overflow-hidden sm:rounded-[2rem]">
-        {role === "socia" && <Bienvenida />}
-        {role !== "socia" && <Pendiente role={role} />}
+      <main className={`relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col sm:min-h-[calc(100vh-3rem)] sm:overflow-hidden sm:rounded-[2rem] ${crema ? "hero-crema" : "bg-background"}`}>
+        {children}
       </main>
-      <RoleSwitcher role={role} onChange={setRole} />
     </div>
   );
 }
 
 function Bienvenida() {
+  const [ayuda, setAyuda] = useState(false);
   return (
-    <section className="flex flex-1 flex-col items-center pb-24 text-center">
-      <div className="hero-crema flex w-full flex-col items-center rounded-b-[2.5rem] px-6 pb-10 pt-12">
-      <img
-        src={escudo.url}
-        alt="Escudo del Real Unión Lucense F.S."
-        width={450}
-        height={676}
-        className="crest crest-blend animate-rise w-44"
-      />
+    <section className="hero-crema flex flex-1 flex-col items-center px-6 pb-24 pt-12 text-center">
+      <img src={escudo.url} alt="Escudo del Real Unión Lucense F.S." width={450} height={676} className="crest crest-blend animate-rise w-44" />
       <h1 className="title-club animate-rise mt-8 text-[2.5rem]" style={{ animationDelay: "120ms" }}>
         Más que un club, un grupo de amigos.
       </h1>
       <span className="gold-rule mt-5" />
       <p className="mt-5 text-muted-foreground">Real Unión Lucense F.S. · Guntín (Lugo)</p>
-      </div>
-      <div className="flex w-full flex-col px-6">
 
-      <PhotoSlot label="piña del equipo en el pabellón de Guntín" className="mt-8 aspect-[4/3] w-full" />
+      <PhotoSlot label="piña del equipo en el pabellón de Guntín" className="mt-8 aspect-[4/3] w-full bg-transparent" />
 
       <div className="mt-8 flex w-full flex-col gap-3">
-        <button className="min-h-12 rounded-2xl bg-primary px-6 text-lg font-black uppercase tracking-wide text-primary-foreground transition-opacity duration-200 hover:opacity-90">
+        <a
+          href={waLink("¡Hola! Quiero hacerme socia/o del R.U. Lucense.")}
+          target="_blank"
+          rel="noreferrer"
+          className="flex min-h-12 items-center justify-center rounded-2xl bg-primary px-6 text-lg font-black uppercase tracking-wide text-primary-foreground transition-opacity duration-200 hover:opacity-90"
+        >
           Únete a la familia
-        </button>
-        <button className="min-h-12 rounded-2xl border-2 border-primary px-6 font-bold transition-colors duration-200 hover:bg-roto">
+        </a>
+        <button onClick={() => setAyuda((a) => !a)} className="min-h-12 rounded-2xl border-2 border-primary px-6 font-bold transition-colors duration-200">
           Ya soy socia/o
         </button>
-      </div>
+        {ayuda && (
+          <div className="animate-rise rounded-2xl bg-background/70 p-4 text-left">
+            <p>Busca en tu WhatsApp el enlace que te mandó el club. Si no lo encuentras, pídenos uno nuevo.</p>
+            <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="mt-3 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary font-bold text-primary-foreground">
+              <MessageCircle size={18} strokeWidth={1.75} /> Pedir enlace por WhatsApp
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function Pendiente({ role }: { role: Role }) {
+function PantallaCarne({ socio }: { socio: Socio }) {
+  return (
+    <section className="flex flex-1 flex-col px-6 pb-28 pt-10">
+      <p className="label-club text-accent">Tu carné</p>
+      <h1 className="title-club mt-2 text-4xl">Eres de los nuestros.</h1>
+      <div className="mt-8 animate-rise">
+        <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
+      </div>
+    </section>
+  );
+}
+
+function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
   return (
     <section className="flex flex-1 flex-col justify-center px-6 pb-24">
-      <p className="label-club text-accent">Vista {role === "negocio" ? "Negocio" : "Directiva"}</p>
+      <Smartphone size={32} strokeWidth={1.75} />
+      <h1 className="title-club mt-4 text-3xl">{estado === "movido" ? "Tu carné está en otro móvil" : "Tu carné está desactivado"}</h1>
+      <span className="gold-rule mt-4" />
+      <p className="mt-4">
+        {estado === "movido" ? "Tu carné se ha abierto en otro móvil. Si no has sido tú, habla con el club." : "Habla con el club para volver a activarlo."}
+      </p>
+      <a href={waLink("¡Hola! Tengo un problema con mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary font-bold text-primary-foreground">
+        <MessageCircle size={18} strokeWidth={1.75} /> Hablar con el club
+      </a>
+    </section>
+  );
+}
+
+function Pendiente() {
+  return (
+    <section className="flex flex-1 flex-col justify-center px-6 pb-24">
+      <p className="label-club text-accent">Vista Negocio</p>
       <h1 className="title-club mt-2 text-4xl">Estamos montándola.</h1>
       <span className="gold-rule mt-4" />
       <p className="mt-4 text-muted-foreground">Esta parte llega en el siguiente paso.</p>
