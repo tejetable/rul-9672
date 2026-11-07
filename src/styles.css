@@ -61,6 +61,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-gold: var(--gold);
   --color-roto: var(--roto);
+  --color-crema: var(--crema);
   --color-verde: var(--verde);
   --color-esmeralda: var(--esmeralda);
   --font-sans: var(--font-lato);
@@ -73,6 +74,7 @@
   --esmeralda: oklch(0.62 0.12 160);      /* #28A073 */
   --roto: oklch(0.977 0.004 145);         /* #F7F9F7 */
   --oro: oklch(0.67 0.09 75);             /* #B98E4A */
+  --crema: oklch(0.887 0.032 72);         /* fondo del bordado del escudo */
   --background: oklch(1 0 0);
   --foreground: var(--verde);
   --card: var(--roto);
@@ -164,4 +166,16 @@
 
 @utility animate-rise {
   animation: rise-in 600ms cubic-bezier(.2,.7,.2,1) both;
+}
+
+@utility crest-blend {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 4%, #000 96%, transparent 100%), linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 4%, #000 96%, transparent 100%), linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  mask-composite: intersect;
+}
+
+@utility hero-crema {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, color-mix(in oklab, var(--crema) 70%, white) 0%, var(--crema) 75%);
 }
