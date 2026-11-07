@@ -117,7 +117,7 @@ export function SociasPanel() {
                     enviar(n);
                   }
                 }}
-                className="min-h-11 flex-1 rounded-xl border border-primary text-sm font-bold"
+                className="min-h-11 flex-1 rounded-xl btn-suave text-sm font-bold"
               >
                 Reenviar invitación
               </button>

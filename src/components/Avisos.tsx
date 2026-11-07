@@ -41,7 +41,7 @@ export function AvisosPanel() {
     setTitulo(""); setTexto(""); refrescar();
   };
 
-  const chip = (on: boolean) => `min-h-11 rounded-xl px-3 text-sm font-bold ${on ? "bg-primary text-primary-foreground" : "border-2 border-primary bg-background"}`;
+  const chip = (on: boolean) => `min-h-11 rounded-xl px-3 text-sm font-bold ${on ? "bg-primary text-primary-foreground" : "btn-suave"}`;
 
   return (
     <section className="px-5 pb-32 pt-6">
