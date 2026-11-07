@@ -89,7 +89,7 @@ function Inicio({ db, socio, irA }: { db: DB; socio: Socio; irA: (t: Tab) => voi
       )}
 
       {nueva && patNueva && (
-        <button onClick={() => irA("ventajas")} className="mt-4 flex w-full items-center gap-4 rounded-2xl bg-roto p-5 text-left">
+        <button onClick={() => irA("ventajas")} className="mt-4 flex w-full items-center gap-4 rounded-2xl bg-suave p-5 text-left">
           <span className="title-club text-3xl text-accent">{nueva.destacado}</span>
           <span className="flex-1">
             <span className="label-club block text-muted-foreground">{patNueva.nombre}</span>
@@ -121,7 +121,7 @@ function Ventajas({ db }: { db: DB }) {
         <span className="gold-rule mt-4" />
         <div className="mt-6 space-y-4">
           {vs.map((v) => (
-            <div key={v.id} className="rounded-2xl bg-roto p-5">
+            <div key={v.id} className="rounded-2xl bg-suave p-5">
               <p className="title-club text-4xl text-accent">{v.destacado}</p>
               <p className="mt-2 text-lg font-bold">{v.titulo}</p>
               <p className="mt-1">{v.descripcion}</p>
@@ -165,7 +165,7 @@ function Ventajas({ db }: { db: DB }) {
           const vs = db.ventajas.filter((v) => v.patrocinadorId === pt.id && v.activa);
           return (
             <li key={pt.id}>
-              <button onClick={() => setSel(pt.id)} className="flex w-full items-center gap-4 rounded-2xl bg-roto p-4 text-left transition-transform duration-200 active:scale-[.98]">
+              <button onClick={() => setSel(pt.id)} className="flex w-full items-center gap-4 rounded-2xl bg-suave p-4 text-left transition-transform duration-200 active:scale-[.98]">
                 <span className={`flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary font-black text-primary-foreground ${(vs[0]?.destacado?.length ?? 0) > 4 ? "text-[11px] uppercase" : "text-lg"}`}>
                   {vs[0]?.destacado}
                 </span>

@@ -99,7 +99,7 @@ function Bienvenida() {
           Ya soy socia/o
         </button>
         {ayuda && (
-          <div className="animate-rise rounded-2xl bg-roto p-4 text-left">
+          <div className="animate-rise rounded-2xl bg-suave p-4 text-left">
             <p>Busca en tu WhatsApp el enlace que te mandó el club. Si no lo encuentras, pídenos uno nuevo.</p>
             <div className="mt-3 flex gap-2">
               <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-2 text-sm font-bold text-primary-foreground">
@@ -136,7 +136,7 @@ function Directiva() {
   const [t, setT] = useState<"socias" | "patro" | "avisos">("socias");
   return (
     <div className="flex flex-1 flex-col">
-      <div className="mx-5 mt-5 grid grid-cols-3 rounded-2xl bg-roto p-1">
+      <div className="mx-5 mt-5 grid grid-cols-3 rounded-2xl bg-suave p-1">
         {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
           <button key={id} onClick={() => setT(id)} className={`min-h-11 rounded-xl text-sm font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</button>
         ))}

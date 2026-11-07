@@ -15,7 +15,7 @@ export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
       {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
       <ul className="mt-6 space-y-3">
         {avisos.map((a) => (
-          <li key={a.id} className="rounded-2xl bg-roto p-4">
+          <li key={a.id} className="rounded-2xl bg-suave p-4">
             <p className="label-club text-accent">{TIPO[a.tipo]} · {new Date(a.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</p>
             <p className="mt-1 font-black">{a.titulo}</p>
             <p className="mt-1 whitespace-pre-line">{a.texto}</p>
@@ -64,7 +64,7 @@ export function AvisosPanel() {
       <h2 className="label-club mt-10 text-muted-foreground">Avisos publicados</h2>
       <ul className="mt-2 space-y-3">
         {avisos.map((a) => (
-          <li key={a.id} className="flex items-start gap-3 rounded-2xl bg-roto p-4">
+          <li key={a.id} className="flex items-start gap-3 rounded-2xl bg-suave p-4">
             <div className="flex-1">
               <p className="label-club text-accent">{TIPO[a.tipo]} · {PARA[a.para ?? "todos"]}</p>
               <p className="mt-1 font-black">{a.titulo}</p>

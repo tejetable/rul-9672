@@ -41,7 +41,7 @@ export function PatrocinadoresPanel() {
           const s = estadisticas(db.visitas, p.id, desde);
           const prog = progresoObjetivo(db.visitas, p.id);
           return (
-            <li key={p.id} className="rounded-2xl bg-roto p-4">
+            <li key={p.id} className="rounded-2xl bg-suave p-4">
               <p className="font-black">{p.nombre}</p>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                 {[["Visitas", s.visitas], ["Nuevas verif.", s.nuevasVerificadas], ["Nuevas decl.", s.nuevasDeclaradas], ["Repiten", s.repiten], ["% nuevas", `${s.pctNuevas}%`], ["90 días", `${prog.nuevas}/5`]].map(([l, n]) => (

@@ -10,7 +10,7 @@ export function Carne({ nombre, numero, temporada = "2026/27" }: { nombre: strin
       <p className="label-club mt-5 opacity-80">Socia/o de la temporada {temporada}</p>
       <p className="title-club mt-3 text-3xl">{nombre}</p>
       <p className="mt-4 text-5xl font-black text-gold">Nº {String(numero).padStart(3, "0")}</p>
-      <div className="mx-auto mt-5 w-fit rounded-xl bg-roto p-3">
+      <div className="mx-auto mt-5 w-fit rounded-xl bg-suave p-3">
         <QRCodeSVG value={`RUL:${numero}`} size={112} fgColor="#0D4631" bgColor="#F7F9F7" />
       </div>
       <p className="mx-auto mt-2 max-w-56 text-xs opacity-80">Enséñalo en el comercio: lo escanean desde su pantalla del club y tu visita suma.</p>
