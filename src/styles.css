@@ -75,11 +75,11 @@
   --roto: oklch(0.977 0.004 145);         /* #F7F9F7 */
   --oro: oklch(0.67 0.09 75);             /* #B98E4A */
   --crema: oklch(0.887 0.032 72);         /* fondo del bordado del escudo */
-  --background: oklch(1 0 0);
+  --background: var(--crema);
   --foreground: var(--verde);
   --card: var(--roto);
   --card-foreground: var(--verde);
-  --popover: oklch(1 0 0);
+  --popover: var(--roto);
   --popover-foreground: var(--verde);
   --primary: var(--verde);
   --primary-foreground: oklch(1 0 0);

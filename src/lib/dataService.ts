@@ -33,6 +33,8 @@ export interface Ventaja {
   activa: boolean;
   fechaInicio: string;
   fechaFin: string;
+  destacado?: string;
+  tarifas?: { servicio: string; normal: string; socio: string }[];
 }
 export interface Canje {
   id: string;
@@ -70,7 +72,7 @@ export interface DB {
   socioActualId: string | null;
 }
 
-const KEY = "rul-demo-db-v2";
+const KEY = "rul-demo-db-v3";
 const DEVICE_KEY = "rul-device-id";
 const SESSION_KEY = "rul-session-socio";
 
@@ -98,20 +100,43 @@ function seed(): DB {
     dispositivoId: "demo-seed",
     cambioDispositivo: false,
   }));
+  const pend = "[Dirección pendiente]";
   const patrocinadores: Patrocinador[] = [
-    { id: "p1", nombre: "[Tienda de uñas – nombre pendiente]", categoria: "Estética", logoUrl: "", direccion: "[Dirección pendiente], Guntín", pin: "1234", activo: true },
-    { id: "p2", nombre: "[Patrocinador piloto 2 – pendiente]", categoria: "[Categoría pendiente]", logoUrl: "", direccion: "[Dirección pendiente], Lugo", pin: "5678", activo: true },
+    { id: "p1", nombre: "EFG Parquets", categoria: "Parquets y suelos", logoUrl: "", direccion: pend, pin: "1111", activo: true },
+    { id: "p2", nombre: "Noel López Pinín · Nutrición", categoria: "Nutrición", logoUrl: "", direccion: pend, pin: "2222", activo: true },
+    { id: "p3", nombre: "BajoCero · Mauro Busi", categoria: "Fisio, entreno y estética", logoUrl: "", direccion: pend, pin: "3333", activo: true },
+    { id: "p4", nombre: "Psicotécnico San Roque", categoria: "Psicotécnicos", logoUrl: "", direccion: pend, pin: "4444", activo: true },
+    { id: "p5", nombre: "Clínica Dinam", categoria: "Salud", logoUrl: "", direccion: pend, pin: "5555", activo: true },
   ];
+  const T = { activa: true, fechaInicio: "2026-09-01", fechaFin: "2027-06-30" };
   const ventajas: Ventaja[] = [
-    { id: "v1", patrocinadorId: "p1", titulo: "[Ventaja pendiente de acordar]", descripcion: "[Descripción pendiente]", condiciones: "Una vez al día por socia/o. Enseña tu carné en el mostrador.", activa: true, fechaInicio: "2026-09-01", fechaFin: "2027-06-30" },
-    { id: "v2", patrocinadorId: "p2", titulo: "[Ventaja pendiente de acordar]", descripcion: "[Descripción pendiente]", condiciones: "Una vez al día por socia/o.", activa: true, fechaInicio: "2026-09-01", fechaFin: "2027-06-30" },
+    { id: "v1", patrocinadorId: "p1", destacado: "10 %", titulo: "En trabajos de EFG Parquets", descripcion: "Para que tu casa también juegue en casa.", condiciones: "Enseña tu carné al pedir presupuesto.", ...T },
+    { id: "v2", patrocinadorId: "p2", destacado: "15 %", titulo: "En asesoría mensual", descripcion: "De 90 € a 76,50 € al mes.", condiciones: "Enseña tu carné al empezar la asesoría.", ...T },
+    { id: "v3", patrocinadorId: "p3", destacado: "10 %", titulo: "Primera sesión de fisioterapia", descripcion: "En tu primera visita.", condiciones: "Solo en la primera sesión.", ...T },
+    { id: "v4", patrocinadorId: "p3", destacado: "10 %", titulo: "Primera mensualidad de entrenamiento", descripcion: "Incluye una sesión de prueba gratis.", condiciones: "Solo en la primera mensualidad.", ...T },
+    { id: "v5", patrocinadorId: "p3", destacado: "10 %", titulo: "Bonos de estética", descripcion: "Incluye diagnóstico gratis.", condiciones: "Enseña tu carné al comprar el bono.", ...T },
+    { id: "v6", patrocinadorId: "p4", destacado: "5 €", titulo: "Menos en tu psicotécnico", descripcion: "Con tu carné de socia/o.", condiciones: "Enseña tu carné al pedir cita.", ...T },
+    {
+      id: "v7", patrocinadorId: "p5", destacado: "Tarifas", titulo: "Tarifas de socia/o en consultas y pruebas", descripcion: "Y 5 € menos en psicotécnicos con tu carné.", condiciones: "Di que eres socia/o al pedir cita. Analítica básica con cita previa martes y jueves.", ...T,
+      tarifas: [
+        { servicio: "Consulta medicina general", normal: "50 €", socio: "40 €" },
+        { servicio: "Revisión medicina general", normal: "30 €", socio: "25 €" },
+        { servicio: "Electrocardiograma (ECG)", normal: "20 €", socio: "15 €" },
+        { servicio: "Audiometría", normal: "15 €", socio: "12 €" },
+        { servicio: "Espirometría", normal: "15 €", socio: "12 €" },
+        { servicio: "Radiografía · 1 proyección", normal: "20 €", socio: "18 €" },
+        { servicio: "Radiografía · 2 proyecciones", normal: "32 €", socio: "30 €" },
+        { servicio: "Reconocimiento deportivo", normal: "35 €", socio: "25 €" },
+        { servicio: "Analítica básica", normal: "65 €", socio: "40 €" },
+      ],
+    },
   ];
   // 26 canjes repartidos en 8 semanas
   const canjes: Canje[] = [];
   const visto = new Set<string>();
   for (let i = 0; i < 26; i++) {
     const socio = socios[(i * 7) % socios.length]!;
-    const pat = i % 3 === 0 ? "p2" : "p1";
+    const pat = `p${(i % 5) + 1}`;
     const k = socio.id + pat;
     const primero = !visto.has(k);
     visto.add(k);
@@ -119,7 +144,7 @@ function seed(): DB {
       id: `c${i + 1}`,
       socioId: socio.id,
       patrocinadorId: pat,
-      ventajaId: pat === "p1" ? "v1" : "v2",
+      ventajaId: ventajas.find((v) => v.patrocinadorId === pat)!.id,
       fechaHora: new Date(now.getTime() - Math.floor((i / 26) * 56 + 1) * 86400000).toISOString(),
       primeraVezDeclarada: primero && i % 4 !== 0,
       primerCanjeSistema: primero,
@@ -127,7 +152,7 @@ function seed(): DB {
   }
   const partidos: Partido[] = [
     { id: "m1", rival: "[Rival]", fechaHora: "", lugar: "Pabellón de Guntín", esLocal: true, golesLocal: null, golesVisitante: null, jugado: true },
-    { id: "m2", rival: "[Rival]", fechaHora: "", lugar: "Pabellón de Guntín", esLocal: true, golesLocal: null, golesVisitante: null, jugado: false },
+    { id: "m2", rival: "Abella F.C.", fechaHora: "", lugar: "[Pabellón pendiente]", esLocal: true, golesLocal: null, golesVisitante: null, jugado: false },
   ];
   const avisos: Aviso[] = [
     { id: "a1", titulo: "Arrancamos temporada", texto: "Primera temporada en Primera Futgal. Te esperamos en Guntín.", fecha: now.toISOString(), tipo: "club" },
