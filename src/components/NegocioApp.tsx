@@ -9,12 +9,13 @@ import { waLink } from "@/lib/whatsapp";
 export function NegocioApp() {
   const [neg, setNeg] = useState<Patrocinador | null | undefined>(undefined);
   const [tab, setTab] = useState<"registrar" | "mes">("registrar");
+  const [reciente, setReciente] = useState<string | null>(null);
   useEffect(() => setNeg(dataService.negocioSesion()), []);
   if (neg === undefined) return null;
   if (!neg) return <Pin onOk={(p) => { dataService.abrirNegocio(p.id); setNeg(p); }} />;
 
   return (
-    <div className="flex flex-1 flex-col pb-32">
+    <div className="flex flex-1 flex-col pb-16">
       <header className="flex items-center gap-3 px-5 pt-5">
         <img src={escudo.url} alt="Escudo del R.U. Lucense" width={450} height={676} className="crest crest-blend h-10 w-auto" />
         <span className="flex-1">
@@ -27,12 +28,26 @@ export function NegocioApp() {
       </header>
       <div className="mx-5 mt-4 grid grid-cols-2 rounded-2xl bg-roto p-1">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"]] as const).map(([id, l]) => (
-          <button key={id} onClick={() => setTab(id)} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
+          <button key={id} onClick={() => { setTab(id); setReciente(null); }} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
             {l}
           </button>
         ))}
       </div>
-      {tab === "registrar" ? <Registrar neg={neg} /> : <TuMes neg={neg} />}
+      {tab === "registrar" ? (
+        <Registrar neg={neg} onHecho={(id) => { setReciente(id); setTab("mes"); }} />
+      ) : (
+        <>
+          {reciente && (
+            <div className="animate-rise mx-5 mt-4 flex items-center gap-3 rounded-2xl bg-roto p-4">
+              <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
+              <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
+              <button onClick={() => { dataService.anularVisita(reciente); setReciente(null); setTab("registrar"); }} className="min-h-11 rounded-xl border-2 border-primary px-3 text-sm font-bold">Deshacer</button>
+            </div>
+          )}
+          <TuMes key={reciente ?? "x"} neg={neg} />
+          <button onClick={() => { setReciente(null); setTab("registrar"); }} className="mx-5 mt-6 min-h-14 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Registrar otra visita</button>
+        </>
+      )}
     </div>
   );
 }
@@ -79,17 +94,15 @@ function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
   );
 }
 
-type Paso = { k: "quien" } | { k: "noExiste" } | { k: "tipo"; socio: Socio | null; origen: Visita["origen"] } | { k: "hecho" };
 
-function Registrar({ neg }: { neg: Patrocinador }) {
-  const [paso, setPaso] = useState<Paso>({ k: "quien" });
+function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) => void }) {
   const [num, setNum] = useState("");
   const [socio, setSocio] = useState<Socio | null>(null);
+  const [origen, setOrigen] = useState<Visita["origen"]>("numero");
   const [aviso, setAviso] = useState<string | null>(null);
+  const [noExiste, setNoExiste] = useState<Visita["tipoCliente"] | null>(null);
   const [scan, setScan] = useState(false);
-  const [ultima, setUltima] = useState<{ id: string; t: number } | null>(null);
   const [hoy, setHoy] = useState<Visita[]>([]);
-  const [, tick] = useState(0);
 
   const refrescar = useCallback(() => {
     const d = new Date().toDateString();
@@ -97,127 +110,55 @@ function Registrar({ neg }: { neg: Patrocinador }) {
   }, [neg.id]);
   useEffect(refrescar, [refrescar]);
 
-  useEffect(() => {
-    if (!ultima) return;
-    const i = setInterval(() => {
-      tick((x) => x + 1);
-      if (Date.now() - ultima.t > 10000) setUltima(null);
-    }, 500);
-    return () => clearInterval(i);
-  }, [ultima]);
-
-  const reset = () => { setPaso({ k: "quien" }); setNum(""); setSocio(null); setAviso(null); };
-
-  const buscar = (n: string) => {
-    setNum(n);
-    setAviso(null);
+  const buscar = (n: string, o: Visita["origen"] = "numero") => {
+    setNum(n); setOrigen(o); setAviso(null); setNoExiste(null);
     const s = n ? dataService.socioPorNumero(Number(n)) : null;
     setSocio(s);
     if (s && dataService.yaHoy(neg.id, s.id)) setAviso("Esta visita ya está registrada hoy.");
   };
 
-  const seguir = (origen: Visita["origen"]) => {
-    if (num && !socio) return setPaso({ k: "noExiste" });
-    if (socio && dataService.yaHoy(neg.id, socio.id)) return;
-    setPaso({ k: "tipo", socio, origen: socio ? origen : "sin_carne" });
-  };
+  const onScan = useCallback((n: number) => { setScan(false); buscar(String(n), "qr"); }, [neg.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onScan = useCallback((n: number) => {
-    setScan(false);
-    const s = dataService.socioPorNumero(n);
-    setNum(String(n));
-    setSocio(s);
-    if (!s) return setPaso({ k: "noExiste" });
-    if (dataService.yaHoy(neg.id, s.id)) return setAviso("Esta visita ya está registrada hoy.");
-    setPaso({ k: "tipo", socio: s, origen: "qr" });
-  }, [neg.id]);
-
-  const guardar = (tipo: Visita["tipoCliente"]) => {
-    if (paso.k !== "tipo") return;
-    const r = dataService.registrarVisita({ patrocinadorId: neg.id, socio: paso.socio, origen: paso.origen, tipoCliente: tipo });
-    if (r === "duplicada") { setAviso("Esta visita ya está registrada hoy."); setPaso({ k: "quien" }); return; }
-    setUltima({ id: r.id, t: Date.now() });
-    setPaso({ k: "hecho" });
+  const guardar = (tipo: Visita["tipoCliente"], forzarSinNumero = false) => {
+    if (aviso) return;
+    if (num && !socio && !forzarSinNumero) return setNoExiste(tipo);
+    const s = forzarSinNumero ? null : socio;
+    const r = dataService.registrarVisita({ patrocinadorId: neg.id, socio: s, origen: s ? origen : "sin_carne", tipoCliente: tipo });
+    if (r === "duplicada") return setAviso("Esta visita ya está registrada hoy.");
     refrescar();
-    setTimeout(reset, 3000);
+    onHecho(r.id);
   };
 
-  const big = "flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl text-lg font-black uppercase transition-transform duration-200 active:scale-[.98]";
+  const big = "flex min-h-20 w-full items-center justify-center gap-2 rounded-2xl text-xl font-black uppercase transition-transform duration-200 active:scale-[.98] disabled:opacity-40";
+  const repite = socio && dataService.repite(neg.id, socio.id);
 
   return (
-    <section className="px-5 pt-6">
+    <section className="flex flex-1 flex-col px-5 pt-6">
       {scan && <QrScanner onResult={onScan} onClose={() => setScan(false)} />}
-
-      {paso.k === "quien" && (
-        <div className="animate-rise">
-          <p className="label-club text-accent">Paso 1 · ¿Quién es?</p>
-          <button onClick={() => setScan(true)} className={`${big} mt-3 min-h-20 bg-primary text-primary-foreground`}>
-            <QrCode size={28} strokeWidth={1.75} /> Escanear carné
-          </button>
-          <label className="label-club mt-5 block">Nº de socio (opcional)</label>
-          <div className="mt-1 flex gap-2">
-            <input value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Ej. 12" className="min-h-14 flex-1 rounded-2xl border-2 border-input bg-background px-4 text-2xl font-black" />
-            <button onClick={() => seguir("numero")} disabled={!num || !!aviso} className="min-h-14 rounded-2xl bg-primary px-5 font-black uppercase text-primary-foreground disabled:opacity-40">
-              Seguir
-            </button>
-          </div>
-          {socio && !aviso && <p className="mt-3 flex items-center gap-2 text-lg font-black text-accent"><Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}</p>}
-          {aviso && <p className="mt-3 rounded-xl border-2 border-gold p-3 font-bold">{aviso}</p>}
-          <button onClick={() => { setNum(""); setSocio(null); setPaso({ k: "tipo", socio: null, origen: "sin_carne" }); }} className="mt-4 min-h-11 text-sm font-bold underline">
-            No tiene carné / viene de parte del club
-          </button>
-          {ultima && (
-            <div className="mt-4 flex items-center justify-between rounded-2xl bg-roto p-3">
-              <span className="text-sm">Visita registrada.</span>
-              <button onClick={() => { dataService.anularVisita(ultima.id); setUltima(null); refrescar(); }} className="min-h-11 rounded-xl border-2 border-primary px-4 font-bold">
-                Deshacer ({Math.max(0, 10 - Math.floor((Date.now() - ultima.t) / 1000))})
-              </button>
-            </div>
-          )}
-        </div>
+      <button onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
+        <QrCode size={28} strokeWidth={1.75} /> Escanear carné
+      </button>
+      <label className="label-club mt-5 block">Nº de socio (opcional)</label>
+      <input value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Si no tiene carné, déjalo vacío" className="mt-1 min-h-14 w-full rounded-2xl border-2 border-input bg-background px-4 text-xl font-black placeholder:text-base placeholder:font-normal" />
+      {socio && !aviso && (
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-lg font-black text-accent">
+          <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}
+          {repite && <span className="label-club rounded-full bg-accent px-3 py-1 text-accent-foreground">Repite por el club</span>}
+        </p>
       )}
-
-      {paso.k === "noExiste" && (
-        <div className="animate-rise">
-          <p className="text-xl font-black">Ese número no está en el club. ¿Lo registramos sin número?</p>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <button onClick={() => { setSocio(null); setNum(""); setPaso({ k: "tipo", socio: null, origen: "sin_carne" }); }} className={`${big} bg-primary text-primary-foreground`}>Sí</button>
-            <button onClick={() => setPaso({ k: "quien" })} className={`${big} border-2 border-primary bg-background`}>Corregir</button>
+      {num && !socio && !noExiste && <p className="mt-3 text-sm text-muted-foreground">Ese número no está en el club.</p>}
+      {aviso && <p className="mt-3 rounded-xl border-2 border-gold p-3 font-bold">{aviso}</p>}
+      {noExiste && (
+        <div className="mt-3 rounded-2xl bg-roto p-4">
+          <p className="font-bold">Ese número no está en el club. ¿Lo registramos sin número?</p>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <button onClick={() => guardar(noExiste, true)} className="min-h-14 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Sí</button>
+            <button onClick={() => { setNoExiste(null); setNum(""); setSocio(null); }} className="min-h-14 rounded-2xl border-2 border-primary bg-background font-black uppercase">Corregir</button>
           </div>
         </div>
       )}
 
-      {paso.k === "tipo" && (
-        <div className="animate-rise">
-          <p className="label-club text-accent">Paso 2</p>
-          <p className="title-club mt-2 text-3xl">¿Ya era clienta tuya antes?</p>
-          <p className="mt-3 font-bold">{paso.socio ? `${paso.socio.nombre} · Socia nº ${paso.socio.numeroSocio}` : "Sin carné"}</p>
-          {paso.socio && dataService.repite(neg.id, paso.socio.id) && (
-            <span className="label-club mt-2 inline-block rounded-full bg-accent px-3 py-1 text-accent-foreground">Repite por el club</span>
-          )}
-          <div className="mt-5 flex flex-col gap-3">
-            <button onClick={() => guardar("nueva")} className={`${big} min-h-20 bg-primary text-2xl text-primary-foreground`}>Nueva</button>
-            <button onClick={() => guardar("ya_era_clienta")} className={`${big} min-h-20 border-2 border-primary bg-background text-2xl`}>Ya era clienta</button>
-          </div>
-          <button onClick={reset} className="mt-4 min-h-11 text-sm font-bold underline">Volver</button>
-        </div>
-      )}
-
-      {paso.k === "hecho" && (
-        <div className="flex flex-col items-center py-10 text-center">
-          <span className="animate-check flex size-24 items-center justify-center rounded-full bg-accent text-accent-foreground">
-            <Check size={56} strokeWidth={3} />
-          </span>
-          <p className="title-club mt-6 text-2xl">Hecho. Gracias por apoyar a quien nos apoya.</p>
-          {ultima && (
-            <button onClick={() => { dataService.anularVisita(ultima.id); setUltima(null); refrescar(); reset(); }} className="mt-6 min-h-11 rounded-xl border-2 border-primary px-5 font-bold">
-              Deshacer
-            </button>
-          )}
-        </div>
-      )}
-
-      <h2 className="label-club mt-10 text-muted-foreground">Últimas visitas de hoy</h2>
+      <h2 className="label-club mt-8 text-muted-foreground">Últimas visitas de hoy</h2>
       {hoy.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">Todavía ninguna hoy.</p>
       ) : (
@@ -235,6 +176,14 @@ function Registrar({ neg }: { neg: Patrocinador }) {
           })}
         </ul>
       )}
+
+      <div className="sticky bottom-0 -mx-5 mt-auto bg-background px-5 pb-5 pt-4">
+        <p className="label-club mb-2 text-center text-accent">¿Ya era clienta tuya antes? Pulsa y queda registrada</p>
+        <div className="grid grid-cols-2 gap-3">
+          <button onClick={() => guardar("nueva")} disabled={!!aviso || !!noExiste} className={`${big} bg-primary text-primary-foreground`}>Nueva</button>
+          <button onClick={() => guardar("ya_era_clienta")} disabled={!!aviso || !!noExiste} className={`${big} border-2 border-primary bg-background text-lg`}>Ya era clienta</button>
+        </div>
+      </div>
     </section>
   );
 }
