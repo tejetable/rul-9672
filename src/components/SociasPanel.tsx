@@ -94,7 +94,7 @@ export function SociasPanel() {
 
       <ul className="mt-4 flex flex-col gap-3">
         {lista.map((s) => (
-          <li key={s.id} className="rounded-2xl bg-roto p-4">
+          <li key={s.id} className="rounded-2xl bg-suave p-4">
             <div className="flex items-center justify-between gap-2">
               <div>
                 <p className="font-bold">{s.nombre}</p>
@@ -117,7 +117,7 @@ export function SociasPanel() {
                     enviar(n);
                   }
                 }}
-                className="min-h-11 flex-1 rounded-xl btn-suave text-sm font-bold"
+                className="min-h-11 flex-1 rounded-xl border border-primary text-sm font-bold"
               >
                 Reenviar invitación
               </button>
