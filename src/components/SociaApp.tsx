@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, Home, IdCard, MapPin } from "lucide-react";
+import { ContactarClub } from "@/components/ContactarClub";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
@@ -21,6 +22,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
         <img src={escudo.url} alt="Escudo del R.U. Lucense" width={450} height={676} className="crest crest-blend h-10 w-auto" />
         <span className="label-club">R.U. Lucense</span>
       </header>
+      <ContactarClub texto={`Hola, soy socia/o del R.U. Lucense y quería consultaros algo.`} />
       <div className="flex-1 pb-36">
         {tab === "inicio" && <Inicio db={db} socio={socio} irA={setTab} />}
         {tab === "carne" && (
