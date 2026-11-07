@@ -57,7 +57,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (n: number) => void
       ) : (
         <>
           <video ref={video} playsInline muted className="aspect-square w-full max-w-sm rounded-3xl object-cover" />
-          <p className="label-club mt-4">Apunta al QR del carné</p>
+          <p className="label-club mt-4">Apunta al QR del carnet</p>
         </>
       )}
     </div>

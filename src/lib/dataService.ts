@@ -116,14 +116,14 @@ function seed(): DB {
   ];
   const T = { activa: true, fechaInicio: "2026-09-01", fechaFin: "2027-06-30" };
   const ventajas: Ventaja[] = [
-    { id: "v1", patrocinadorId: "p1", destacado: "10 %", titulo: "En trabajos de EFG Parquets", descripcion: "Para que tu casa también juegue en casa.", condiciones: "Enseña tu carné al pedir presupuesto.", ...T },
-    { id: "v2", patrocinadorId: "p2", destacado: "15 %", titulo: "En asesoría mensual", descripcion: "De 90 € a 76,50 € al mes.", condiciones: "Enseña tu carné al empezar la asesoría.", ...T },
+    { id: "v1", patrocinadorId: "p1", destacado: "10 %", titulo: "En trabajos de EFG Parquets", descripcion: "Para que tu casa también juegue en casa.", condiciones: "Enseña tu carnet al pedir presupuesto.", ...T },
+    { id: "v2", patrocinadorId: "p2", destacado: "15 %", titulo: "En asesoría mensual", descripcion: "De 90 € a 76,50 € al mes.", condiciones: "Enseña tu carnet al empezar la asesoría.", ...T },
     { id: "v3", patrocinadorId: "p3", destacado: "10 %", titulo: "Primera sesión de fisioterapia", descripcion: "En tu primera visita.", condiciones: "Solo en la primera sesión.", ...T },
     { id: "v4", patrocinadorId: "p3", destacado: "10 %", titulo: "Primera mensualidad de entrenamiento", descripcion: "Incluye una sesión de prueba gratis.", condiciones: "Solo en la primera mensualidad.", ...T },
-    { id: "v5", patrocinadorId: "p3", destacado: "10 %", titulo: "Bonos de estética", descripcion: "Incluye diagnóstico gratis.", condiciones: "Enseña tu carné al comprar el bono.", ...T },
-    { id: "v6", patrocinadorId: "p4", destacado: "5 €", titulo: "Menos en tu psicotécnico", descripcion: "Con tu carné de socia/o.", condiciones: "Enseña tu carné al pedir cita.", ...T },
+    { id: "v5", patrocinadorId: "p3", destacado: "10 %", titulo: "Bonos de estética", descripcion: "Incluye diagnóstico gratis.", condiciones: "Enseña tu carnet al comprar el bono.", ...T },
+    { id: "v6", patrocinadorId: "p4", destacado: "5 €", titulo: "Menos en tu psicotécnico", descripcion: "Con tu carnet de socia/o.", condiciones: "Enseña tu carnet al pedir cita.", ...T },
     {
-      id: "v7", patrocinadorId: "p5", destacado: "Tarifas", titulo: "Tarifas de socia/o en consultas y pruebas", descripcion: "Y 5 € menos en psicotécnicos con tu carné.", condiciones: "Di que eres socia/o al pedir cita. Analítica básica con cita previa martes y jueves.", ...T,
+      id: "v7", patrocinadorId: "p5", destacado: "Tarifas", titulo: "Tarifas de socia/o en consultas y pruebas", descripcion: "Y 5 € menos en psicotécnicos con tu carnet.", condiciones: "Di que eres socia/o al pedir cita. Analítica básica con cita previa martes y jueves.", ...T,
       tarifas: [
         { servicio: "Consulta medicina general", normal: "50 €", socio: "40 €" },
         { servicio: "Revisión medicina general", normal: "30 €", socio: "25 €" },
@@ -262,7 +262,7 @@ export const dataService = {
     }
     return d;
   },
-  /** Un carné, un móvil: activar en otro dispositivo mueve el carné aquí */
+  /** Un carnet, un móvil: activar en otro dispositivo mueve el carnet aquí */
   activar(token: string): Socio | null {
     const s = this.porToken(token);
     if (!s) return null;
@@ -280,7 +280,7 @@ export const dataService = {
     window.localStorage.setItem(SESSION_KEY, s.id);
     return r;
   },
-  /** Sesión de este móvil: carné propio, movido a otro móvil, o ninguno */
+  /** Sesión de este móvil: carnet propio, movido a otro móvil, o ninguno */
   sesion(): { socio: Socio; estado: "ok" | "movido" | "desactivada" } | null {
     const id = window.localStorage.getItem(SESSION_KEY);
     if (!id) return null;
@@ -290,7 +290,7 @@ export const dataService = {
     if (s.dispositivoId !== this.dispositivoId()) return { socio: s, estado: "movido" };
     return { socio: s, estado: "ok" };
   },
-  /** Cierra la sesión de este móvil (el carné sigue activo en el club) */
+  /** Cierra la sesión de este móvil (el carnet sigue activo en el club) */
   cerrarSesion() {
     window.localStorage.removeItem(SESSION_KEY);
   },

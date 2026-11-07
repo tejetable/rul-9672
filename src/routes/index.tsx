@@ -15,10 +15,10 @@ import { waLink } from "@/lib/whatsapp";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "R.U. Lucense · Carné de la afición" },
-      { name: "description", content: "Tu carné de socia/o del Real Unión Lucense F.S. y lo que te da ser de los nuestros en Guntín." },
-      { property: "og:title", content: "R.U. Lucense · Carné de la afición" },
-      { property: "og:description", content: "Más que un club, un grupo de amigos. Tu carné y tus ventajas en el móvil." },
+      { title: "R.U. Lucense · Carnet de la afición" },
+      { name: "description", content: "Tu carnet de socia/o del Real Unión Lucense F.S. y lo que te da ser de los nuestros en Guntín." },
+      { property: "og:title", content: "R.U. Lucense · Carnet de la afición" },
+      { property: "og:description", content: "Más que un club, un grupo de amigos. Tu carnet y tus ventajas en el móvil." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -123,7 +123,7 @@ function Bienvenida() {
           <div className="animate-rise rounded-2xl bg-suave p-4 text-left">
             <p>Busca en tu WhatsApp el enlace que te mandó el club. Si no lo encuentras, pídenos uno nuevo.</p>
             <div className="mt-3 flex gap-2">
-              <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-2 text-sm font-bold text-primary-foreground">
+              <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carnet del R.U. Lucense.")} target="_blank" rel="noreferrer" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-2 text-sm font-bold text-primary-foreground">
                 <MessageCircle size={18} strokeWidth={1.75} /> Pedir enlace
               </a>
               <button onClick={simular} className="min-h-11 flex-1 rounded-xl border-2 border-dashed border-primary px-2 text-sm font-bold">
@@ -141,12 +141,12 @@ function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
   return (
     <section className="flex flex-1 flex-col justify-center px-6 pb-24">
       <Smartphone size={32} strokeWidth={1.75} />
-      <h1 className="title-club mt-4 text-3xl">{estado === "movido" ? "Tu carné está en otro móvil" : "Tu carné está desactivado"}</h1>
+      <h1 className="title-club mt-4 text-3xl">{estado === "movido" ? "Tu carnet está en otro móvil" : "Tu carnet está desactivado"}</h1>
       <span className="gold-rule mt-4" />
       <p className="mt-4">
-        {estado === "movido" ? "Tu carné se ha abierto en otro móvil. Si no has sido tú, habla con el club." : "Habla con el club para volver a activarlo."}
+        {estado === "movido" ? "Tu carnet se ha abierto en otro móvil. Si no has sido tú, habla con el club." : "Habla con el club para volver a activarlo."}
       </p>
-      <a href={waLink("¡Hola! Tengo un problema con mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary font-bold text-primary-foreground">
+      <a href={waLink("¡Hola! Tengo un problema con mi carnet del R.U. Lucense.")} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary font-bold text-primary-foreground">
         <MessageCircle size={18} strokeWidth={1.75} /> Hablar con el club
       </a>
     </section>

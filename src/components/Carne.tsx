@@ -10,14 +10,14 @@ export function Carne({ nombre, numero, temporada = "2026/27" }: { nombre: strin
   const [reverso, setReverso] = useState(false);
   return (
     <div className="mx-auto w-full max-w-[390px]">
-      <article className="digital-card relative isolate overflow-hidden rounded-lg text-primary" aria-label={reverso ? "Reverso del carné: ventajas" : `Carné digital de ${nombre}, nº ${String(numero).padStart(4, "0")}`}>
-        <img key={reverso ? "reverso" : "frente"} src={reverso ? dorso.url : frente.url} alt={reverso ? "Ventajas del socio. Primer año, primera historia. Patrocinadores del Real Unión Lucense F.S." : "Carné de socio. Real Unión Lucense F.S. Temporada 2026/27. Ayúdanos a que esta historia siga. Primera temporada."} className="h-full w-full object-contain" />
+      <article className="digital-card relative isolate overflow-hidden rounded-lg text-primary" aria-label={reverso ? "Reverso del carnet: ventajas" : `Carnet digital de ${nombre}, nº ${String(numero).padStart(4, "0")}`}>
+        <img key={reverso ? "reverso" : "frente"} src={reverso ? dorso.url : frente.url} alt={reverso ? "Ventajas del socio. Primer año, primera historia. Patrocinadores del Real Unión Lucense F.S." : "Carnet de socio. Real Unión Lucense F.S. Temporada 2026/27. Ayúdanos a que esta historia siga. Primera temporada."} className="h-full w-full object-contain" />
         {!reverso && <span className="physical-card-number">{String(numero).padStart(4, "0")}</span>}
         {reverso && <a href={folleto.url} target="_blank" rel="noreferrer" className="physical-card-benefits-qr rounded-md focus-visible:outline-2 focus-visible:outline-ring" aria-label="Abrir el folleto de ventajas"><QRCodeSVG value={folleto.url} size={160} className="card-qr-code h-full w-full" /></a>}
       </article>
       <div className="mt-3 flex items-center justify-between gap-2">
-        <span className="card-kicker text-muted-foreground">{reverso ? "02 / Ventajas" : "01 / Tu carné"}</span>
-        <Button variant="ghost" onClick={() => setReverso((v) => !v)} className="h-10 text-xs font-bold hover:bg-primary/10"><ArrowLeftRight /> {reverso ? "Ver carné" : "Dar la vuelta"}</Button>
+        <span className="card-kicker text-muted-foreground">{reverso ? "02 / Ventajas" : "01 / Tu carnet"}</span>
+        <Button variant="ghost" onClick={() => setReverso((v) => !v)} className="h-10 text-xs font-bold hover:bg-primary/10"><ArrowLeftRight /> {reverso ? "Ver carnet" : "Dar la vuelta"}</Button>
       </div>
       <div className="mt-3 flex items-center justify-between gap-4 border-t border-primary/15 pt-4">
         <div className="min-w-0">

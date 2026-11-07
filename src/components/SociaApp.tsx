@@ -271,7 +271,7 @@ function Ventajas({ db }: { db: DB }) {
       <a href={folleto.url} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl btn-suave font-bold">
         <FileText size={18} strokeWidth={1.75} /> Ver el folleto completo (PDF)
       </a>
-      <p className="mt-4 text-center text-sm text-muted-foreground">Enseña tu carné o di que eres socia/o al pedir cita.</p>
+      <p className="mt-4 text-center text-sm text-muted-foreground">Enseña tu carnet o di que eres socia/o al pedir cita.</p>
     </section>
   );
 }

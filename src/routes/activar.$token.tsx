@@ -9,10 +9,10 @@ import { waLink } from "@/lib/whatsapp";
 export const Route = createFileRoute("/activar/$token")({
   head: () => ({
     meta: [
-      { title: "Activa tu carné · R.U. Lucense" },
-      { name: "description", content: "Activa tu carné de socia/o del Real Unión Lucense F.S." },
-      { property: "og:title", content: "Activa tu carné · R.U. Lucense" },
-      { property: "og:description", content: "Tu carné de socia/o del R.U. Lucense, listo en tu móvil." },
+      { title: "Activa tu carnet · R.U. Lucense" },
+      { name: "description", content: "Activa tu carnet de socia/o del Real Unión Lucense F.S." },
+      { property: "og:title", content: "Activa tu carnet · R.U. Lucense" },
+      { property: "og:description", content: "Tu carnet de socia/o del R.U. Lucense, listo en tu móvil." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -57,7 +57,7 @@ function Activar() {
             <h1 className="title-club text-3xl">Este enlace ya no vale.</h1>
             <span className="gold-rule mt-4" />
             <p className="mt-4">Pídele uno nuevo al club.</p>
-            <a href={waLink("¡Hola! Mi enlace para activar el carné del R.U. Lucense ya no vale. ¿Me mandáis uno nuevo?")} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary font-bold text-primary-foreground">
+            <a href={waLink("¡Hola! Mi enlace para activar el carnet del R.U. Lucense ya no vale. ¿Me mandáis uno nuevo?")} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-primary font-bold text-primary-foreground">
               <MessageCircle size={18} strokeWidth={1.75} /> Escribir al club
             </a>
           </section>
@@ -76,7 +76,7 @@ function Activar() {
 
         {socio && !hecho && (
           <section className="flex flex-1 flex-col px-6 pb-10 pt-8">
-            <h1 className="title-club text-3xl">Hola, {socio.nombre}. Este es tu carné.</h1>
+            <h1 className="title-club text-3xl">Hola, {socio.nombre}. Este es tu carnet.</h1>
             <div className="mt-6">
               <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
             </div>
@@ -90,7 +90,7 @@ function Activar() {
             <label className="mt-4 flex cursor-pointer items-start gap-3">
               <input type="checkbox" checked={rgpd} onChange={(e) => setRgpd(e.target.checked)} className="mt-1 size-5 shrink-0 accent-primary" />
               <span>
-                Guardamos tu nombre y tu teléfono para darte el carné y contar cuántas veces usas tus ventajas. No vendemos tus datos a nadie. Los negocios solo ven tu nombre al validar.{" "}
+                Guardamos tu nombre y tu teléfono para darte el carnet y contar cuántas veces usas tus ventajas. No vendemos tus datos a nadie. Los negocios solo ven tu nombre al validar.{" "}
                 <Link to="/privacidad" className="font-bold underline">Política de privacidad</Link>
               </span>
             </label>
@@ -100,7 +100,7 @@ function Activar() {
               disabled={!mayor || !rgpd}
               className="mt-8 min-h-12 rounded-2xl bg-primary text-lg font-black uppercase text-primary-foreground transition-opacity duration-200 disabled:opacity-40"
             >
-              Activar mi carné
+              Activar mi carnet
             </button>
           </section>
         )}

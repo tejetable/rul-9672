@@ -139,10 +139,10 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
     <section className="flex flex-1 flex-col px-5 pt-6">
       {scan && <QrScanner onResult={onScan} onClose={() => setScan(false)} />}
       <button onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
-        <QrCode size={28} strokeWidth={1.75} /> Escanear carné
+        <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
       </button>
       <label className="label-club mt-5 block">Nº de socio (opcional)</label>
-      <input value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Si no tiene carné, déjalo vacío" className="mt-1 min-h-14 w-full rounded-2xl border-2 border-input bg-background px-4 text-xl font-black placeholder:text-base placeholder:font-normal" />
+      <input value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Si no tiene carnet, déjalo vacío" className="mt-1 min-h-14 w-full rounded-2xl border-2 border-input bg-background px-4 text-xl font-black placeholder:text-base placeholder:font-normal" />
       {socio && !aviso && (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-lg font-black text-accent">
           <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}
@@ -171,7 +171,7 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
             return (
               <li key={v.id} className={`flex flex-wrap items-center gap-2 py-3 ${v.anulada ? "opacity-40 line-through" : ""}`}>
                 <span className="w-12 text-sm font-bold">{new Date(v.fechaHora).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</span>
-                <span className="flex-1 font-bold">{s ? s.nombre : "Sin carné"}</span>
+                <span className="flex-1 font-bold">{s ? s.nombre : "Sin carnet"}</span>
                 <span className="label-club rounded-full border border-primary px-2 py-0.5">{v.tipoCliente === "nueva" ? "Nueva" : "Ya era clienta"}</span>
                 {v.repiteViaClub && <span className="label-club rounded-full bg-accent px-2 py-0.5 text-accent-foreground">Repite</span>}
               </li>
@@ -255,11 +255,11 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-2xl border-2 border-primary p-4">
           <p className="text-3xl font-black">{s.verificadas}</p>
-          <p className="label-club mt-1 text-[11px]">Verificadas (con carné)</p>
+          <p className="label-club mt-1 text-[11px]">Verificadas (con carnet)</p>
         </div>
         <div className="rounded-2xl border-2 border-primary p-4">
           <p className="text-3xl font-black">{s.declaradas}</p>
-          <p className="label-club mt-1 text-[11px]">Declaradas (sin carné)</p>
+          <p className="label-club mt-1 text-[11px]">Declaradas (sin carnet)</p>
         </div>
       </div>
 

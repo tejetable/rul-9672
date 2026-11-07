@@ -228,3 +228,7 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-rise, .animate-check { animation: none; }
 }
+
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@utility animate-sheet { animation: sheet-up .35s cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) { .animate-sheet { animation: none; } }

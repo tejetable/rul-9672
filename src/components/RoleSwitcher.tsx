@@ -13,9 +13,9 @@ const ROLES: { id: Role; label: string }[] = [
 export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="relative z-30 mx-5 my-3 flex flex-col items-end gap-2">
+    <div className="fixed right-0 top-1/2 z-40 -translate-y-1/2">
       {open && (
-        <div className="absolute bottom-12 right-0 rounded-lg border border-primary/20 bg-background p-2 shadow-sm">
+        <div className="absolute right-full top-1/2 mr-1 w-40 -translate-y-1/2 rounded-lg border border-primary/20 bg-background p-2 shadow-sm">
           <p className="label-club px-2 pb-1 text-muted-foreground">Demo · Ver como</p>
           {ROLES.map((r) => (
             <Button variant="ghost"
@@ -35,7 +35,7 @@ export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Rol
       )}
       <Button variant="ghost"
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-9 items-center gap-2 text-xs text-muted-foreground hover:bg-primary/10"
+        className="flex h-auto min-h-9 items-center gap-1 rounded-l-lg rounded-r-none bg-primary px-1.5 py-3 text-[11px] text-primary-foreground opacity-80 [writing-mode:vertical-rl] hover:bg-primary hover:opacity-100"
         aria-label="Selector de rol de la demo"
       >
         <FlaskConical size={16} strokeWidth={1.75} />
