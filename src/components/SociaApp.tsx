@@ -6,7 +6,6 @@ import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
-import { PhotoSlot } from "@/components/PhotoSlot";
 import { dataService, type DB, type Socio } from "@/lib/dataService";
 
 type Tab = "inicio" | "carne" | "ventajas" | "avisos";
