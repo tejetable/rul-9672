@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, IdCard, Instagram, LogOut, MapPin, Twitch, Volleyball } from "lucide-react";
+import { Bell, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, Instagram, LogOut, MapPin, Twitch, X } from "lucide-react";
 import { PhotoSlot } from "@/components/PhotoSlot";
 import { ContactarClub } from "@/components/ContactarClub";
 import { ListaAvisos } from "@/components/Avisos";
@@ -8,16 +8,35 @@ import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
-import { dataService, type DB, type Socio } from "@/lib/dataService";
+import { dataService, type Aviso, type DB, type Socio } from "@/lib/dataService";
 
-type Tab = "equipo" | "carne" | "ventajas" | "avisos";
+type Tab = "equipo" | "ventajas";
 const EQUIPO = "Concello de Guntín - R.U. Lucense";
+const fecha = (f: string) => new Date(f).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+
+function BalonIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 7.5l4.3 3.1-1.6 5h-5.4l-1.6-5z" />
+      <path d="M12 7.5V2.2M16.3 10.6l5-1.6M14.7 15.6l3.1 4.3M9.3 15.6l-3.1 4.3M7.7 10.6l-5-1.6" />
+    </svg>
+  );
+}
 
 export function SociaApp({ socio }: { socio: Socio }) {
-  const [tab, setTab] = useState<Tab>("carne");
+  const [tab, setTab] = useState<Tab>("equipo");
   const [db, setDb] = useState<DB | null>(null);
-  useEffect(() => setDb(dataService.get()), []);
+  const [leidos, setLeidos] = useState<string[]>([]);
+  const [carnet, setCarnet] = useState(false);
+  useEffect(() => { setDb(dataService.get()); setLeidos(dataService.avisosLeidos()); }, []);
   if (!db) return null;
+  const avisos = dataService.avisosPara("socias");
+  const sinLeer = avisos.filter((a) => !leidos.includes(a.id));
+  const leer = (id: string) => { dataService.marcarAvisoLeido(id); setLeidos(dataService.avisosLeidos()); };
+
+  const tabCls = (on: boolean) => `relative flex min-h-16 flex-col items-center justify-center gap-1 text-xs ${on ? "font-bold text-primary" : "font-normal text-[rgba(13,70,49,.55)]"}`;
+  const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -36,50 +55,84 @@ export function SociaApp({ socio }: { socio: Socio }) {
       </header>
       <ContactarClub texto={`Hola, soy socia/o del R.U. Lucense y quería consultaros algo.`} />
       <div className="flex-1 pb-12">
-        {tab === "equipo" && <Equipo db={db} />}
-        {tab === "carne" && (
-          <section className="px-5 pt-5">
-            <div className="flex items-end justify-between gap-3">
-              <h1 className="title-club text-4xl">Tu carnet.<br />Tu club.</h1>
-              <span className="label-club pb-1 text-muted-foreground">{socio.temporada}</span>
-            </div>
-            <span className="gold-rule mt-4" />
-            <div className="animate-rise mt-6">
-              <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
-            </div>
-          </section>
-        )}
+        {tab === "equipo" && <Equipo db={db} avisos={avisos} sinLeer={sinLeer} onLeer={leer} />}
         {tab === "ventajas" && <Ventajas db={db} />}
-        {tab === "avisos" && <Avisos db={db} />}
       </div>
-      <nav aria-label="Secciones de socio" className="member-navigation sticky bottom-0 z-20 grid grid-cols-4 border-t border-primary/15 bg-background pb-2 pt-1">
-        {(
-          [
-            ["carne", "Carnet", IdCard],
-            ["equipo", "El Equipo", Volleyball],
-            ["ventajas", "Ventajas", Gift],
-            ["avisos", "Avisos", Bell],
-          ] as const
-        ).map(([id, label, Icon]) => (
-          <Button variant="ghost"
-            key={id}
-            onClick={() => setTab(id)}
-            aria-current={tab === id ? "page" : undefined}
-            className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-none text-xs font-bold hover:bg-primary/5 [&_svg]:size-[22px] ${tab === id ? "border-t-2 border-primary bg-primary/5 text-primary" : "border-t-2 border-transparent text-muted-foreground"}`}
-          >
-            <Icon size={22} strokeWidth={1.75} />
-            {label}
-          </Button>
-        ))}
+      <nav aria-label="Secciones de socio" className="member-navigation sticky bottom-0 z-20 grid grid-cols-3 border-t border-[rgba(13,70,49,.12)] bg-background pt-1">
+        <button onClick={() => setTab("equipo")} aria-current={tab === "equipo" ? "page" : undefined} className={tabCls(tab === "equipo")}>
+          {indicador(tab === "equipo")}
+          <span className="relative">
+            <BalonIcon />
+            {sinLeer.length > 0 && <span aria-label="Avisos sin leer" className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-accent" />}
+          </span>
+          El Equipo
+        </button>
+        <button onClick={() => setCarnet(true)} className="flex flex-col items-center justify-end gap-1 pb-2 text-xs text-[rgba(13,70,49,.55)]" aria-label="Abrir carnet">
+          <span className="-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-oro"><IdCard size={26} strokeWidth={1.75} /></span>
+          Carnet
+        </button>
+        <button onClick={() => setTab("ventajas")} aria-current={tab === "ventajas" ? "page" : undefined} className={tabCls(tab === "ventajas")}>
+          {indicador(tab === "ventajas")}
+          <Gift size={22} strokeWidth={1.75} />
+          Ventajas
+        </button>
       </nav>
+      {carnet && <CarnetSheet socio={socio} onClose={() => setCarnet(false)} />}
     </div>
   );
 }
 
-function Equipo({ db }: { db: DB }) {
+function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) {
+  const [dy, setDy] = useState(0);
+  const [y0, setY0] = useState<number | null>(null);
+  return (
+    <div role="dialog" aria-label="Tu carnet" className="animate-sheet fixed inset-0 z-50 mx-auto flex max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-8"
+      style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
+      onTouchStart={(e) => setY0(e.touches[0].clientY)}
+      onTouchMove={(e) => y0 !== null && setDy(Math.max(0, e.touches[0].clientY - y0))}
+      onTouchEnd={() => { if (dy > 100) onClose(); else setDy(0); setY0(null); }}
+    >
+      <button onClick={onClose} aria-label="Cerrar carnet" className="mx-auto flex min-h-11 w-full flex-col items-center justify-center gap-1 pt-2">
+        <span className="h-1 w-10 rounded-full bg-primary/30" />
+        <ChevronDown size={20} strokeWidth={1.75} className="text-muted-foreground" />
+      </button>
+      <div className="flex items-end justify-between gap-3">
+        <h1 className="title-club text-4xl">Tu carnet.<br />Tu club.</h1>
+        <span className="label-club pb-1 text-muted-foreground">{socio.temporada}</span>
+      </div>
+      <span className="gold-rule mt-4" />
+      <div className="mt-6">
+        <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
+      </div>
+    </div>
+  );
+}
+
+function Equipo({ db, avisos, sinLeer, onLeer }: { db: DB; avisos: Aviso[]; sinLeer: Aviso[]; onLeer: (id: string) => void }) {
   const proximo = db.partidos.find((p) => !p.jugado);
+  const [todos, setTodos] = useState(false);
+  const destacado = sinLeer[0];
+  if (todos) {
+    return (
+      <div>
+        <button onClick={() => setTodos(false)} className="label-club mx-5 mt-4 flex min-h-11 items-center gap-1"><ChevronLeft size={18} strokeWidth={1.75} /> El Equipo</button>
+        <ListaAvisos quien="socias" />
+      </div>
+    );
+  }
   return (
     <section className="px-5 pt-6">
+      {destacado && (
+        <div className="animate-rise mb-6 flex items-start gap-3 rounded-2xl bg-primary p-4 text-primary-foreground">
+          <Bell size={20} strokeWidth={1.75} className="mt-0.5 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="font-black">{destacado.titulo}</p>
+            <p className="mt-1 line-clamp-2 text-sm opacity-90">{destacado.texto}</p>
+            <p className="mt-2 text-xs opacity-70">{fecha(destacado.fecha)}</p>
+          </div>
+          <button onClick={() => onLeer(destacado.id)} aria-label="Marcar como leído" className="-mr-2 -mt-2 flex size-11 shrink-0 items-center justify-center"><X size={18} strokeWidth={1.75} /></button>
+        </div>
+      )}
       <p className="label-club text-accent">El Equipo</p>
       <h1 className="title-club mt-2 text-4xl">Vamos, que empieza.</h1>
       <span className="gold-rule mt-4" />
@@ -106,6 +159,21 @@ function Equipo({ db }: { db: DB }) {
           </div>
         </div>
       )}
+
+      <div className="mt-8 flex items-center justify-between">
+        <p className="label-club">Avisos</p>
+        {avisos.length > 0 && <button onClick={() => setTodos(true)} className="min-h-11 text-sm font-bold text-accent">Ver todos</button>}
+      </div>
+      {avisos.length === 0 && <p className="mt-2 text-muted-foreground">Todavía no hay avisos.</p>}
+      <ul className="mt-2 space-y-2">
+        {avisos.slice(0, 3).map((a) => (
+          <li key={a.id} className="rounded-2xl bg-suave p-4">
+            <p className="text-xs text-muted-foreground">{fecha(a.fecha)}</p>
+            <p className="font-black">{a.titulo}</p>
+            <p className="line-clamp-2 text-sm">{a.texto}</p>
+          </li>
+        ))}
+      </ul>
 
       <p className="label-club mt-8">Fotos y vídeos</p>
       <div className="-mx-5 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2">
@@ -208,6 +276,3 @@ function Ventajas({ db }: { db: DB }) {
   );
 }
 
-function Avisos({ db: _db }: { db: DB }) {
-  return <ListaAvisos quien="socias" />;
-}
