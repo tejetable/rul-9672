@@ -179,3 +179,13 @@
   background:
     radial-gradient(ellipse 80% 60% at 50% 30%, color-mix(in oklab, var(--crema) 70%, white) 0%, var(--crema) 75%);
 }
+
+@keyframes check-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@utility animate-check {
+  animation: check-pop 420ms cubic-bezier(.2,.7,.2,1) both;
+}
