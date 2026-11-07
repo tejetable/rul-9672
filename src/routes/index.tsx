@@ -33,6 +33,7 @@ function Index() {
   const [role, setRole] = useState<Role>("socia");
   const [sesion, setSesion] = useState<Sesion>(null);
   const [ready, setReady] = useState(false);
+  const [espera, setEspera] = useState(true);
 
   useEffect(() => {
     dataService.get();
@@ -40,6 +41,8 @@ function Index() {
     if (r) setRole(r);
     setSesion(dataService.sesion());
     setReady(true);
+    const t = setTimeout(() => setEspera(false), 2500);
+    return () => clearTimeout(t);
   }, []);
 
   const cambiar = (r: Role) => {
@@ -48,13 +51,24 @@ function Index() {
     setSesion(dataService.sesion());
   };
 
+  const cargando = !ready || espera;
   return (
-    <AppFrame>
-      {ready && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
-      {ready && role === "directiva" && <Directiva />}
-      {ready && role === "negocio" && <NegocioApp />}
-      <RoleSwitcher role={role} onChange={cambiar} />
+    <AppFrame crema={cargando}>
+      {cargando && <Cargando />}
+      {!cargando && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
+      {!cargando && role === "directiva" && <Directiva />}
+      {!cargando && role === "negocio" && <NegocioApp />}
+      {!cargando && <RoleSwitcher role={role} onChange={cambiar} />}
     </AppFrame>
+  );
+}
+
+function Cargando() {
+  return (
+    <section className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+      <img src={escudo.url} alt="Escudo del Real Unión Lucense F.S." width={450} height={676} className="crest crest-blend animate-rise w-36" />
+      <p className="label-club animate-rise mt-6" style={{ animationDelay: "200ms" }}>R.U. Lucense</p>
+    </section>
   );
 }
 
