@@ -7,8 +7,13 @@ export interface Socio {
   numeroSocio: number;
   temporada: string;
   fechaAlta: string;
-  consentimientoRGPD: { aceptado: boolean; fecha: string };
-  esMenor: boolean;
+  consentimientoRGPD: { aceptado: boolean; fecha: string | null };
+  mayorDeEdad: boolean;
+  estado: "invitada" | "activa" | "desactivada";
+  tokenInvitacion: string;
+  fechaActivacion: string | null;
+  dispositivoId: string | null;
+  cambioDispositivo: boolean;
 }
 export interface Patrocinador {
   id: string;
@@ -65,7 +70,15 @@ export interface DB {
   socioActualId: string | null;
 }
 
-const KEY = "rul-demo-db-v1";
+const KEY = "rul-demo-db-v2";
+const DEVICE_KEY = "rul-device-id";
+const SESSION_KEY = "rul-session-socio";
+
+export function nuevoToken() {
+  const a = new Uint8Array(24);
+  crypto.getRandomValues(a);
+  return Array.from(a, (b) => b.toString(36).padStart(2, "0")).join("").slice(0, 32);
+}
 const TEMPORADA = "2026/27";
 
 function seed(): DB {
@@ -78,7 +91,12 @@ function seed(): DB {
     temporada: TEMPORADA,
     fechaAlta: new Date(now.getTime() - (60 - i) * 86400000).toISOString(),
     consentimientoRGPD: { aceptado: true, fecha: now.toISOString() },
-    esMenor: false,
+    mayorDeEdad: true,
+    estado: "activa",
+    tokenInvitacion: `seed-token-demo-${i + 1}-xxxxxxxxxxxx`,
+    fechaActivacion: now.toISOString(),
+    dispositivoId: "demo-seed",
+    cambioDispositivo: false,
   }));
   const patrocinadores: Patrocinador[] = [
     { id: "p1", nombre: "[Tienda de uñas – nombre pendiente]", categoria: "Estética", logoUrl: "", direccion: "[Dirección pendiente], Guntín", pin: "1234", activo: true },
@@ -143,26 +161,82 @@ export const dataService = {
     save(db);
     return db;
   },
-  altaSocio(nombre: string, telefono: string): Socio {
+  /** Directiva da de alta: queda invitada con token */
+  crearSocio(nombre: string, telefono: string): Socio {
     const db = load();
     const socio: Socio = {
       id: crypto.randomUUID(),
-      nombre,
-      telefono,
+      nombre: nombre.trim(),
+      telefono: telefono.replace(/\D/g, ""),
       numeroSocio: Math.max(0, ...db.socios.map((s) => s.numeroSocio)) + 1,
       temporada: TEMPORADA,
       fechaAlta: new Date().toISOString(),
-      consentimientoRGPD: { aceptado: true, fecha: new Date().toISOString() },
-      esMenor: false,
+      consentimientoRGPD: { aceptado: false, fecha: null },
+      mayorDeEdad: false,
+      estado: "invitada",
+      tokenInvitacion: nuevoToken(),
+      fechaActivacion: null,
+      dispositivoId: null,
+      cambioDispositivo: false,
     };
     db.socios.push(socio);
-    db.socioActualId = socio.id;
     save(db);
     return socio;
   },
-  socioActual(): Socio | null {
+  update(id: string, patch: Partial<Socio>): Socio | null {
     const db = load();
-    return db.socios.find((s) => s.id === db.socioActualId) ?? null;
+    const s = db.socios.find((x) => x.id === id);
+    if (!s) return null;
+    Object.assign(s, patch);
+    save(db);
+    return s;
+  },
+  /** Reenviar: token nuevo, el anterior deja de valer */
+  regenerarToken(id: string) {
+    return this.update(id, { tokenInvitacion: nuevoToken() });
+  },
+  desactivar(id: string) {
+    return this.update(id, { estado: "desactivada" });
+  },
+  porToken(token: string): Socio | null {
+    const s = load().socios.find((x) => x.tokenInvitacion === token);
+    return s && s.estado !== "desactivada" ? s : null;
+  },
+  dispositivoId(): string {
+    let d = window.localStorage.getItem(DEVICE_KEY);
+    if (!d) {
+      d = crypto.randomUUID();
+      window.localStorage.setItem(DEVICE_KEY, d);
+    }
+    return d;
+  },
+  /** Un carné, un móvil: activar en otro dispositivo mueve el carné aquí */
+  activar(token: string): Socio | null {
+    const s = this.porToken(token);
+    if (!s) return null;
+    const dev = this.dispositivoId();
+    const otro = s.dispositivoId !== null && s.dispositivoId !== dev;
+    const now = new Date().toISOString();
+    const r = this.update(s.id, {
+      estado: "activa",
+      mayorDeEdad: true,
+      consentimientoRGPD: { aceptado: true, fecha: now },
+      fechaActivacion: now,
+      dispositivoId: dev,
+      cambioDispositivo: s.cambioDispositivo || otro,
+    });
+    window.localStorage.setItem(SESSION_KEY, s.id);
+    return r;
+  },
+  /** Sesión de este móvil: carné propio, movido a otro móvil, o ninguno */
+  sesion(): { socio: Socio; estado: "ok" | "movido" | "desactivada" } | null {
+    const id = window.localStorage.getItem(SESSION_KEY);
+    if (!id) return null;
+    const s = load().socios.find((x) => x.id === id);
+    if (!s) return null;
+    if (s.estado === "desactivada") return { socio: s, estado: "desactivada" };
+    if (s.dispositivoId !== this.dispositivoId()) return { socio: s, estado: "movido" };
+    return { socio: s, estado: "ok" };
   },
   /** Clienta nueva = declarada primera vez Y sin canjes previos en ese negocio */
   esClientaNueva(c: Canje) {
