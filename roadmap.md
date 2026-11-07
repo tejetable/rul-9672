@@ -1,0 +1,2 @@
+- [x] Rediseñar el carné digital siguiendo el carné físico y darle protagonismo en la pantalla de socios.
+- [x] Verificar activación, carné, ventajas y salida en móvil y escritorio.

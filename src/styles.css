@@ -129,14 +129,14 @@
   font-weight: 900;
   text-transform: uppercase;
   line-height: 0.95;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 @utility label-club {
   font-weight: 700;
   font-size: 12.5px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
 }
 
 @utility gold-rule {
@@ -200,4 +200,34 @@
 /* Fondo de tarjeta de socia: verde suave */
 @utility bg-suave {
   background-color: color-mix(in oklab, var(--esmeralda) 16%, var(--crema));
+}
+
+:root {
+  --shadow-carne: 0 12px 30px -12px color-mix(in oklab, var(--verde) 35%, transparent), 0 1px 3px color-mix(in oklab, var(--verde) 12%, transparent);
+  --card-legibility: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--roto) 94%, transparent) 10%, color-mix(in oklab, var(--roto) 65%, transparent) 32%, color-mix(in oklab, var(--roto) 25%, transparent) 100%);
+}
+
+.digital-card {
+  min-height: 468px;
+  background: var(--roto);
+  box-shadow: var(--shadow-carne);
+  border: 1px solid color-mix(in oklab, var(--verde) 18%, transparent);
+}
+.card-content { padding: 22px 20px 22px 34px; }
+.digital-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--card-legibility); pointer-events: none; }
+.card-kicker { font-size: 10px; font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0; }
+.card-member-name { font-size: 24px; font-weight: 900; line-height: 1.1; text-transform: uppercase; overflow-wrap: anywhere; }
+.card-motto { font-size: 22px; font-style: italic; font-weight: 900; line-height: 1.1; }
+.card-qr-code > path:first-child { fill: var(--roto); }
+.card-qr-code > path:last-child { fill: var(--verde); }
+.member-navigation { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+@media (max-width: 359px) {
+  .card-content { padding-left: 24px; padding-right: 14px; }
+  .card-content > div:nth-child(2) { gap: 8px; }
+  .card-content > div:nth-child(2) > img { width: 64px; height: 96px; }
+  .card-content > div:nth-child(2) .title-club { font-size: 30px; }
+  .card-member-name { font-size: 21px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise, .animate-check { animation: none; }
 }

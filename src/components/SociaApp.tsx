@@ -6,67 +6,70 @@ import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
+import { Button } from "@/components/ui/button";
 import { dataService, type DB, type Socio } from "@/lib/dataService";
 
 type Tab = "inicio" | "carne" | "ventajas" | "avisos";
 const EQUIPO = "Concello de Guntín - R.U. Lucense";
 
 export function SociaApp({ socio }: { socio: Socio }) {
-  const [tab, setTab] = useState<Tab>("inicio");
+  const [tab, setTab] = useState<Tab>("carne");
   const [db, setDb] = useState<DB | null>(null);
   useEffect(() => setDb(dataService.get()), []);
   if (!db) return null;
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center gap-3 px-5 pt-5">
+      <header className="flex items-center gap-3 border-b border-primary/15 px-5 py-4">
         <img src={escudo.url} alt="Escudo del R.U. Lucense" width={450} height={676} className="crest crest-blend h-10 w-auto" />
-        <span className="label-club flex-1">R.U. Lucense</span>
-        <button
+        <span className="flex-1"><span className="label-club block">R.U. Lucense</span><span className="text-xs text-muted-foreground">Somos familia.</span></span>
+        <Button variant="ghost"
           onClick={() => {
             dataService.cerrarSesion();
             window.location.reload();
           }}
-          className="label-club flex min-h-11 items-center gap-1 text-muted-foreground"
+          className="flex min-h-11 items-center gap-1 text-xs font-bold text-muted-foreground hover:bg-primary/10"
         >
           <LogOut size={16} strokeWidth={1.75} /> Salir
-        </button>
+        </Button>
       </header>
       <ContactarClub texto={`Hola, soy socia/o del R.U. Lucense y quería consultaros algo.`} />
-      <div className="flex-1 pb-36">
+      <div className="flex-1 pb-12">
         {tab === "inicio" && <Inicio db={db} socio={socio} irA={setTab} />}
         {tab === "carne" && (
-          <section className="px-6 pt-6">
-            <p className="label-club text-accent">Tu carné</p>
-            <h1 className="title-club mt-2 text-4xl">Eres de los nuestros.</h1>
-            <div className="animate-rise mt-8">
+          <section className="px-5 pt-5">
+            <div className="flex items-end justify-between gap-3">
+              <h1 className="title-club text-4xl">Tu carné.<br />Tu club.</h1>
+              <span className="label-club pb-1 text-muted-foreground">{socio.temporada}</span>
+            </div>
+            <span className="gold-rule mt-4" />
+            <div className="animate-rise mt-6">
               <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
             </div>
-            <button onClick={() => setTab("ventajas")} className="mt-8 min-h-12 w-full rounded-2xl bg-primary font-black uppercase text-primary-foreground">
-              Ver mis ventajas
-            </button>
+            <Button onClick={() => setTab("ventajas")} className="mt-4 min-h-14 w-full justify-between rounded-lg px-5 font-bold"><span className="flex items-center gap-3"><Gift /> Mis ventajas</span><ChevronRight /></Button>
           </section>
         )}
         {tab === "ventajas" && <Ventajas db={db} />}
         {tab === "avisos" && <Avisos db={db} />}
       </div>
-      <nav className="sticky bottom-0 grid grid-cols-4 border-t border-border bg-background pb-2 pt-1">
+      <nav aria-label="Secciones de socio" className="member-navigation sticky bottom-0 z-20 grid grid-cols-4 border-t border-primary/15 bg-background pb-2 pt-1">
         {(
           [
-            ["inicio", "Inicio", Home],
             ["carne", "Carné", IdCard],
+            ["inicio", "Inicio", Home],
             ["ventajas", "Ventajas", Gift],
             ["avisos", "Avisos", Bell],
           ] as const
         ).map(([id, label, Icon]) => (
-          <button
+          <Button variant="ghost"
             key={id}
             onClick={() => setTab(id)}
-            className={`flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-bold transition-opacity duration-200 ${tab === id ? "" : "opacity-55"}`}
+            aria-current={tab === id ? "page" : undefined}
+            className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-none text-xs font-bold hover:bg-primary/5 [&_svg]:size-[22px] ${tab === id ? "border-t-2 border-primary bg-primary/5 text-primary" : "border-t-2 border-transparent text-muted-foreground"}`}
           >
             <Icon size={22} strokeWidth={1.75} />
             {label}
-          </button>
+          </Button>
         ))}
       </nav>
     </div>
