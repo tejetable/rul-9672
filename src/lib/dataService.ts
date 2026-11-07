@@ -75,7 +75,7 @@ export interface DB {
   socioActualId: string | null;
 }
 
-const KEY = "rul-demo-db-v4";
+const KEY = "rul-demo-db-v5";
 const DEVICE_KEY = "rul-device-id";
 const SESSION_KEY = "rul-session-socio";
 const NEGOCIO_KEY = "rul-session-negocio";
@@ -176,7 +176,7 @@ function seed(): DB {
       numeroSocio: socio?.numeroSocio,
       socioId: socio?.id,
       origen: conCarne ? (i % 2 ? "qr" : "numero") : "sin_carne",
-      tipoCliente: i % 3 === 1 ? "ya_era_clienta" : "nueva",
+      tipoCliente: i % 9 === 0 ? "nueva" : "ya_era_clienta",
       repiteViaClub: socio ? repiteViaClub(visitas, "p1", socio.id, fecha) : false,
       verificada: conCarne,
       anulada: false,

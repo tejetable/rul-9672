@@ -286,7 +286,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
         <p className="label-club text-muted-foreground">Visitas por semana</p>
         <div className="mt-3 flex h-32 items-end gap-2">
           {sem.map((w) => (
-            <div key={w.label} className="flex flex-1 flex-col items-center gap-1">
+            <div key={w.label} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
               <div className="flex w-full flex-col justify-end overflow-hidden rounded-md bg-primary" style={{ height: `${(w.total / max) * 100}%`, minHeight: w.total ? 4 : 0 }}>
                 <div className="w-full bg-accent" style={{ height: `${w.total ? (w.nuevas / w.total) * 100 : 0}%` }} />
               </div>
