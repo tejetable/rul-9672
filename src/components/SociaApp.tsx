@@ -163,7 +163,7 @@ function Ventajas({ db }: { db: DB }) {
           return (
             <li key={pt.id}>
               <button onClick={() => setSel(pt.id)} className="flex w-full items-center gap-4 rounded-2xl bg-roto p-4 text-left transition-transform duration-200 active:scale-[.98]">
-                <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary font-black text-primary-foreground ${(vs[0]?.destacado?.length ?? 0) > 4 ? "text-[11px] uppercase" : "text-lg"}`}>
+                <span className={`flex size-14 shrink-0 items-center justify-center rounded-xl bg-primary font-black text-primary-foreground ${(vs[0]?.destacado?.length ?? 0) > 4 ? "text-[11px] uppercase" : "text-lg"}`}>
                   {vs[0]?.destacado}
                 </span>
                 <span className="flex-1">
