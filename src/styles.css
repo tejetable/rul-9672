@@ -196,3 +196,8 @@
   color: var(--primary);
   border: 2px solid color-mix(in oklab, var(--esmeralda, #28A073) 35%, transparent);
 }
+
+/* Fondo de tarjeta de socia: verde suave */
+@utility bg-suave {
+  background-color: color-mix(in oklab, var(--esmeralda) 16%, var(--crema));
+}
