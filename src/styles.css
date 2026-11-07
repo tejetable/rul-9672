@@ -204,17 +204,18 @@
 
 :root {
   --shadow-carne: 0 12px 30px -12px color-mix(in oklab, var(--verde) 35%, transparent), 0 1px 3px color-mix(in oklab, var(--verde) 12%, transparent);
-  --card-legibility: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--roto) 94%, transparent) 10%, color-mix(in oklab, var(--roto) 65%, transparent) 32%, color-mix(in oklab, var(--roto) 25%, transparent) 100%);
+  --card-printed-ink: oklch(0.12 0.005 160);
 }
 
 .digital-card {
-  min-height: 468px;
+  aspect-ratio: 1101 / 642;
   background: var(--roto);
   box-shadow: var(--shadow-carne);
   border: 1px solid color-mix(in oklab, var(--verde) 18%, transparent);
 }
-.card-content { padding: 22px 20px 22px 34px; }
-.digital-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--card-legibility); pointer-events: none; }
+.digital-card { container-type: inline-size; }
+.physical-card-number { position: absolute; left: 61%; top: 53%; width: 11%; height: 9%; display: flex; justify-content: center; align-items: center; font-size: 5cqw; font-weight: 900; line-height: 1; color: var(--card-printed-ink); transform: scaleX(.8); }
+.physical-card-benefits-qr { position: absolute; left: 73.15%; top: 25.5%; width: 14.8%; height: 25%; background: var(--roto); padding: 2px; }
 .card-kicker { font-size: 10px; font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0; }
 .card-member-name { font-size: 24px; font-weight: 900; line-height: 1.1; text-transform: uppercase; overflow-wrap: anywhere; }
 .card-motto { font-size: 22px; font-style: italic; font-weight: 900; line-height: 1.1; }
@@ -222,10 +223,6 @@
 .card-qr-code > path:last-child { fill: var(--verde); }
 .member-navigation { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
 @media (max-width: 359px) {
-  .card-content { padding-left: 24px; padding-right: 14px; }
-  .card-content > div:nth-child(2) { gap: 8px; }
-  .card-content > div:nth-child(2) > img { width: 64px; height: 96px; }
-  .card-content > div:nth-child(2) .title-club { font-size: 30px; }
   .card-member-name { font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) {

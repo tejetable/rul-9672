@@ -46,7 +46,6 @@ export function SociaApp({ socio }: { socio: Socio }) {
             <div className="animate-rise mt-6">
               <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
             </div>
-            <Button onClick={() => setTab("ventajas")} className="mt-4 min-h-14 w-full justify-between rounded-lg px-5 font-bold"><span className="flex items-center gap-3"><Gift /> Mis ventajas</span><ChevronRight /></Button>
           </section>
         )}
         {tab === "ventajas" && <Ventajas db={db} />}
