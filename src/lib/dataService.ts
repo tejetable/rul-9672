@@ -92,7 +92,7 @@ function seed(): DB {
   const canjes: Canje[] = [];
   const visto = new Set<string>();
   for (let i = 0; i < 26; i++) {
-    const socio = socios[(i * 7) % socios.length];
+    const socio = socios[(i * 7) % socios.length]!;
     const pat = i % 3 === 0 ? "p2" : "p1";
     const k = socio.id + pat;
     const primero = !visto.has(k);
