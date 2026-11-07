@@ -354,6 +354,14 @@ export const dataService = {
     db.avisos = db.avisos.filter((x) => x.id !== id);
     save(db);
   },
+  avisosLeidos(): string[] {
+    if (typeof window === "undefined") return [];
+    try { return JSON.parse(window.localStorage.getItem("rul-avisos-leidos") || "[]"); } catch { return []; }
+  },
+  marcarAvisoLeido(id: string) {
+    const l = new Set(this.avisosLeidos()); l.add(id);
+    window.localStorage.setItem("rul-avisos-leidos", JSON.stringify([...l]));
+  },
   avisosPara(quien: "socias" | "negocios") {
     return [...load().avisos].filter((a) => !a.para || a.para === "todos" || a.para === quien).sort((a, b) => b.fecha.localeCompare(a.fecha));
   },
