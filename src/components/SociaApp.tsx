@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, Home, IdCard, LogOut, MapPin } from "lucide-react";
+import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, IdCard, Instagram, LogOut, MapPin, Twitch, Volleyball } from "lucide-react";
+import { PhotoSlot } from "@/components/PhotoSlot";
 import { ContactarClub } from "@/components/ContactarClub";
 import { ListaAvisos } from "@/components/Avisos";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
@@ -9,7 +10,7 @@ import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
 import { dataService, type DB, type Socio } from "@/lib/dataService";
 
-type Tab = "inicio" | "carne" | "ventajas" | "avisos";
+type Tab = "equipo" | "carne" | "ventajas" | "avisos";
 const EQUIPO = "Concello de Guntín - R.U. Lucense";
 
 export function SociaApp({ socio }: { socio: Socio }) {
@@ -35,11 +36,11 @@ export function SociaApp({ socio }: { socio: Socio }) {
       </header>
       <ContactarClub texto={`Hola, soy socia/o del R.U. Lucense y quería consultaros algo.`} />
       <div className="flex-1 pb-12">
-        {tab === "inicio" && <Inicio db={db} socio={socio} irA={setTab} />}
+        {tab === "equipo" && <Equipo db={db} />}
         {tab === "carne" && (
           <section className="px-5 pt-5">
             <div className="flex items-end justify-between gap-3">
-              <h1 className="title-club text-4xl">Tu carné.<br />Tu club.</h1>
+              <h1 className="title-club text-4xl">Tu carnet.<br />Tu club.</h1>
               <span className="label-club pb-1 text-muted-foreground">{socio.temporada}</span>
             </div>
             <span className="gold-rule mt-4" />
@@ -54,8 +55,8 @@ export function SociaApp({ socio }: { socio: Socio }) {
       <nav aria-label="Secciones de socio" className="member-navigation sticky bottom-0 z-20 grid grid-cols-4 border-t border-primary/15 bg-background pb-2 pt-1">
         {(
           [
-            ["carne", "Carné", IdCard],
-            ["inicio", "Inicio", Home],
+            ["carne", "Carnet", IdCard],
+            ["equipo", "El Equipo", Volleyball],
             ["ventajas", "Ventajas", Gift],
             ["avisos", "Avisos", Bell],
           ] as const
@@ -75,18 +76,26 @@ export function SociaApp({ socio }: { socio: Socio }) {
   );
 }
 
-function Inicio({ db, socio, irA }: { db: DB; socio: Socio; irA: (t: Tab) => void }) {
+function Equipo({ db }: { db: DB }) {
   const proximo = db.partidos.find((p) => !p.jugado);
-  const nueva = db.ventajas.find((v) => v.activa);
-  const patNueva = nueva && db.patrocinadores.find((p) => p.id === nueva.patrocinadorId);
   return (
     <section className="px-5 pt-6">
-      <p className="label-club text-accent">Hola, {socio.nombre.split(" ")[0]}</p>
+      <p className="label-club text-accent">El Equipo</p>
       <h1 className="title-club mt-2 text-4xl">Vamos, que empieza.</h1>
       <span className="gold-rule mt-4" />
 
+      <div className="mt-6 rounded-2xl bg-suave p-5">
+        <p className="label-club text-muted-foreground">Último resultado</p>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="title-club flex-1 text-xl">R.U. Lucense</p>
+          <p className="title-club text-5xl text-primary">18<span className="mx-1 text-muted-foreground">-</span>0</p>
+          <p className="title-club flex-1 text-right text-xl">P.M. Friol</p>
+        </div>
+        <p className="mt-3 font-bold text-accent">¡Victoria! Gracias por empujar.</p>
+      </div>
+
       {proximo && (
-        <div className="mt-6 overflow-hidden rounded-2xl bg-primary p-5 text-primary-foreground">
+        <div className="mt-4 overflow-hidden rounded-2xl bg-primary p-5 text-primary-foreground">
           <p className="label-club opacity-80">Próximo partido</p>
           <p className="title-club mt-3 text-2xl">{EQUIPO}</p>
           <p className="label-club my-2 opacity-70">vs</p>
@@ -95,22 +104,22 @@ function Inicio({ db, socio, irA }: { db: DB; socio: Socio; irA: (t: Tab) => voi
             <p className="flex items-center gap-2"><CalendarDays size={16} strokeWidth={1.75} /> {proximo.fechaHora || "Fecha y hora por confirmar"}</p>
             <p className="flex items-center gap-2"><MapPin size={16} strokeWidth={1.75} /> {proximo.lugar}</p>
           </div>
-          <p className="mt-4 font-bold">Te esperamos en Guntín.</p>
         </div>
       )}
 
-      {nueva && patNueva && (
-        <button onClick={() => irA("ventajas")} className="mt-4 flex w-full items-center gap-4 rounded-2xl bg-suave p-5 text-left">
-          <span className="title-club text-3xl text-accent">{nueva.destacado}</span>
-          <span className="flex-1">
-            <span className="label-club block text-muted-foreground">{patNueva.nombre}</span>
-            <span className="font-bold">{nueva.titulo}</span>
-          </span>
-          <ChevronRight size={20} strokeWidth={1.75} />
-        </button>
-      )}
+      <p className="label-club mt-8">Fotos y vídeos</p>
+      <div className="-mx-5 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2">
+        <img src={pina.url} alt="El equipo en el pabellón de Guntín" width={1920} height={1280} className="aspect-[3/2] w-[85%] shrink-0 snap-center rounded-2xl object-cover" />
+        {["Celebración del 18-0", "Vídeo: resumen del partido", "La grada en Guntín"].map((t) => (
+          <div key={t} className="w-[85%] shrink-0 snap-center"><PhotoSlot label={t} /></div>
+        ))}
+      </div>
 
-      <img src={pina.url} alt="El equipo en el pabellón de Guntín" width={1920} height={1280} className="mt-4 aspect-[3/2] w-full rounded-2xl object-cover" />
+      <p className="label-club mt-8">Síguenos</p>
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <a href="https://www.instagram.com/realunionlucense/" target="_blank" rel="noreferrer" className="btn-suave flex min-h-14 items-center justify-center gap-2 rounded-2xl font-bold"><Instagram size={20} strokeWidth={1.75} /> Instagram</a>
+        <a href="https://www.twitch.tv/adrifdez_10" target="_blank" rel="noreferrer" className="btn-suave flex min-h-14 items-center justify-center gap-2 rounded-2xl font-bold"><Twitch size={20} strokeWidth={1.75} /> Twitch</a>
+      </div>
     </section>
   );
 }
