@@ -25,8 +25,11 @@ export function Carne({ nombre, numero, temporada = "2026/27" }: { nombre: strin
           <p className="card-member-name mt-1">{nombre}</p>
           <p className="mt-2 text-xs font-bold text-muted-foreground">Identificación · Nº {String(numero).padStart(4, "0")}</p>
         </div>
-        <div className="shrink-0 rounded-md bg-roto p-2">
-          <QRCodeSVG value={`RUL:${numero}`} size={80} className="card-qr-code" aria-label={`Identificación de socio ${numero}`} />
+        <div className="flex shrink-0 flex-col items-center gap-1">
+          <div className="rounded-md bg-roto p-2">
+            <QRCodeSVG value={`RUL:${numero}`} size={80} className="card-qr-code" aria-label={`Identificación de socio ${numero}`} />
+          </div>
+          <p className="max-w-[104px] text-center text-[11px] font-bold leading-tight text-primary">Registra tu visita escaneando este QR</p>
         </div>
       </div>
     </div>
