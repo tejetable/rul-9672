@@ -88,8 +88,8 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
   return (
     <div role="dialog" aria-label="Tu carnet" className="animate-sheet fixed inset-0 z-50 mx-auto flex max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-8"
       style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
-      onTouchStart={(e) => setY0(e.touches[0].clientY)}
-      onTouchMove={(e) => y0 !== null && setDy(Math.max(0, e.touches[0].clientY - y0))}
+      onTouchStart={(e) => setY0((e.touches[0]?.clientY ?? 0))}
+      onTouchMove={(e) => y0 !== null && setDy(Math.max(0, (e.touches[0]?.clientY ?? 0) - y0))}
       onTouchEnd={() => { if (dy > 100) onClose(); else setDy(0); setY0(null); }}
     >
       <button onClick={onClose} aria-label="Cerrar carnet" className="mx-auto flex min-h-11 w-full flex-col items-center justify-center gap-1 pt-2">
