@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
-import { PhotoSlot } from "@/components/PhotoSlot";
+import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
 import { AvisosPanel } from "@/components/Avisos";
@@ -84,7 +84,14 @@ function Bienvenida() {
       <span className="gold-rule mt-5" />
       <p className="mt-5 text-muted-foreground">Real Unión Lucense F.S. · Guntín (Lugo)</p>
 
-      <PhotoSlot label="piña del equipo en el pabellón de Guntín" className="mt-8 aspect-[4/3] w-full bg-transparent" />
+      <img
+        src={pina.url}
+        alt="La piña del equipo en el pabellón de Guntín"
+        width={1920}
+        height={1280}
+        className="animate-rise mt-8 aspect-[3/2] w-full rounded-2xl object-cover"
+        style={{ animationDelay: "240ms" }}
+      />
 
       <div className="mt-8 flex w-full flex-col gap-3">
         <a
