@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
-import { PhotoSlot } from "@/components/PhotoSlot";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
 import { AvisosPanel } from "@/components/Avisos";
