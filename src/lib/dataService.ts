@@ -63,6 +63,8 @@ export interface Aviso {
   texto: string;
   fecha: string;
   tipo: "partido" | "ventaja" | "club";
+  /** A quién va dirigido; sin valor = todos */
+  para?: "todos" | "socias" | "negocios";
 }
 export interface DB {
   socios: Socio[];
@@ -337,6 +339,19 @@ export const dataService = {
     const v = db.visitas.find((x) => x.id === id);
     if (v) v.anulada = true;
     save(db);
+  },
+  crearAviso(a: { titulo: string; texto: string; tipo: Aviso["tipo"]; para: NonNullable<Aviso["para"]> }) {
+    const db = load();
+    db.avisos.push({ ...a, id: "a" + Date.now(), fecha: new Date().toISOString() });
+    save(db);
+  },
+  borrarAviso(id: string) {
+    const db = load();
+    db.avisos = db.avisos.filter((x) => x.id !== id);
+    save(db);
+  },
+  avisosPara(quien: "socias" | "negocios") {
+    return [...load().avisos].filter((a) => !a.para || a.para === "todos" || a.para === quien).sort((a, b) => b.fecha.localeCompare(a.fecha));
   },
   /** Clienta nueva = declarada primera vez Y sin canjes previos en ese negocio */
   esClientaNueva(c: Canje) {

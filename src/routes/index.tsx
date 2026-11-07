@@ -5,6 +5,7 @@ import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { PhotoSlot } from "@/components/PhotoSlot";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
+import { AvisosPanel } from "@/components/Avisos";
 import { SociasPanel } from "@/components/SociasPanel";
 import { PatrocinadoresPanel } from "@/components/PatrocinadoresPanel";
 import { NegocioApp } from "@/components/NegocioApp";
@@ -132,15 +133,15 @@ function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
 }
 
 function Directiva() {
-  const [t, setT] = useState<"socias" | "patro">("socias");
+  const [t, setT] = useState<"socias" | "patro" | "avisos">("socias");
   return (
     <div className="flex flex-1 flex-col">
-      <div className="mx-5 mt-5 grid grid-cols-2 rounded-2xl bg-roto p-1">
-        {([["socias", "Socias/os"], ["patro", "Patrocinadores"]] as const).map(([id, l]) => (
+      <div className="mx-5 mt-5 grid grid-cols-3 rounded-2xl bg-roto p-1">
+        {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
           <button key={id} onClick={() => setT(id)} className={`min-h-11 rounded-xl text-sm font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</button>
         ))}
       </div>
-      {t === "socias" ? <SociasPanel /> : <PatrocinadoresPanel />}
+      {t === "socias" ? <SociasPanel /> : t === "patro" ? <PatrocinadoresPanel /> : <AvisosPanel />}
     </div>
   );
 }
