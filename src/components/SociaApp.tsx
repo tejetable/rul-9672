@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, Home, IdCard, MapPin } from "lucide-react";
+import { Bell, CalendarDays, ChevronLeft, ChevronRight, FileText, Gift, Home, IdCard, LogOut, MapPin } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
 import { ListaAvisos } from "@/components/Avisos";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
@@ -21,7 +21,16 @@ export function SociaApp({ socio }: { socio: Socio }) {
     <div className="flex flex-1 flex-col">
       <header className="flex items-center gap-3 px-5 pt-5">
         <img src={escudo.url} alt="Escudo del R.U. Lucense" width={450} height={676} className="crest crest-blend h-10 w-auto" />
-        <span className="label-club">R.U. Lucense</span>
+        <span className="label-club flex-1">R.U. Lucense</span>
+        <button
+          onClick={() => {
+            dataService.cerrarSesion();
+            window.location.reload();
+          }}
+          className="label-club flex min-h-11 items-center gap-1 text-muted-foreground"
+        >
+          <LogOut size={16} strokeWidth={1.75} /> Salir
+        </button>
       </header>
       <ContactarClub texto={`Hola, soy socia/o del R.U. Lucense y quería consultaros algo.`} />
       <div className="flex-1 pb-36">
