@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FlaskConical } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type Role = "socia" | "negocio" | "directiva";
 
@@ -12,12 +13,12 @@ const ROLES: { id: Role; label: string }[] = [
 export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="fixed bottom-20 right-4 z-50 flex flex-col items-end gap-2">
+    <div className="relative z-30 mx-5 my-3 flex flex-col items-end gap-2">
       {open && (
-        <div className="rounded-2xl border-2 border-dashed border-gold bg-background p-2 shadow-sm">
+        <div className="absolute bottom-12 right-0 rounded-lg border border-primary/20 bg-background p-2 shadow-sm">
           <p className="label-club px-2 pb-1 text-muted-foreground">Demo · Ver como</p>
           {ROLES.map((r) => (
-            <button
+            <Button variant="ghost"
               key={r.id}
               onClick={() => {
                 onChange(r.id);
@@ -28,18 +29,18 @@ export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Rol
               }`}
             >
               {r.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}
-      <button
+      <Button variant="ghost"
         onClick={() => setOpen((o) => !o)}
-        className="label-club flex min-h-11 items-center gap-2 rounded-full border-2 border-dashed border-gold bg-background px-4 shadow-sm"
+        className="flex min-h-9 items-center gap-2 text-xs text-muted-foreground hover:bg-primary/10"
         aria-label="Selector de rol de la demo"
       >
         <FlaskConical size={16} strokeWidth={1.75} />
         Demo: {ROLES.find((r) => r.id === role)?.label}
-      </button>
+      </Button>
     </div>
   );
 }

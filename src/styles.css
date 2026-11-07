@@ -222,6 +222,8 @@
 @media (max-width: 359px) {
   .card-content { padding-left: 24px; padding-right: 14px; }
   .card-content > div:nth-child(2) { gap: 8px; }
+  .card-content > div:nth-child(2) > img { width: 64px; height: 96px; }
+  .card-content > div:nth-child(2) .title-club { font-size: 30px; }
   .card-member-name { font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) {
