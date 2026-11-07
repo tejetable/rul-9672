@@ -31,7 +31,7 @@ describe("visitas", () => {
     expect(repiteViaClub(vs, "p1", "s1", new Date("2026-11-01T10:00:00"))).toBe(true);
   });
 
-  it("separa nuevas verificadas (con carné) de declaradas (sin carné)", () => {
+  it("separa nuevas verificadas (con carnet) de declaradas (sin carnet)", () => {
     const vs = [v({}), v({ verificada: false, origen: "sin_carne" }), v({ tipoCliente: "ya_era_clienta" })];
     const s = estadisticas(vs, "p1", new Date("2026-01-01"));
     expect(s).toMatchObject({ visitas: 3, nuevas: 2, nuevasVerificadas: 1, nuevasDeclaradas: 1, pctNuevas: 67 });

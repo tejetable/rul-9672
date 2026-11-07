@@ -23,8 +23,8 @@ function Privacidad() {
         <span className="gold-rule mt-4" />
         <div className="mt-6 space-y-4">
           <p><b>Qué guardamos:</b> tu nombre, tu teléfono y tu número de socia/o.</p>
-          <p><b>Para qué:</b> para darte el carné y contar cuántas veces usas tus ventajas en los negocios que nos apoyan.</p>
-          <p><b>Quién lo ve:</b> el club. Los negocios solo ven tu nombre al validar tu carné.</p>
+          <p><b>Para qué:</b> para darte el carnet y contar cuántas veces usas tus ventajas en los negocios que nos apoyan.</p>
+          <p><b>Quién lo ve:</b> el club. Los negocios solo ven tu nombre al validar tu carnet.</p>
           <p><b>Lo que no hacemos:</b> no vendemos tus datos a nadie.</p>
           <p><b>Tus derechos:</b> puedes pedirnos ver, corregir o borrar tus datos cuando quieras. Escríbenos al [contacto del club pendiente].</p>
           <p className="text-sm text-muted-foreground">Responsable: Real Unión Lucense F.S. · [datos legales pendientes]</p>
