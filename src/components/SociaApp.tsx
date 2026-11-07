@@ -68,7 +68,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
           El Equipo
         </button>
         <button onClick={() => setCarnet(true)} className="flex flex-col items-center justify-end gap-1 pb-2 text-xs text-[rgba(13,70,49,.55)]" aria-label="Abrir carnet">
-          <span className="-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-oro"><IdCard size={26} strokeWidth={1.75} /></span>
+          <span className="-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-gold"><IdCard size={26} strokeWidth={1.75} /></span>
           Carnet
         </button>
         <button onClick={() => setTab("ventajas")} aria-current={tab === "ventajas" ? "page" : undefined} className={tabCls(tab === "ventajas")}>
