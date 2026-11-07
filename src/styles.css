@@ -204,6 +204,7 @@
 
 :root {
   --shadow-carne: 0 12px 30px -12px color-mix(in oklab, var(--verde) 35%, transparent), 0 1px 3px color-mix(in oklab, var(--verde) 12%, transparent);
+  --card-legibility: linear-gradient(90deg, transparent 0%, color-mix(in oklab, var(--roto) 94%, transparent) 10%, color-mix(in oklab, var(--roto) 65%, transparent) 32%, color-mix(in oklab, var(--roto) 25%, transparent) 100%);
 }
 
 .digital-card {
@@ -213,6 +214,7 @@
   border: 1px solid color-mix(in oklab, var(--verde) 18%, transparent);
 }
 .card-content { padding: 22px 20px 22px 34px; }
+.digital-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--card-legibility); pointer-events: none; }
 .card-kicker { font-size: 10px; font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0; }
 .card-member-name { font-size: 24px; font-weight: 900; line-height: 1.1; text-transform: uppercase; overflow-wrap: anywhere; }
 .card-motto { font-size: 22px; font-style: italic; font-weight: 900; line-height: 1.1; }
