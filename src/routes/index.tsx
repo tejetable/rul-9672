@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
@@ -67,6 +67,11 @@ export function AppFrame({ children, crema = false }: { children: React.ReactNod
 
 function Bienvenida() {
   const [ayuda, setAyuda] = useState(false);
+  const navigate = useNavigate();
+  const simular = () => {
+    const inv = dataService.get().socios.find((x) => x.estado === "invitada") ?? dataService.crearSocio("Socia Demo", "600000000");
+    navigate({ to: "/activar/$token", params: { token: inv.tokenInvitacion } });
+  };
   return (
     <section className="hero-crema flex flex-1 flex-col items-center px-6 pb-24 pt-12 text-center">
       <img src={escudo.url} alt="Escudo del Real Unión Lucense F.S." width={450} height={676} className="crest crest-blend animate-rise w-44" />
@@ -93,9 +98,14 @@ function Bienvenida() {
         {ayuda && (
           <div className="animate-rise rounded-2xl bg-background/70 p-4 text-left">
             <p>Busca en tu WhatsApp el enlace que te mandó el club. Si no lo encuentras, pídenos uno nuevo.</p>
-            <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="mt-3 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary font-bold text-primary-foreground">
-              <MessageCircle size={18} strokeWidth={1.75} /> Pedir enlace por WhatsApp
-            </a>
+            <div className="mt-3 flex gap-2">
+              <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-2 text-sm font-bold text-primary-foreground">
+                <MessageCircle size={18} strokeWidth={1.75} /> Pedir enlace
+              </a>
+              <button onClick={simular} className="min-h-11 flex-1 rounded-xl border-2 border-dashed border-primary px-2 text-sm font-bold">
+                Simular enlace
+              </button>
+            </div>
           </div>
         )}
       </div>
