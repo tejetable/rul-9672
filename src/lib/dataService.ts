@@ -290,6 +290,10 @@ export const dataService = {
     if (s.dispositivoId !== this.dispositivoId()) return { socio: s, estado: "movido" };
     return { socio: s, estado: "ok" };
   },
+  /** Cierra la sesión de este móvil (el carné sigue activo en el club) */
+  cerrarSesion() {
+    window.localStorage.removeItem(SESSION_KEY);
+  },
   // ---- Negocio ----
   negocioPorPin(pin: string) {
     return load().patrocinadores.find((p) => p.pin === pin && p.activo) ?? null;
