@@ -156,6 +156,7 @@ function seed(): DB {
   ];
   const avisos: Aviso[] = [
     { id: "a1", titulo: "Arrancamos temporada", texto: "Primera temporada en Primera Futgal. Te esperamos en Guntín.", fecha: now.toISOString(), tipo: "club" },
+    { id: "a2", titulo: "Próximo partido: vs Abella F.C.", texto: "Concello de Guntín - R.U. Lucense contra Abella F.C. Fecha y hora por confirmar. Te esperamos.", fecha: new Date(now.getTime() + 1000).toISOString(), tipo: "partido" },
   ];
   return { socios, patrocinadores, ventajas, canjes, partidos, avisos, socioActualId: null };
 }
