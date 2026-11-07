@@ -12,7 +12,7 @@ const ROLES: { id: Role; label: string }[] = [
 export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Role) => void }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+    <div className="fixed bottom-20 right-4 z-50 flex flex-col items-end gap-2">
       {open && (
         <div className="rounded-2xl border-2 border-dashed border-gold bg-background p-2 shadow-sm">
           <p className="label-club px-2 pb-1 text-muted-foreground">Demo · Ver como</p>
