@@ -6,6 +6,8 @@ import { PhotoSlot } from "@/components/PhotoSlot";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
 import { SociasPanel } from "@/components/SociasPanel";
+import { PatrocinadoresPanel } from "@/components/PatrocinadoresPanel";
+import { NegocioApp } from "@/components/NegocioApp";
 import { dataService } from "@/lib/dataService";
 import { waLink } from "@/lib/whatsapp";
 
@@ -48,8 +50,8 @@ function Index() {
   return (
     <AppFrame>
       {ready && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
-      {ready && role === "directiva" && <SociasPanel />}
-      {ready && role === "negocio" && <Pendiente />}
+      {ready && role === "directiva" && <Directiva />}
+      {ready && role === "negocio" && <NegocioApp />}
       <RoleSwitcher role={role} onChange={cambiar} />
     </AppFrame>
   );
@@ -129,13 +131,16 @@ function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
   );
 }
 
-function Pendiente() {
+function Directiva() {
+  const [t, setT] = useState<"socias" | "patro">("socias");
   return (
-    <section className="flex flex-1 flex-col justify-center px-6 pb-24">
-      <p className="label-club text-accent">Vista Negocio</p>
-      <h1 className="title-club mt-2 text-4xl">Estamos montándola.</h1>
-      <span className="gold-rule mt-4" />
-      <p className="mt-4 text-muted-foreground">Esta parte llega en el siguiente paso.</p>
-    </section>
+    <div className="flex flex-1 flex-col">
+      <div className="mx-5 mt-5 grid grid-cols-2 rounded-2xl bg-roto p-1">
+        {([["socias", "Socias/os"], ["patro", "Patrocinadores"]] as const).map(([id, l]) => (
+          <button key={id} onClick={() => setT(id)} className={`min-h-11 rounded-xl text-sm font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</button>
+        ))}
+      </div>
+      {t === "socias" ? <SociasPanel /> : <PatrocinadoresPanel />}
+    </div>
   );
 }

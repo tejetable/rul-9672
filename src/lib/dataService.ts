@@ -1,3 +1,5 @@
+import { repiteViaClub, yaRegistradaHoy, type Visita } from "./visitas";
+export type { Visita } from "./visitas";
 // Capa de datos aislada. Hoy: localStorage. Mañana: se cambia por Lovable Cloud sin tocar pantallas.
 
 export interface Socio {
@@ -69,12 +71,14 @@ export interface DB {
   canjes: Canje[];
   partidos: Partido[];
   avisos: Aviso[];
+  visitas: Visita[];
   socioActualId: string | null;
 }
 
-const KEY = "rul-demo-db-v3";
+const KEY = "rul-demo-db-v5";
 const DEVICE_KEY = "rul-device-id";
 const SESSION_KEY = "rul-session-socio";
+const NEGOCIO_KEY = "rul-session-negocio";
 
 export function nuevoToken() {
   const a = new Uint8Array(24);
@@ -158,7 +162,27 @@ function seed(): DB {
     { id: "a1", titulo: "Arrancamos temporada", texto: "Primera temporada en Primera Futgal. Te esperamos en Guntín.", fecha: now.toISOString(), tipo: "club" },
     { id: "a2", titulo: "Próximo partido: vs Abella F.C.", texto: "Concello de Guntín - R.U. Lucense contra Abella F.C. Fecha y hora por confirmar. Te esperamos.", fecha: new Date(now.getTime() + 1000).toISOString(), tipo: "partido" },
   ];
-  return { socios, patrocinadores, ventajas, canjes, partidos, avisos, socioActualId: null };
+  // 26 visitas de demo en 8 semanas para el patrocinador piloto (p1)
+  const visitas: Visita[] = [];
+  for (let i = 0; i < 26; i++) {
+    const dias = 55 - Math.floor(i * 2.1);
+    const fecha = new Date(now.getTime() - dias * 86400000 - (i % 5) * 3600000);
+    const conCarne = i % 4 !== 3;
+    const socio = conCarne ? socios[(i * 5) % 11]! : undefined;
+    visitas.push({
+      id: `vi${i + 1}`,
+      patrocinadorId: "p1",
+      fechaHora: fecha.toISOString(),
+      numeroSocio: socio?.numeroSocio,
+      socioId: socio?.id,
+      origen: conCarne ? (i % 2 ? "qr" : "numero") : "sin_carne",
+      tipoCliente: i % 9 === 0 ? "nueva" : "ya_era_clienta",
+      repiteViaClub: socio ? repiteViaClub(visitas, "p1", socio.id, fecha) : false,
+      verificada: conCarne,
+      anulada: false,
+    });
+  }
+  return { socios, patrocinadores, ventajas, canjes, partidos, avisos, visitas, socioActualId: null };
 }
 
 function load(): DB {
@@ -263,6 +287,56 @@ export const dataService = {
     if (s.estado === "desactivada") return { socio: s, estado: "desactivada" };
     if (s.dispositivoId !== this.dispositivoId()) return { socio: s, estado: "movido" };
     return { socio: s, estado: "ok" };
+  },
+  // ---- Negocio ----
+  negocioPorPin(pin: string) {
+    return load().patrocinadores.find((p) => p.pin === pin && p.activo) ?? null;
+  },
+  negocioSesion() {
+    const id = window.localStorage.getItem(NEGOCIO_KEY);
+    return id ? (load().patrocinadores.find((p) => p.id === id) ?? null) : null;
+  },
+  abrirNegocio(id: string) {
+    window.localStorage.setItem(NEGOCIO_KEY, id);
+  },
+  cerrarNegocio() {
+    window.localStorage.removeItem(NEGOCIO_KEY);
+  },
+  socioPorNumero(n: number) {
+    return load().socios.find((s) => s.numeroSocio === n && s.estado !== "desactivada") ?? null;
+  },
+  yaHoy(patId: string, socioId: string) {
+    return yaRegistradaHoy(load().visitas, patId, socioId);
+  },
+  repite(patId: string, socioId: string) {
+    return repiteViaClub(load().visitas, patId, socioId);
+  },
+  registrarVisita(input: { patrocinadorId: string; socio: Socio | null; origen: Visita["origen"]; tipoCliente: Visita["tipoCliente"] }): Visita | "duplicada" {
+    const db = load();
+    const { socio, patrocinadorId } = input;
+    if (socio && yaRegistradaHoy(db.visitas, patrocinadorId, socio.id)) return "duplicada";
+    const v: Visita = {
+      id: crypto.randomUUID(),
+      patrocinadorId,
+      fechaHora: new Date().toISOString(),
+      numeroSocio: socio?.numeroSocio,
+      socioId: socio?.id,
+      origen: socio ? input.origen : "sin_carne",
+      tipoCliente: input.tipoCliente,
+      repiteViaClub: socio ? repiteViaClub(db.visitas, patrocinadorId, socio.id) : false,
+      verificada: !!socio,
+      ventajaId: db.ventajas.find((x) => x.patrocinadorId === patrocinadorId)?.id,
+      anulada: false,
+    };
+    db.visitas.push(v);
+    save(db);
+    return v;
+  },
+  anularVisita(id: string) {
+    const db = load();
+    const v = db.visitas.find((x) => x.id === id);
+    if (v) v.anulada = true;
+    save(db);
   },
   /** Clienta nueva = declarada primera vez Y sin canjes previos en ese negocio */
   esClientaNueva(c: Canje) {
