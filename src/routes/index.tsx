@@ -4,9 +4,9 @@ import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { PhotoSlot } from "@/components/PhotoSlot";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
-import { Carne } from "@/components/Carne";
+import { SociaApp } from "@/components/SociaApp";
 import { SociasPanel } from "@/components/SociasPanel";
-import { dataService, type Socio } from "@/lib/dataService";
+import { dataService } from "@/lib/dataService";
 import { waLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
@@ -47,7 +47,7 @@ function Index() {
 
   return (
     <AppFrame>
-      {ready && role === "socia" && (sesion?.estado === "ok" ? <PantallaCarne socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
+      {ready && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
       {ready && role === "directiva" && <SociasPanel />}
       {ready && role === "negocio" && <Pendiente />}
       <RoleSwitcher role={role} onChange={cambiar} />
@@ -96,7 +96,7 @@ function Bienvenida() {
           Ya soy socia/o
         </button>
         {ayuda && (
-          <div className="animate-rise rounded-2xl bg-background/70 p-4 text-left">
+          <div className="animate-rise rounded-2xl bg-roto p-4 text-left">
             <p>Busca en tu WhatsApp el enlace que te mandó el club. Si no lo encuentras, pídenos uno nuevo.</p>
             <div className="mt-3 flex gap-2">
               <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carné del R.U. Lucense.")} target="_blank" rel="noreferrer" className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-2 text-sm font-bold text-primary-foreground">
@@ -108,18 +108,6 @@ function Bienvenida() {
             </div>
           </div>
         )}
-      </div>
-    </section>
-  );
-}
-
-function PantallaCarne({ socio }: { socio: Socio }) {
-  return (
-    <section className="flex flex-1 flex-col px-6 pb-28 pt-10">
-      <p className="label-club text-accent">Tu carné</p>
-      <h1 className="title-club mt-2 text-4xl">Eres de los nuestros.</h1>
-      <div className="mt-8 animate-rise">
-        <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
       </div>
     </section>
   );
