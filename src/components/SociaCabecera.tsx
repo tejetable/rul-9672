@@ -1,3 +1,4 @@
+import {VerComo} from "@/components/VerComo";
 import { Instagram, LogOut, MessageCircle, MoreHorizontal, Twitch } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { AvisosCampana } from "@/components/AvisosCampana";
@@ -12,7 +13,7 @@ export function SociaCabecera() {
   return <header className="sticky top-0 z-30 flex h-14 w-full shrink-0 items-center gap-2 border-b border-border bg-background px-4">
     <img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-7 shrink-0 object-contain" />
     <span className="min-w-0 flex-1 truncate text-sm font-black">R.U. LUCENSE</span>
-    <AvisosCampana quien="socias" />
+    <VerComo/><AvisosCampana quien="socias" />
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label="Más opciones" title="Más opciones" className="size-11 shrink-0"><MoreHorizontal size={22} strokeWidth={1.75} /></Button></DropdownMenuTrigger>
       <DropdownMenuContent align="end" collisionPadding={12} className="w-56 max-w-[calc(100vw-24px)] rounded-tile bg-background">

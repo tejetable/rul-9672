@@ -25,5 +25,8 @@
 - [x] Gestión del equipo directivo, invitaciones y selector Directiva/Socia.
 - [x] Ajustes del club y enlaces WhatsApp centralizados.
 - [x] Verificar acceso de Super admin y rechazos de API sin permisos.
-- [ ] Verificar recepción de invitación y acceso de Directiva por email (falta destinatario de prueba autorizado).
+- [ ] Unificar acceso por email, selección de varios roles y cambio de vista; retirar PIN y activaciones por token.
+- [ ] Añadir roles por email y formularios de Directiva, socias y negocios.
+- [ ] Añadir solicitudes públicas pendientes de pago y confirmación en efectivo.
+- [ ] Verificar acceso, permisos, solicitudes y cambio de rol; recepción de email requiere buzón del destinatario.
 - [ ] Configurar WhatsApp real del club y comprobar chat final (falta número con prefijo de país).

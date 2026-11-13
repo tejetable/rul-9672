@@ -85,6 +85,20 @@
       "when": 1794594473224,
       "tag": "0011_protect_private_club_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794594857211,
+      "tag": "0012_email_roles_and_membership_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794595019131,
+      "tag": "0013_audit_email_role_assignments",
+      "breakpoints": true
     }
   ]
 }

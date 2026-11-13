@@ -1,0 +1,3 @@
+CREATE FUNCTION public.audit_email_roles() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN IF auth.uid() IS NOT NULL AND (TG_OP='INSERT' OR OLD.activo IS DISTINCT FROM NEW.activo) THEN INSERT INTO public.registro_permisos(actor_id,afectado_id,accion,motivo) VALUES(auth.uid(),coalesce(NEW.user_id,auth.uid()),CASE WHEN NEW.activo THEN 'asignar_'||NEW.rol::text ELSE 'retirar_'||NEW.rol::text END,'Acceso por email'); END IF; RETURN NEW; END $$;
+CREATE TRIGGER audit_email_roles AFTER INSERT OR UPDATE ON public.usuario_roles FOR EACH ROW EXECUTE FUNCTION public.audit_email_roles();
+REVOKE ALL ON FUNCTION public.audit_email_roles() FROM PUBLIC,anon,authenticated;

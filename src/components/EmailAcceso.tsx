@@ -1,0 +1,11 @@
+import {useState} from 'react';
+import {ArrowLeft,Mail} from 'lucide-react';
+import {supabase} from '@/integrations/supabase/client';
+import {Button} from '@/components/ui/button';
+import {ClubCabecera} from '@/components/ClubCabecera';
+import {dataService} from '@/lib/dataService';
+export function EmailAcceso({onBack,onDone}:{onBack:()=>void;onDone:()=>void}){
+ const [email,setEmail]=useState(''),[sent,setSent]=useState(false),[code,setCode]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ async function submit(){setBusy(true);setError('');try{if(!sent){const r=await supabase.auth.signInWithOtp({email:email.trim().toLowerCase(),options:{shouldCreateUser:true,emailRedirectTo:window.location.origin}});if(r.error)throw r.error;setSent(true);}else{const r=await supabase.auth.verifyOtp({email:email.trim().toLowerCase(),token:code,type:'email'});if(r.error)throw r.error;await dataService.init();onDone();}}catch(e){setError(e instanceof Error?e.message:'No se pudo entrar.');}finally{setBusy(false);}}
+ return <div className="flex flex-1 flex-col"><ClubCabecera etiqueta="Entrar"><Button variant="ghost" size="icon" aria-label="Volver" onClick={onBack}><ArrowLeft/></Button></ClubCabecera><form className="space-y-5 px-6 py-8" onSubmit={e=>{e.preventDefault();void submit();}}><Mail className="text-accent"/><h1 className="club-title">Entra con tu email</h1><label className="block label-club">Email<input required autoComplete="email" type="email" disabled={sent} value={email} onChange={e=>setEmail(e.target.value)} className="club-input mt-2 w-full p-3"/></label>{sent&&<><p role="status" className="text-body-sm">Revisa tu email: entra con el enlace o escribe el código recibido.</p><label className="block label-club">Código de acceso<input required inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6,8}" maxLength={8} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))} className="club-input mt-2 w-full p-3"/></label></>}{error&&<p role="alert" className="text-body-sm font-bold">{error}</p>}<Button className="min-h-12 w-full" disabled={busy}>{busy?'Un momento…':sent?'Verificar y entrar':'Enviar acceso'}</Button>{sent&&<Button variant="ghost" type="button" onClick={()=>{setSent(false);setCode('');}}>Cambiar email</Button>}</form></div>;
+}

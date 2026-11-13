@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
-import { Route as ActivarTokenRouteImport } from './routes/activar.$token'
 import { Route as GaleriaFolderIdRouteImport } from './routes/galeria_.$folderId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -30,11 +29,6 @@ const PrivacidadRoute = PrivacidadRouteImport.update({
   path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ActivarTokenRoute = ActivarTokenRouteImport.update({
-  id: '/activar/$token',
-  path: '/activar/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GaleriaFolderIdRoute = GaleriaFolderIdRouteImport.update({
   id: '/galeria_/$folderId',
   path: '/galeria/$folderId',
@@ -45,14 +39,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
-  '/activar/$token': typeof ActivarTokenRoute
   '/galeria/$folderId': typeof GaleriaFolderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
-  '/activar/$token': typeof ActivarTokenRoute
   '/galeria/$folderId': typeof GaleriaFolderIdRoute
 }
 export interface FileRoutesById {
@@ -60,30 +52,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
-  '/activar/$token': typeof ActivarTokenRoute
   '/galeria_/$folderId': typeof GaleriaFolderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    '/' | '/galeria' | '/privacidad' | '/activar/$token' | '/galeria/$folderId'
+  fullPaths: '/' | '/galeria' | '/privacidad' | '/galeria/$folderId'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    '/' | '/galeria' | '/privacidad' | '/activar/$token' | '/galeria/$folderId'
-  id:
-    | '__root__'
-    | '/'
-    | '/galeria'
-    | '/privacidad'
-    | '/activar/$token'
-    | '/galeria_/$folderId'
+  to: '/' | '/galeria' | '/privacidad' | '/galeria/$folderId'
+  id: '__root__' | '/' | '/galeria' | '/privacidad' | '/galeria_/$folderId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GaleriaRoute: typeof GaleriaRoute
   PrivacidadRoute: typeof PrivacidadRoute
-  ActivarTokenRoute: typeof ActivarTokenRoute
   GaleriaFolderIdRoute: typeof GaleriaFolderIdRoute
 }
 
@@ -110,13 +92,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/activar/$token': {
-      id: '/activar/$token'
-      path: '/activar/$token'
-      fullPath: '/activar/$token'
-      preLoaderRoute: typeof ActivarTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/galeria_/$folderId': {
       id: '/galeria_/$folderId'
       path: '/galeria/$folderId'
@@ -131,7 +106,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GaleriaRoute: GaleriaRoute,
   PrivacidadRoute: PrivacidadRoute,
-  ActivarTokenRoute: ActivarTokenRoute,
   GaleriaFolderIdRoute: GaleriaFolderIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,7 +1,6 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest';
 const mocks=vi.hoisted(()=>({rpc:vi.fn(),from:vi.fn(),getUser:vi.fn().mockResolvedValue({data:{user:null}})}));
 vi.mock('@/integrations/supabase/client',()=>({supabase:{auth:{getUser:mocks.getUser},rpc:mocks.rpc,from:mocks.from}}));
-vi.mock('./club.functions',()=>({previewInvitation:vi.fn()}));
 vi.mock('./drive.functions',()=>({getDriveGallery:vi.fn().mockResolvedValue({albumes:[]})}));
 import {dataService} from './dataService';
 beforeEach(()=>{vi.clearAllMocks();mocks.from.mockImplementation(()=>({select:()=>({maybeSingle:async()=>({data:null,error:null})})}));});

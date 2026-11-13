@@ -1,6 +1,7 @@
+import {VerComo} from "@/components/VerComo";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Delete, LogOut, MessageCircle, QrCode } from "lucide-react";
+import { Check, LogOut, MessageCircle, QrCode } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
@@ -16,12 +17,12 @@ export function NegocioApp() {
   const [tab, setTab] = useState<"registrar" | "mes">("registrar");
   useEffect(() => setNeg(dataService.negocioSesion()), []);
   if (neg === undefined) return null;
-  if (!neg) return <Pin onOk={(p) => { dataService.abrirNegocio(p.id); setNeg(p); }} />;
+  if (!neg) return <p className="p-6">El club debe asociar tu email a un negocio.</p>;
 
   return (
     <div className="flex flex-1 flex-col pb-16">
       <ClubCabecera titulo={neg.nombre} etiqueta="Negocio amigo">
-        <AvisosCampana quien="negocios" />
+        <VerComo/><AvisosCampana quien="negocios" />
         <Button variant="ghost" size="icon" onClick={() => { runAction(async () => { await dataService.cerrarNegocio(); setNeg(null); }); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>
       </ClubCabecera>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
@@ -36,48 +37,6 @@ export function NegocioApp() {
     </div>
   );
 }
-
-function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
-  const [pin, setPin] = useState("");
-  const [err, setErr] = useState(false);
-  const pulsar = async (d: string) => {
-    const n = (pin + d).slice(0, 4);
-    setPin(n);
-    setErr(false);
-    if (n.length === 4) {
-      const p = await dataService.negocioPorPin(n);
-      if (p) onOk(p);
-      else {
-        setErr(true);
-        setPin("");
-      }
-    }
-  };
-  return (
-    <div className="flex flex-1 flex-col"><ClubCabecera etiqueta="Negocio" /><section className="flex flex-1 flex-col items-center px-5 pb-8 pt-8 text-center">
-      <span className="club-chip">Negocio amigo</span>
-      <h1 className="title-club mt-6 text-heading">Entra con tu PIN</h1>
-            <p className="mt-4 text-muted-foreground">El que te dio el club. Solo se pide una vez en este móvil.</p>
-      <div className="mt-6 flex gap-3">
-        {[0, 1, 2, 3].map((i) => (
-          <span key={i} className={`size-4 rounded-full border-2 border-primary ${i < pin.length ? "bg-primary" : ""}`} />
-        ))}
-      </div>
-      <p className="mt-3 min-h-6 text-body-sm font-bold">{err ? "Ese PIN no es de ningún negocio del club. Prueba otra vez." : ""}</p>
-      <div className="mt-2 grid w-full max-w-xs grid-cols-3 gap-3">
-        {["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"].map((d) =>
-          d === "" ? <span key="x" /> : (
-            <Button variant="ghost" key={d} onClick={() => (d === "⌫" ? setPin(pin.slice(0, -1)) : runAction(() => pulsar(d)))} className="flex h-auto min-h-14 items-center justify-center rounded-panel bg-surface text-section font-black active:scale-95">
-              {d === "⌫" ? <Delete size={22} strokeWidth={1.75} /> : d}
-            </Button>
-          ),
-        )}
-      </div>
-      <p className="label-club mt-6 text-muted-foreground">Demo: EFG Parquets · 1111</p>
-    </section></div>
-  );
-}
-
 
 function Registrar({ neg }: { neg: Patrocinador }) {
   const db = useClubData();

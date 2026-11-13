@@ -1,6 +1,0 @@
-import {useState} from 'react';
-import {supabase} from '@/integrations/supabase/client';
-import {Button} from '@/components/ui/button';
-import {dataService,runAction} from '@/lib/dataService';
-import {ClubCabecera} from '@/components/ClubCabecera';
-export function DirectivaAcceso(){const [email,setEmail]=useState(''),[sent,setSent]=useState(false),[busy,setBusy]=useState(false);return <div><ClubCabecera etiqueta="Directiva"/><form className="space-y-4 px-5 py-8" onSubmit={e=>{e.preventDefault();runAction(async()=>{setBusy(true);try{const r=await supabase.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:window.location.origin}});if(r.error)throw r.error;setSent(true);}finally{setBusy(false);}});}}><h1 className="club-title">Cuenta del club</h1>{dataService.rol()?<Button type="button" onClick={()=>runAction(async()=>{await dataService.cerrarSesion();window.location.reload();})}>Cerrar la sesión actual</Button>:<><label className="block label-club">Email<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} className="club-input mt-1 w-full p-3"/></label><Button type="submit" disabled={busy}>Enviar enlace de acceso</Button>{sent&&<p role="status">Revisa tu email para entrar.</p>}</>}</form></div>;}

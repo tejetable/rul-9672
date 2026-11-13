@@ -199,6 +199,7 @@ export type Database = {
           categoria: string
           detalle_baja: string | null
           direccion: string
+          email_acceso: string | null
           fecha_alta: string
           fecha_baja: string | null
           id: string
@@ -213,6 +214,7 @@ export type Database = {
           categoria?: string
           detalle_baja?: string | null
           direccion?: string
+          email_acceso?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
           id?: string
@@ -227,6 +229,7 @@ export type Database = {
           categoria?: string
           detalle_baja?: string | null
           direccion?: string
+          email_acceso?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
           id?: string
@@ -336,6 +339,7 @@ export type Database = {
           cambio_dispositivo: boolean
           consentimiento_at: string | null
           dispositivo_id: string | null
+          email: string | null
           estado: string
           fecha_activacion: string | null
           fecha_alta: string
@@ -354,6 +358,7 @@ export type Database = {
           cambio_dispositivo?: boolean
           consentimiento_at?: string | null
           dispositivo_id?: string | null
+          email?: string | null
           estado?: string
           fecha_activacion?: string | null
           fecha_alta?: string
@@ -363,7 +368,7 @@ export type Database = {
           motivo_baja?: string | null
           nombre: string
           numero_socio?: number
-          telefono: string
+          telefono?: string
           temporada?: string
           token_invitacion?: string
           ultima_apertura?: string | null
@@ -372,6 +377,7 @@ export type Database = {
           cambio_dispositivo?: boolean
           consentimiento_at?: string | null
           dispositivo_id?: string | null
+          email?: string | null
           estado?: string
           fecha_activacion?: string | null
           fecha_alta?: string
@@ -388,6 +394,59 @@ export type Database = {
         }
         Relationships: []
       }
+      solicitudes_socios: {
+        Row: {
+          consentimiento_at: string
+          creado_at: string
+          email: string
+          estado: string
+          id: string
+          mayor_de_edad: boolean
+          nombre: string
+          pago_origen: string | null
+          pago_referencia: string | null
+          socio_id: string | null
+          telefono: string
+          temporada: string
+        }
+        Insert: {
+          consentimiento_at?: string
+          creado_at?: string
+          email: string
+          estado?: string
+          id?: string
+          mayor_de_edad: boolean
+          nombre: string
+          pago_origen?: string | null
+          pago_referencia?: string | null
+          socio_id?: string | null
+          telefono?: string
+          temporada?: string
+        }
+        Update: {
+          consentimiento_at?: string
+          creado_at?: string
+          email?: string
+          estado?: string
+          id?: string
+          mayor_de_edad?: boolean
+          nombre?: string
+          pago_origen?: string | null
+          pago_referencia?: string | null
+          socio_id?: string | null
+          telefono?: string
+          temporada?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitudes_socios_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           role: Database["public"]["Enums"]["club_role"]
@@ -402,6 +461,86 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      usuario_roles: {
+        Row: {
+          activo: boolean
+          creado_at: string
+          creado_por: string | null
+          email: string
+          id: string
+          nombre: string
+          patrocinador_id: string | null
+          rol: Database["public"]["Enums"]["club_role"]
+          socio_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          activo?: boolean
+          creado_at?: string
+          creado_por?: string | null
+          email: string
+          id?: string
+          nombre?: string
+          patrocinador_id?: string | null
+          rol: Database["public"]["Enums"]["club_role"]
+          socio_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          activo?: boolean
+          creado_at?: string
+          creado_por?: string | null
+          email?: string
+          id?: string
+          nombre?: string
+          patrocinador_id?: string | null
+          rol?: Database["public"]["Enums"]["club_role"]
+          socio_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuario_roles_patrocinador_id_fkey"
+            columns: ["patrocinador_id"]
+            isOneToOne: false
+            referencedRelation: "patrocinadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usuario_roles_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usuario_vista: {
+        Row: {
+          role_id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          role_id: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          role_id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usuario_vista_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "usuario_roles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ventajas: {
         Row: {
@@ -542,6 +681,37 @@ export type Database = {
       }
     }
     Functions: {
+      alta_socio_email: {
+        Args: {
+          p_email: string
+          p_nombre: string
+          p_solicitud?: string
+          p_telefono?: string
+        }
+        Returns: string
+      }
+      asignar_directiva_email: {
+        Args: { p_email: string; p_nombre: string }
+        Returns: string
+      }
+      asignar_negocio_email: {
+        Args: { p_email: string; p_id: string }
+        Returns: undefined
+      }
+      crear_negocio_email: {
+        Args: {
+          p_categoria: string
+          p_condiciones: string
+          p_descripcion: string
+          p_direccion: string
+          p_email: string
+          p_importe?: number
+          p_logo: string
+          p_nombre: string
+          p_titulo: string
+        }
+        Returns: string
+      }
       crear_patrocinador: {
         Args: {
           p_categoria: string
@@ -556,6 +726,8 @@ export type Database = {
         }
         Returns: string
       }
+      elegir_vista: { Args: { p_role: string }; Returns: undefined }
+      enlazar_roles_email: { Args: never; Returns: Json }
       enlazar_socio: {
         Args: { p_dispositivo: string; p_token: string }
         Returns: string
@@ -563,6 +735,10 @@ export type Database = {
       entrar_negocio: { Args: { p_pin: string }; Returns: string }
       estado_sesion_socia: { Args: never; Returns: string }
       has_club_role: {
+        Args: { r: Database["public"]["Enums"]["club_role"] }
+        Returns: boolean
+      }
+      has_role: {
         Args: { r: Database["public"]["Enums"]["club_role"] }
         Returns: boolean
       }
@@ -578,6 +754,20 @@ export type Database = {
       }
       reservar_directiva: {
         Args: { p_email: string; p_nombre: string; p_socio?: string }
+        Returns: string
+      }
+      retirar_directiva_email: {
+        Args: { p_id: string; p_motivo: string }
+        Returns: undefined
+      }
+      solicitar_alta: {
+        Args: {
+          p_consentimiento: boolean
+          p_email: string
+          p_mayor: boolean
+          p_nombre: string
+          p_telefono: string
+        }
         Returns: string
       }
       stats_club: { Args: { p_periodo: string }; Returns: Json }

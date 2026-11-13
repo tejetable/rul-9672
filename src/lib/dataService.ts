@@ -3,8 +3,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {defaultSettings,settingsSchema,canManageTeam,clubWhatsapp} from "./club-settings";
-import {invitarDirectiva} from "./admin.functions";
-import { previewInvitation } from "./club.functions";
+import {membershipSchema,initialRole,type EmailRole} from "./email-access";
 import { getDriveGallery } from './drive.functions';
 import { folderIdFromUrl } from './drive-gallery';
 import type { Rango, Visita } from "./visitas";
@@ -14,6 +13,7 @@ export interface Socio {
   id: string;
   nombre: string;
   telefono: string;
+  email?: string;
   numeroSocio: number;
   temporada: string;
   fechaAlta: string;
@@ -35,6 +35,7 @@ export interface Patrocinador {
   categoria: string;
   logoUrl: string;
   direccion: string;
+  emailAcceso?: string;
   pin?: string;
   importePatrocinio?: number;
   fechaBaja?: string | null;
@@ -98,6 +99,8 @@ const emptyDB = (): DB => ({ socios: [], patrocinadores: [], ventajas: [], canje
 let settings=defaultSettings;
 let db = emptyDB();
 let role: 'socia' | 'negocio' | 'directiva' | 'super_admin' | null = null;
+let roles:EmailRole[]=[];
+let selectedRole:string|null=null;
 let reads: string[] = [];
 let version = 0;
 let userId: string | null = null;
@@ -109,7 +112,7 @@ let channel: ReturnType<typeof supabase.channel> | null = null;
 const notify = () => { version++; listeners.forEach((fn) => fn()); };
 const check = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 const socioFrom = (s: Record<string, unknown>): Socio => ({
-  id: String(s['id']), nombre: String(s['nombre']), telefono: String(s['telefono'] ?? ''), numeroSocio: Number(s['numero_socio']),
+  email:String(s['email']??''),id: String(s['id']), nombre: String(s['nombre']), telefono: String(s['telefono'] ?? ''), numeroSocio: Number(s['numero_socio']),
   temporada: String(s['temporada'] ?? '2026/27'), fechaAlta: String(s['fecha_alta'] ?? ''),
   consentimientoRGPD: { aceptado: !!s['consentimiento_at'], fecha: s['consentimiento_at'] ? String(s['consentimiento_at']) : null },
   mayorDeEdad: !!s['mayor_de_edad'], estado: s['estado'] as Socio['estado'], tokenInvitacion: String(s['token_invitacion'] ?? ''),
@@ -128,7 +131,9 @@ export const dataService = {
   estadoSocia:()=>sessionState,
   nombreVisita:(id:string)=>visitNames[id]?.nombre ?? 'Sin carnet',
   rol: () => role,
-  esSuper:()=>canManageTeam(role),
+  roles:()=>roles,
+  autenticado:()=>!!userId,
+  esSuper:()=>roles.some(r=>r.rol==='super_admin')||canManageTeam(role),
   esDirectiva:()=>role==='directiva'||role==='super_admin',
   ajustes:()=>settings,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
@@ -147,21 +152,27 @@ export const dataService = {
     notify();
   },
   async guardarAjustes(input:typeof defaultSettings){const r=await supabase.from("ajustes_club").update(settingsSchema.parse(input)).eq("id",true).select();check(r.error);if(!r.data?.length)throw new Error("Solo Super admin puede editar ajustes.");await this.cargarAjustes();},
-  async equipo(){const [p,r,i,h]=await Promise.all([supabase.from("profiles").select("*"),supabase.from("user_roles").select("*"),supabase.from("equipo_invitaciones").select("*"),supabase.from("registro_permisos").select("*").order("fecha",{ascending:false})]);check(p.error);check(i.error);check(h.error);return {personas:(p.data??[]).filter(x=>(r.data??[]).some(y=>y.user_id===x.id&&["directiva","super_admin"].includes(y.role))).map(x=>({...x,role:r.data?.find(y=>y.user_id===x.id)?.role})),invitaciones:i.data??[],historial:h.data??[]};},
-  async invitarDirectiva(nombre:string,email:string,socioId:string|null=null){return invitarDirectiva({data:{nombre,email,socioId,origin:window.location.origin}});},
-  async quitarDirectiva(id:string,motivo:string){const r=await supabase.rpc("quitar_directiva",{p_user:id,p_motivo:motivo});check(r.error);},
+  async equipo(){const [r,h]=await Promise.all([supabase.from('usuario_roles').select('*').in('rol',['directiva','super_admin']).eq('activo',true),supabase.from('registro_permisos').select('*').order('fecha',{ascending:false})]);check(r.error);check(h.error);return {personas:(r.data??[]).map(x=>({id:x.id,email:x.email,nombre:x.nombre,role:x.rol,estado:x.user_id?'Activo':'Disponible',fecha_alta:x.creado_at})),invitaciones:[],historial:h.data??[]};},
+  async invitarDirectiva(nombre:string,email:string,_socioId:string|null=null){const r=await supabase.rpc('asignar_directiva_email',{p_nombre:nombre,p_email:email});check(r.error);},
+  async quitarDirectiva(id:string,motivo:string){const r=await supabase.rpc('retirar_directiva_email',{p_id:id,p_motivo:motivo});check(r.error);},
+  async solicitarAlta(input:unknown){const f=membershipSchema.parse(input);const r=await supabase.rpc('solicitar_alta',{p_nombre:f.nombre,p_email:f.email,p_telefono:f.telefono,p_mayor:f.mayor,p_consentimiento:f.consentimiento});check(r.error);return r.data;},
+  async solicitudes(){const r=await supabase.from('solicitudes_socios').select('*').eq('estado','pendiente_pago').order('creado_at');check(r.error);return r.data??[];},
+  async pagarSolicitud(s:{id:string;nombre:string;email:string;telefono:string}){const r=await supabase.rpc('alta_socio_email',{p_nombre:s.nombre,p_email:s.email,p_telefono:s.telefono,p_solicitud:s.id});check(r.error);await this.refresh();},
+  async emailNegocio(id:string,email:string){const r=await supabase.rpc('asignar_negocio_email',{p_id:id,p_email:email});check(r.error);await this.refresh();},
+  async elegirRol(id:string){const chosen=roles.find(r=>r.id===id);if(!chosen)throw new Error('Rol no autorizado');const r=await supabase.rpc('elegir_vista',{p_role:id});check(r.error);selectedRole=id;role=chosen.rol;linkedSocio=chosen.socio_id;sessionState=role==='socia'?'ok':null;window.localStorage.setItem('rul-last-email-role',id);await this.refresh();},
   async albumes(){return (await getDriveGallery()).albumes;},
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {
     role=null;
     await this.cargarAjustes();
     const { data } = await supabase.auth.getUser(); userId = data.user?.id ?? null;
-    if (!userId) { db = emptyDB(); role = null; linkedSocio = null; reads = []; sessionState=null;visitNames={};notify(); return; }
-    const rr = await supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(); check(rr.error); role = rr.data?.role ?? null;
+    if (!userId) { db = emptyDB(); role = null;roles=[];selectedRole=null; linkedSocio = null; reads = []; sessionState=null;visitNames={};notify(); return; }
+    const rr=await supabase.rpc('enlazar_roles_email');check(rr.error);roles=(rr.data??[]) as unknown as EmailRole[];
+    const selected=initialRole(roles,selectedRole??window.localStorage.getItem('rul-last-email-role'));
+    selectedRole=selected?.id??null;role=selected?.rol??null;linkedSocio=selected?.socio_id??null;
+    if(selected){const r=await supabase.rpc('elegir_vista',{p_role:selected.id});check(r.error);}
+    sessionState=role==='socia'?'ok':null;
     if(this.esSuper())await this.cargarAjustes();
-    const pr = await supabase.from('profiles').select('socio_id').eq('id', userId).maybeSingle(); check(pr.error); linkedSocio = pr.data?.socio_id ?? null;
-    const status=role==='socia'?await supabase.rpc('estado_sesion_socia'):null;
-    sessionState=status?.data as typeof sessionState ?? null;
     await this.refresh();
     if (!channel) {
       channel = supabase.channel(`club-${crypto.randomUUID()}`).on('postgres_changes', { event: '*', schema: 'public' }, () => { void this.refresh().catch(() => toast.error('No se pudieron actualizar los datos.')); }).subscribe();
@@ -171,7 +182,7 @@ export const dataService = {
     if (!userId || !role) { db = emptyDB(); notify(); return; }
     const [socios, pats, ventajas, visitas, partidos, avisos, leidos] = await Promise.all([
       allRows((a,b) => supabase.from('socios').select('*').order('numero_socio').range(a,b)),
-      allRows((a,b) => supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,importe_patrocinio,fecha_baja,motivo_baja').order('fecha_alta').range(a,b)),
+      allRows((a,b) => supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,importe_patrocinio,fecha_baja,motivo_baja,email_acceso').order('fecha_alta').range(a,b)),
       allRows((a,b) => supabase.from('ventajas').select('*').order('id').range(a,b)),
       role === 'socia' ? Promise.resolve([]) : allRows((a,b) => {
         const q=supabase.from('visitas').select('*').order('fecha_hora');
@@ -181,7 +192,7 @@ export const dataService = {
       allRows((a,b) => supabase.from('avisos').select('*').order('publicado_at',{ascending:false}).range(a,b)),
       allRows((a,b) => supabase.from('avisos_leidos').select('aviso_id').eq('user_id',userId ?? '').order('aviso_id').range(a,b)),
     ]);
-    db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
+    db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:v.titulo,descripcion:v.descripcion,condiciones:v.condiciones,activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
       partidos: partidos.map(p=>({id:p.id,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.lugar,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
@@ -190,24 +201,15 @@ export const dataService = {
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}
     reads = leidos.map(l=>l.aviso_id); notify();
   },
-  async crearSocio(nombre: string, telefono: string) {
-    const input = z.object({ nombre:z.string().trim().min(1).max(200),telefono:z.string().regex(/^\d{9,15}$/) }).parse({nombre,telefono:telefono.replace(/\D/g,'')});
-    const r = await supabase.from('socios').insert(input).select().single(); check(r.error); if (!r.data) throw new Error('No se pudo crear la socia.'); await this.refresh(); return socioFrom(r.data);
-  },
-  async regenerarToken(id: string) { const r = await supabase.from('socios').update({token_invitacion:nuevoToken()}).eq('id',id).select().single(); check(r.error); await this.refresh(); return r.data ? socioFrom(r.data) : null; },
+  async crearSocio(nombre:string,telefono:string,email:string){const r=await supabase.rpc('alta_socio_email',{p_nombre:nombre,p_email:email,p_telefono:telefono.replace(/\D/g,'')});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la socia/o');return s;},
   async desactivar(id: string, fecha: string, motivo: string) { const r=await supabase.from('socios').update({estado:'desactivada',fecha_baja:fecha,motivo_baja:motivo}).eq('id',id);check(r.error);await this.refresh(); },
   async bajaPatrocinador(id:string,fecha:string,motivo:string,detalle:string) { const r=await supabase.from('patrocinadores').update({activo:false,fecha_baja:fecha,motivo_baja:motivo,detalle_baja:detalle}).eq('id',id);check(r.error);await this.refresh(); },
-  async porToken(token:string) { const s=await previewInvitation({data:{token}}); return s ? socioFrom(s) : null; },
   dispositivoId() { let d=window.localStorage.getItem('rul-device-id'); if(!d){d=crypto.randomUUID();window.localStorage.setItem('rul-device-id',d);} return d; },
-  async anonymous() { const {data}=await supabase.auth.getUser(); if(!data.user){const r=await supabase.auth.signInAnonymously();check(r.error);} },
-  async activar(token:string) { await this.anonymous(); const r=await supabase.rpc('enlazar_socio',{p_token:token,p_dispositivo:this.dispositivoId()});check(r.error);await this.init();return this.sesion()?.socio ?? null; },
-  sesion(): {socio:Socio;estado:'ok'|'movido'|'desactivada'} | null { if(role!=='socia'&&!this.esDirectiva())return null; const s=db.socios.find(s=>s.id===linkedSocio); if(!s)return null;return {socio:s,estado:s.estado==='desactivada'?'desactivada':this.esDirectiva()||s.dispositivoId===this.dispositivoId()?'ok':'movido'}; },
-  async cerrarSesion(){ if(channel){await supabase.removeChannel(channel);channel=null;} db=emptyDB();reads=[];role=null;userId=null;linkedSocio=null;sessionState=null;visitNames={};notify();const r=await supabase.auth.signOut();check(r.error); },
+  sesion(): {socio:Socio;estado:'ok'|'movido'|'desactivada'} | null {const s=db.socios.find(s=>s.id===linkedSocio);return s?{socio:s,estado:s.estado==='activa'?'ok':'desactivada'}:null;},
+  async cerrarSesion(){ if(channel){await supabase.removeChannel(channel);channel=null;} db=emptyDB();reads=[];roles=[];selectedRole=null;settings={...defaultSettings,email_club:''};role=null;userId=null;linkedSocio=null;sessionState=null;visitNames={};notify();const r=await supabase.auth.signOut();check(r.error); },
   async marcarApertura(_id:string){const r=await supabase.rpc('marcar_apertura');check(r.error);},
-  pinLibre:()=>String(Math.floor(1000+Math.random()*9000)),
-  async crearPatrocinador(p:Omit<Patrocinador,'id'|'activo'>,v:{titulo:string;descripcion:string;condiciones:string}):Promise<Patrocinador|'pin_usado'> {const r=await supabase.rpc('crear_patrocinador',{p_nombre:p.nombre,p_categoria:p.categoria,p_direccion:p.direccion,p_logo:p.logoUrl,p_pin:p.pin ?? '',p_titulo:v.titulo,p_descripcion:v.descripcion,p_condiciones:v.condiciones,p_importe:p.importePatrocinio ?? 0});check(r.error);if(!r.data)return 'pin_usado';await this.refresh();const pat=db.patrocinadores.find(x=>x.id===r.data);if(!pat)throw new Error('No se pudo leer el patrocinador.');return pat;},
-  async negocioPorPin(pin:string){await this.anonymous();const r=await supabase.rpc('entrar_negocio',{p_pin:pin});check(r.error);if(!r.data)return null;await this.init();return this.negocioSesion();},
-  negocioSesion(){return role==='negocio'? db.patrocinadores[0] ?? null : null;},
+  async crearPatrocinador(p:Omit<Patrocinador,'id'|'activo'>,v:{titulo:string;descripcion:string;condiciones:string}):Promise<Patrocinador|'pin_usado'> {const r=await supabase.rpc('crear_negocio_email',{p_nombre:p.nombre,p_categoria:p.categoria,p_direccion:p.direccion,p_logo:p.logoUrl,p_email:p.emailAcceso??'',p_titulo:v.titulo,p_descripcion:v.descripcion,p_condiciones:v.condiciones,p_importe:p.importePatrocinio??0});check(r.error);await this.refresh();const pat=db.patrocinadores.find(x=>x.id===r.data);if(!pat)throw new Error('No se pudo leer el patrocinador.');return pat;},
+  negocioSesion(){const id=roles.find(r=>r.id===selectedRole)?.patrocinador_id;return role==='negocio'?db.patrocinadores.find(p=>p.id===id)??null:null;},
   abrirNegocio(_id:string){},
   cerrarNegocio(){return this.cerrarSesion();},
   async socioPorNumero(n:number){const r=await supabase.rpc('identificar_socio',{p_numero:n});check(r.error);if(!r.data)return null;const s=r.data as unknown as {id:string;nombre:string;numeroSocio:number;repite:boolean;yaHoy:boolean};return {...s,telefono:'',temporada:'2026/27',estado:'activa' as const,fechaAlta:'',consentimientoRGPD:{aceptado:false,fecha:null},mayorDeEdad:true,tokenInvitacion:'',fechaActivacion:null,dispositivoId:null,cambioDispositivo:false};},
@@ -221,6 +223,5 @@ export const dataService = {
   async statsPatrocinador(id:string,rango:Rango){const r=await supabase.rpc('stats_patrocinador',{p_patrocinador_id:id,p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubStats;},
   async statsClub(rango:Rango){const r=await supabase.rpc('stats_club',{p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubSummary;},
 };
-export function nuevoToken(){const a=new Uint8Array(24);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('');}
 export function useClubData(){useSyncExternalStore(dataService.subscribe,dataService.snapshot,()=>0);return db;}
 export function runAction(fn:()=>Promise<unknown>){void fn().catch(e=>toast.error(e instanceof Error?e.message:'No se pudo completar la operación.'));}

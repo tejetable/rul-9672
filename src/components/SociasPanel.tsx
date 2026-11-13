@@ -1,19 +1,15 @@
+import {accessMessage} from "@/lib/email-access";
 import {InviteForm} from "./ClubAdmin";
-import {DEMO_MODE} from "@/lib/club-settings";
+
 import { BajaForm } from "@/components/BajaForm";
 import { Button } from "@/components/ui/button";
-import { Link } from "@tanstack/react-router";
+
 import { useEffect, useMemo, useState } from "react";
 import { MessageCircle, Plus, Search, Smartphone } from "lucide-react";
 import { dataService, type Socio, useClubData, runAction } from "@/lib/dataService";
-import { textoInvitacion, waLink } from "@/lib/whatsapp";
+import { waLink } from "@/lib/whatsapp";
 
-function enlace(s: Socio) {
-  return `${window.location.origin}/activar/${s.tokenInvitacion}`;
-}
-function enviar(s: Socio) {
-  window.open(waLink(textoInvitacion(s.nombre, enlace(s)), s.telefono), "_blank");
-}
+function enviar(s:Socio){if(s.telefono)window.open(waLink(accessMessage(s.email??'',window.location.origin),s.telefono),'_blank');else void navigator.clipboard.writeText(accessMessage(s.email??'',window.location.origin));}
 
 const ESTADO: Record<Socio["estado"], { label: string; cls: string }> = {
   invitada: { label: "Invitada", cls: "bg-suave text-muted-foreground border border-border" },
@@ -30,6 +26,9 @@ export function SociasPanel() {
   const [form, setForm] = useState(false);
   const [nombre, setNombre] = useState("");
   const [tel, setTel] = useState("");
+  const [email,setEmail]=useState("");
+  const [pending,setPending]=useState<Awaited<ReturnType<typeof dataService.solicitudes>>>([]);
+  useEffect(()=>{runAction(async()=>setPending(await dataService.solicitudes()));},[db]);
   const [creada, setCreada] = useState<Socio | null>(null);
 
   const refresh = () => setSocios([...dataService.get().socios].sort((a, b) => b.numeroSocio - a.numeroSocio));
@@ -42,11 +41,11 @@ export function SociasPanel() {
   const activas = socios.filter((s) => s.estado === "activa").length;
 
   const guardar = async () => {
-    if (!nombre.trim() || tel.replace(/\D/g, "").length < 9) return;
-    const s = await dataService.crearSocio(nombre, tel);
+    if (!nombre.trim() || !email.includes("@")) return;
+    const s = await dataService.crearSocio(nombre, tel,email);
     setCreada(s);
     setNombre("");
-    setTel("");
+    setTel("");setEmail("");
     setForm(false);
     refresh();
   };
@@ -56,9 +55,10 @@ export function SociasPanel() {
       <p className="club-chip">Directiva</p>
       <h1 className="title-club mt-2 text-heading">Socias/os</h1>
             <p className="mt-4 font-bold">
-        {activas} activas de {socios.length} invitadas
+        {activas} activas de {socios.length} socias/os
       </p>
 
+      {pending.length>0&&<div className="mt-5 space-y-3"><h2 className="club-section-title">Solicitudes pendientes</h2>{pending.map(s=><article key={s.id} className="rounded-panel bg-surface p-4"><p className="font-bold">{s.nombre}</p><p className="break-all text-body-sm">{s.email}</p><p className="label-club mt-2">Pendiente de pago · {s.temporada}</p><Button className="mt-3 whitespace-normal" onClick={()=>runAction(()=>dataService.pagarSolicitud(s))}>Marcar como pagada (efectivo)</Button></article>)}</div>}
       {creada && (
         <div className="animate-rise mt-5 rounded-panel border-2 border-accent bg-suave p-4">
           <p className="label-club text-accent">Nueva socia/o</p>
@@ -67,11 +67,8 @@ export function SociasPanel() {
           </p>
           <div className="mt-3 flex flex-col gap-2">
             <Button variant="ghost" onClick={() => enviar(creada)} className="flex h-auto min-h-11 items-center justify-center gap-2 rounded-control bg-primary font-bold text-primary-foreground">
-              <MessageCircle size={18} strokeWidth={1.75} /> Enviar invitación
+              <MessageCircle size={18} strokeWidth={1.75} /> Enviar / copiar acceso
             </Button>
-            {DEMO_MODE&&<Link to="/activar/$token" params={{ token: creada.tokenInvitacion }} className="flex h-auto min-h-11 items-center justify-center rounded-control border-2 border-dashed border-primary font-bold">
-              Abrir invitación (demo)
-            </Link>}
           </div>
         </div>
       )}
@@ -80,7 +77,7 @@ export function SociasPanel() {
         <div className="mt-5 border-y border-border py-4">
           <label className="label-club">Nombre</label>
           <input value={nombre} onChange={(e) => setNombre(e.target.value)} className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
-          <label className="label-club mt-3 block">Teléfono</label>
+          <label className="label-club mt-3 block">Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="club-input mt-1 min-h-11 w-full px-3"/><label className="label-club mt-3 block">Teléfono (opcional)</label>
           <input value={tel} onChange={(e) => setTel(e.target.value)} inputMode="tel" placeholder="600 000 000" className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
           <div className="mt-4 flex gap-2">
             <Button variant="ghost" onClick={() => runAction(guardar)} className="h-auto min-h-11 flex-1 rounded-control bg-primary font-bold text-primary-foreground">Guardar</Button>
@@ -116,17 +113,10 @@ export function SociasPanel() {
             )}
             <div className="mt-3 flex gap-2">
               <Button variant="ghost"
-                onClick={() => runAction(async () => {
-                  const n = await dataService.regenerarToken(s.id);
-                  refresh();
-                  if (n) {
-                    setCreada(n);
-                    enviar(n);
-                  }
-                })}
+                onClick={()=>enviar(s)}
                 className="h-auto min-h-11 flex-1 rounded-control border border-primary text-body-sm font-bold"
               >
-                Reenviar invitación
+                Enviar / copiar acceso
               </Button>
               {s.estado !== "desactivada" && (
                 <Button variant="ghost"

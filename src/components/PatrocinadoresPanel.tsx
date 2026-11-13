@@ -91,7 +91,7 @@ export function PatrocinadoresPanel() {
               <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
                 <div className="h-full rounded-full bg-accent" style={{ width: `${prog.pct}%` }} />
               </div>
-              {p.activo && <Button variant="ghost" onClick={() => setBaja(p.id)}>Desactivar</Button>}
+              <EmailNegocio id={p.id} email={p.emailAcceso??""}/>{p.activo && <Button variant="ghost" onClick={() => setBaja(p.id)}>Desactivar</Button>}
             </li>
           );
         })}
@@ -105,7 +105,7 @@ export function PatrocinadoresPanel() {
 
 
 function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
-  const [f, setF] = useState({ importe: "", nombre: "", categoria: "", direccion: "", pin: dataService.pinLibre(), logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
+  const [f, setF] = useState({ importe: "", nombre: "", categoria: "", direccion: "", emailAcceso: "", logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
   const [err, setErr] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });
   const logo = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,12 +117,12 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
   };
   const guardar = async () => {
     if (!f.nombre.trim() || !f.titulo.trim()) return setErr("Pon al menos el nombre y la ventaja.");
-    if (!/^\d{4}$/.test(f.pin)) return setErr("El PIN tiene que ser de 4 números.");
+    if (!f.emailAcceso.includes("@")) return setErr("Indica el email de acceso.");
     const r = await dataService.crearPatrocinador(
-      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", pin: f.pin, logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
+      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", emailAcceso: f.emailAcceso, logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
       { titulo: f.titulo.trim(), descripcion: f.descripcion.trim(), condiciones: f.condiciones.trim() },
     );
-    if (r === "pin_usado") return setErr("Ese PIN ya lo tiene otro negocio.");
+    if (r === "pin_usado") return setErr("No se pudo guardar.");
     onDone();
   };
   const inp = "mt-1 h-auto min-h-12 w-full rounded-control club-input border-input px-3";
@@ -137,7 +137,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       <label className="mt-3 block"><span className="label-club">Logo</span><input type="file" accept="image/*" onChange={logo} className="mt-1 block w-full text-body-sm" /></label>
       {f.logoUrl && <img src={f.logoUrl} alt="Logo del patrocinador" className="mt-2 h-14 w-auto object-contain" />}
       {campo("direccion", "Dirección")}
-      {campo("pin", "PIN (4 dígitos)", { inputMode: "numeric", maxLength: 4 })}
+      {campo("emailAcceso", "Email de acceso del negocio", {type:"email",required:true})}
       {campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
       <p className="label-club mt-5 text-accent">Ventaja</p>
       {campo("titulo", "Título")}
@@ -151,3 +151,5 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
     </div>
   );
 }
+
+function EmailNegocio({id,email}:{id:string;email:string}){const [value,setValue]=useState(email);return <form className="mt-3 space-y-2" onSubmit={e=>{e.preventDefault();runAction(()=>dataService.emailNegocio(id,value));}}><label className="block label-club">Email de acceso del negocio<input required type="email" value={value} onChange={e=>setValue(e.target.value)} className="club-input mt-1 w-full p-3"/></label><Button type="submit" variant="outline">Guardar acceso</Button></form>;}
