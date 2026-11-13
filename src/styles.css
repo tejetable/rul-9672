@@ -361,3 +361,45 @@
 .member-tab svg { width: 22px; height: 22px; }
 .member-tab[aria-label="Abrir carnet"] svg { width: 26px; height: 26px; }
 .club-tabs > button[aria-pressed="true"], .club-tabs > button.bg-primary:hover { background: var(--primary); color: var(--primary-foreground); }
+
+/* Welcome and passwordless access share the same full-height composition. */
+:root {
+  --access-halo: radial-gradient(circle, color-mix(in srgb,var(--primary-foreground) 55%,transparent),transparent 70%);
+  --access-input: color-mix(in srgb,var(--primary-foreground) 70%,transparent);
+  --access-border: color-mix(in srgb,var(--primary) 20%,transparent);
+  --access-muted: color-mix(in srgb,var(--primary) 55%,transparent);
+}
+.access-screen { position:relative; display:flex; flex-direction:column; width:100%; height:100dvh; min-height:600px; padding:env(safe-area-inset-top) 24px calc(24px + env(safe-area-inset-bottom)); background:var(--background); }
+.access-identity { flex:1; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding-bottom:24px; text-align:center; transition:padding 250ms; }
+.access-crest-wrap { position:relative; isolation:isolate; }
+.access-crest-wrap::before { content:""; position:absolute; z-index:-1; width:320px; height:320px; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--access-halo); pointer-events:none; }
+.access-crest { display:block; width:150px; height:auto; object-fit:contain; animation:access-crest-in 360ms ease-out both; transition:width 250ms; }
+.access-motto { max-width:350px; margin:28px 0 0; font-size:30px; line-height:1; text-transform:uppercase; font-weight:900; text-wrap:balance; letter-spacing:0; animation:access-phrase-in 360ms 120ms ease-out both; }
+.access-gold { display:block; width:48px; height:3px; margin-top:24px; background:var(--gold); }
+.access-bottom { display:flex; flex-direction:column; gap:12px; flex-shrink:0; animation:access-phrase-in 360ms 240ms ease-out both; }
+.access-button { height:56px; min-height:56px; width:100%; border-radius:16px; font-size:15px; font-weight:900; letter-spacing:.06em; box-shadow:none; }
+.access-button-secondary,.access-button-secondary:hover { background:transparent; border:1.5px solid var(--primary); color:var(--primary); }
+.access-season { text-align:center; font-size:12px; color:var(--access-muted); margin-top:4px; }
+.access-compact .access-crest { width:96px; }
+.access-compact .access-motto { font-size:24px; max-width:290px; margin-top:24px; }
+.access-compact .access-identity { flex:1; padding-bottom:32px; }
+.access-compact .access-crest,.access-compact .access-motto { animation:none; }
+.access-compact .access-bottom { animation:access-phrase-in 250ms ease-out both; }
+.access-form { display:flex; flex-direction:column; gap:16px; }
+.access-title { font-size:24px; line-height:1.15; font-weight:900; text-wrap:balance; }
+.access-input { display:block; height:56px; width:100%; padding:0 16px; border-radius:14px; border:1px solid var(--access-border); background:var(--access-input); outline:none; }
+.access-input:focus { border-color:var(--primary); }
+.access-back { height:32px; padding:0; color:var(--primary); font-size:13px; }
+.access-email-note { font-size:13px; line-height:1.5; overflow-wrap:anywhere; }
+.access-otp { width:100%; justify-content:center; }
+.access-otp-group { display:grid; grid-template-columns:repeat(6,minmax(0,48px)); gap:6px; width:100%; justify-content:space-between; }
+.access-otp-slot { width:100%; height:56px; border:1px solid var(--access-border); border-radius:12px!important; background:var(--access-input); font-size:24px; font-weight:900; box-shadow:none; }
+.access-error { border:1px solid var(--gold); border-radius:12px; padding:12px; font-size:13px; color:var(--primary); }
+.access-role-list { display:flex; flex-direction:column; gap:12px; }
+.access-role { display:flex; height:72px; min-height:72px; width:100%; gap:16px; border-radius:16px; background:var(--result-surface); padding:0 16px; white-space:normal; }
+.access-role:hover { background:var(--access-input); }
+@keyframes access-crest-in { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+@keyframes access-phrase-in { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@media (min-height:801px) { .access-screen:not(.access-compact) .access-crest { width:180px; } }
+@media (min-width:640px) { .access-screen { height:calc(100dvh - 48px); } }
+@media (prefers-reduced-motion:reduce) { .access-crest,.access-motto,.access-bottom { animation:none; transition:none; } .access-identity { transition:none; } }

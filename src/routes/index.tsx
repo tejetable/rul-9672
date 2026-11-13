@@ -3,14 +3,15 @@ import {DEMO_MODE} from "@/lib/club-settings";
 import {EmailAcceso} from "@/components/EmailAcceso";
 import {AltaSocio} from "@/components/AltaSocio";
 import {VerComo} from "@/components/VerComo";
-import {roleLabel} from "@/lib/email-access";
+import {AccesoVisual} from "@/components/AccesoVisual";
+import {EleccionRol} from "@/components/EleccionRol";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
-import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
+
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
 import { AvisosPanel } from "@/components/Avisos";
@@ -24,8 +25,6 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "R.U. Lucense · Carnet de la afición" },
-      { property: "og:image", content: pina.url },
-      { name: "twitter:image", content: pina.url },
       { name: "description", content: "Tu carnet de socia/o del Real Unión Lucense F.S. y lo que te da ser de los nuestros en Guntín." },
       { property: "og:title", content: "R.U. Lucense · Carnet de la afición" },
       { property: "og:description", content: "Más que un club, un grupo de amigos. Tu carnet y tus ventajas en el móvil." },
@@ -43,8 +42,8 @@ function Index() {
  useEffect(()=>{void dataService.init().catch(e=>runAction(async()=>{throw e;})).finally(()=>setReady(true));const saved=window.localStorage.getItem(ROLE_KEY) as Role|null;if(saved)setDemoRole(saved);const t=setTimeout(()=>setWait(false),1500);return()=>clearTimeout(t);},[]);
  const role=dataService.rol(),sesion=dataService.sesion(),roles=dataService.roles();
  const unknown=dataService.autenticado()&&roles.length===0;
- const content=!ready||wait?<Cargando/>:dataService.autenticado()?unknown?<section className="space-y-5 px-6 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><Button onClick={()=>setPage('join')}>Hazte socia/o</Button>{dataService.whatsapp('Hola, necesito ayuda para entrar.')&&<Button asChild variant="outline"><a href={dataService.whatsapp('Hola, necesito ayuda para entrar.')??''} target="_blank" rel="noreferrer">Contactar con el club</a></Button>}<Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<section className="space-y-4 px-6 py-10"><ClubCabecera etiqueta="Entrar"><Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></ClubCabecera><h1 className="club-title">¿Cómo quieres entrar?</h1>{roles.map(r=><Button key={r.id} variant="outline" className="min-h-20 w-full justify-start whitespace-normal rounded-panel bg-surface px-5 text-item" onClick={()=>runAction(()=>dataService.elegirRol(r.id))}>{roleLabel(r)}</Button>)}</section>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')} onJoin={()=>setPage('join')}/>;
- return <AppFrame crema={!dataService.autenticado()}>{page==='join'?<AltaSocio onBack={()=>setPage('welcome')}/>:page==='login'&&!dataService.autenticado()?<EmailAcceso onBack={()=>setPage('welcome')} onDone={()=>setPage('welcome')}/>:content}{ready&&!wait&&DEMO_MODE&&<RoleSwitcher role={demoRole} onChange={r=>{window.localStorage.setItem(ROLE_KEY,r);setDemoRole(r);}}/>}</AppFrame>;
+ const content=!ready||wait?<Cargando/>:dataService.autenticado()?unknown?<section className="space-y-5 px-6 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><Button onClick={()=>setPage('join')}>Hazte socia/o</Button>{dataService.whatsapp('Hola, necesito ayuda para entrar.')&&<Button asChild variant="outline"><a href={dataService.whatsapp('Hola, necesito ayuda para entrar.')??''} target="_blank" rel="noreferrer">Contactar con el club</a></Button>}<Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<EleccionRol/>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')} onJoin={()=>setPage('join')}/>;
+ return <AppFrame>{page==='join'?<AltaSocio onBack={()=>setPage('welcome')}/>:page==='login'&&!dataService.autenticado()?<EmailAcceso onBack={()=>setPage('welcome')} onDone={()=>setPage('welcome')}/>:content}{ready&&!wait&&DEMO_MODE&&<RoleSwitcher role={demoRole} onChange={r=>{window.localStorage.setItem(ROLE_KEY,r);setDemoRole(r);}}/>}</AppFrame>;
 }
 
 function Cargando() {
@@ -67,29 +66,7 @@ export function AppFrame({ children, crema = false }: { children: React.ReactNod
 }
 
 function Bienvenida({onEnter,onJoin}:{onEnter:()=>void;onJoin:()=>void}) {
-  return (
-    <section className="hero-crema flex flex-1 flex-col items-center px-6 pb-24 pt-12 text-center">
-      <img src={escudo.url} alt="Escudo del Real Unión Lucense F.S." width={450} height={676} className="crest crest-blend animate-rise w-44" />
-      <h1 className="title-club animate-rise mt-8 text-heading" style={{ animationDelay: "120ms" }}>
-        Más que un club, un grupo de amigos.
-      </h1>
-            <p className="mt-5 text-muted-foreground">Real Unión Lucense F.S. · Guntín (Lugo)</p>
-
-      <img
-        src={pina.url}
-        alt="La piña del equipo en el pabellón de Guntín"
-        width={1920}
-        height={1280}
-        className="animate-rise mt-8 aspect-[3/2] w-full rounded-panel object-cover"
-        style={{ animationDelay: "240ms" }}
-      />
-
-      <div className="mt-8 flex w-full flex-col gap-3">
-        <Button onClick={onEnter} className="min-h-12 rounded-panel font-black">ENTRAR</Button>
-        <Button variant="outline" onClick={onJoin} className="min-h-12 rounded-panel border-primary font-black">HAZTE SOCIA/O</Button>
-      </div>
-    </section>
-  );
+ return <AccesoVisual><Button onClick={onEnter} className="access-button">ENTRAR</Button><Button variant="outline" onClick={onJoin} className="access-button access-button-secondary">HAZTE SOCIA/O</Button><p className="access-season">Temporada 2026/27</p></AccesoVisual>;
 }
 
 function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {

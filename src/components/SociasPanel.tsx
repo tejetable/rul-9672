@@ -75,10 +75,10 @@ export function SociasPanel() {
 
       {form ? (
         <div className="mt-5 border-y border-border py-4">
-          <label className="label-club">Nombre</label>
-          <input value={nombre} onChange={(e) => setNombre(e.target.value)} className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
-          <label className="label-club mt-3 block">Email</label><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="club-input mt-1 min-h-11 w-full px-3"/><label className="label-club mt-3 block">Teléfono (opcional)</label>
-          <input value={tel} onChange={(e) => setTel(e.target.value)} inputMode="tel" placeholder="600 000 000" className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
+          <label htmlFor="alta-nombre" className="label-club">Nombre</label>
+          <input id="alta-nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
+          <label htmlFor="alta-email" className="label-club mt-3 block">Email</label><input id="alta-email" type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="club-input mt-1 min-h-11 w-full px-3"/><label htmlFor="alta-telefono" className="label-club mt-3 block">Teléfono (opcional)</label>
+          <input id="alta-telefono" value={tel} onChange={(e) => setTel(e.target.value)} inputMode="tel" placeholder="600 000 000" className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
           <div className="mt-4 flex gap-2">
             <Button variant="ghost" onClick={() => runAction(guardar)} className="h-auto min-h-11 flex-1 rounded-control bg-primary font-bold text-primary-foreground">Guardar</Button>
             <Button variant="ghost" onClick={() => setForm(false)} className="h-auto min-h-11 rounded-control px-4 font-bold">Cancelar</Button>

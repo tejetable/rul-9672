@@ -45,3 +45,4 @@ use the editor.
 - Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.
 
 - Public membership applications call a validated RPC that returns only a request ID; payment approval is role-checked and transactional, with payment reference fields reserved for future verified payment callbacks.
+- Welcome, email entry and role selection share AccesoVisual and semantic access tokens; use input-otp for native paste, numeric keyboard and focus progression rather than custom digit handling.

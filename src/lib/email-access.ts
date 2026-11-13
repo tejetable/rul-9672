@@ -1,4 +1,5 @@
 import { z } from 'zod';
+export const CODE_RESEND_SECONDS=30;
 export const membershipSchema=z.object({nombre:z.string().trim().min(1).max(200),email:z.string().trim().toLowerCase().email().max(254),telefono:z.string().regex(/^$|^[0-9]{9,15}$/),mayor:z.literal(true),consentimiento:z.literal(true)});
 export interface EmailRole {id:string;rol:'socia'|'negocio'|'directiva'|'super_admin';socio_id:string|null;patrocinador_id:string|null;numero_socio:number|null;nombre:string;}
 export function roleLabel(r:EmailRole){return r.rol==='socia'?`Socia/o nº ${r.numero_socio??'[pendiente]'}`:r.rol==='negocio'?`Negocio: ${r.nombre}`:r.rol==='super_admin'?'Super admin':'Directiva';}
