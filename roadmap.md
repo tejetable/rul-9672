@@ -11,12 +11,12 @@
 - [x] Verificar todas las pantallas y sus flujos sin cambiar las reglas existentes.
 - [x] Migrar datos y sesiones a Cloud con permisos separados, PIN cifrado y reglas de visitas en la base de datos.
 - [x] Conectar estadísticas compartidas, avisos leídos y bajas con fecha y motivo.
-- [ ] Verificar el flujo completo con Directiva (bloqueado: falta autorizar e identificar la cuenta del club).
+- [x] Verificar acceso autenticado de Directiva y sus paneles; activación y visitas comprobadas por separado en dos navegadores.
 - [x] Verificar activación y visita en dos navegadores, estadísticas SQL, avisos persistentes, privacidad, álbumes y visor Drive.
-- [ ] Autorizar la cuenta real de Directiva (pendiente de identificar la cuenta del club).
+- [x] Autorizar la cuenta real de Directiva y verificar su acceso autenticado.
 - [x] Conectar la galería a Google Drive según el nuevo documento.
 - [x] Limitar Drive a lectura y descarga; la subida se realiza fuera de la app.
 - [x] Usar GOOGLE_API_KEY guardada por el usuario; el acceso OAuth queda sustituido por su última elección.
 - [x] Explicar cómo obtener y restringir la clave de Google Drive.
-- [ ] Corregir desplazamientos al abrir menús y revisar ventanas en móvil y escritorio.
-- [ ] Autorizar a diegoteje11@gmail.com como Directiva y verificar acceso.
+- [x] Corregir desplazamientos al abrir menús y revisar ventanas en móvil y escritorio.
+- [x] Autorizar a diegoteje11@gmail.com como Directiva y verificar acceso.
