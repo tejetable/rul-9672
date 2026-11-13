@@ -233,3 +233,51 @@
 @utility animate-sheet { animation: sheet-up .35s cubic-bezier(.2,.8,.2,1) both; }
 @media (prefers-reduced-motion: reduce) { .animate-sheet { animation: none; } }
 .qr-blanco { background: #ffffff; }
+
+/* Match-card roles: translucent ink is themed from club tokens. */
+:root {
+  --fixture-soft: color-mix(in srgb, var(--primary-foreground) 8%, transparent);
+  --fixture-chip: color-mix(in srgb, var(--accent) 15%, transparent);
+  --result-surface: color-mix(in srgb, var(--primary-foreground) 55%, transparent);
+  --result-border: color-mix(in srgb, var(--primary) 8%, transparent);
+  --result-muted: color-mix(in srgb, var(--primary) 60%, transparent);
+  --result-loser: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.fixture-card { position: relative; overflow: hidden; border-radius: 20px; background: var(--primary); color: var(--primary-foreground); padding: 20px; }
+.fixture-silhouette { position: absolute; right: -12px; bottom: 0; width: 260px; height: 130px; opacity: .06; pointer-events: none; }
+.fixture-chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; background: var(--fixture-chip); color: var(--accent); padding: 6px 10px; font-size: 11px; font-weight: 700; line-height: 1.2; letter-spacing: 0; }
+.fixture-subtitle { margin-top: 12px; font-size: 11px; line-height: 1.5; opacity: .7; }
+.fixture-matchup { display: grid; grid-template-columns: minmax(0,1fr) 110px minmax(0,1fr); align-items: center; gap: 4px; margin-top: 22px; }
+.fixture-team { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 9px; text-align: center; }
+.fixture-team p { font-size: 12px; font-weight: 900; line-height: 1.2; }
+.fixture-opponent { display: flex; width: 56px; height: 56px; align-items: center; justify-content: center; border: 2px solid color-mix(in srgb, var(--primary-foreground) 30%, transparent); border-radius: 50%; font-size: 19px; font-weight: 900; }
+.fixture-time { font-size: 40px; font-weight: 900; line-height: 1.1; }
+.fixture-date { margin-top: 6px; font-size: 13px; font-weight: 700; opacity: .8; }
+.fixture-gold { display: block; margin: 19px auto 16px; width: 40px; height: 3px; background: var(--gold); }
+.fixture-countdown { display: flex; min-height: 62px; align-items: center; justify-content: center; }
+.fixture-counter { border-radius: 12px; background: var(--fixture-soft); padding: 9px 4px; text-align: center; }
+.fixture-counter p { font-size: 26px; font-weight: 900; line-height: 1; }
+.fixture-counter span { display: block; margin-top: 5px; font-size: 10px; opacity: .6; }
+.fixture-location { display: flex; align-items: center; gap: 7px; margin-top: 18px; font-size: 13px; opacity: .8; }
+.fixture-directions, .fixture-calendar { height: 44px; border-radius: 12px; padding: 0 8px; font-size: 12px; font-weight: 700; box-shadow: none; transition: background-color 200ms, opacity 200ms; }
+.fixture-directions { background: var(--primary-foreground); color: var(--primary); }
+.fixture-directions:hover { background: var(--primary-foreground); color: var(--primary); opacity: .9; }
+.fixture-calendar { border: 1px solid color-mix(in srgb, var(--primary-foreground) 40%, transparent); color: var(--primary-foreground); }
+.fixture-calendar:hover { background: var(--fixture-soft); color: var(--primary-foreground); }
+.fixture-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: live-blink 1s ease-in-out infinite; }
+@keyframes live-blink { 50% { opacity: .25; } }
+.result-card { margin-top: 16px; padding: 16px; border-radius: 20px; border: 1px solid var(--result-border); background: var(--result-surface); }
+.result-kicker { font-size: 11px; font-weight: 700; color: var(--result-muted); }
+.result-victory { border-radius: 999px; background: var(--accent); color: var(--primary-foreground); padding: 4px 8px; font-size: 10px; font-weight: 700; }
+.result-matchup { display: grid; grid-template-columns: minmax(0,1fr) 128px minmax(0,1fr); align-items: center; gap: 3px; margin-top: 16px; }
+.result-team { display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center; font-size: 11px; font-weight: 700; }
+.result-opponent { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--result-loser); border-radius: 50%; font-weight: 900; font-size: 11px; }
+.result-score { font-size: 40px; font-weight: 900; line-height: 1; white-space: nowrap; text-align: center; }
+.result-loser { color: var(--result-loser); }
+.result-separator { color: var(--result-muted); }
+@media (max-width: 359px) {
+  .fixture-matchup { grid-template-columns: minmax(0,1fr) 100px minmax(0,1fr); }
+  .fixture-team p { font-size: 11px; }
+  .result-matchup { grid-template-columns: minmax(0,1fr) 116px minmax(0,1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .fixture-live-dot { animation: none; } }

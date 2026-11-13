@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, MapPin } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, MapPin } from "lucide-react";
+import { ProximoPartido, UltimoResultado } from "@/components/PartidoTarjetas";
 import { Galeria } from "@/components/Galeria";
 import { SociaCabecera } from "@/components/SociaCabecera";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { dataService, type DB, type Socio } from "@/lib/dataService";
 
 type Tab = "equipo" | "ventajas";
-const EQUIPO = "Concello de Guntín - R.U. Lucense";
 
 function BalonIcon({ size = 22 }: { size?: number }) {
   return (
@@ -45,7 +45,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
           El Equipo
         </button>
         <button onClick={() => setCarnet(true)} className="flex flex-col items-center justify-end gap-1 pb-2 text-xs text-[rgba(13,70,49,.55)]" aria-label="Abrir carnet">
-          <span className="-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-gold"><IdCard size={26} strokeWidth={1.75} /></span>
+          <span className={`-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ${tab === "equipo" ? "ring-accent" : "ring-gold"}`}><IdCard size={26} strokeWidth={1.75} /></span>
           Carnet
         </button>
         <button onClick={() => setTab("ventajas")} aria-current={tab === "ventajas" ? "page" : undefined} className={tabCls(tab === "ventajas")}>
@@ -89,30 +89,12 @@ function Equipo({ db }: { db: DB }) {
   const proximo = db.partidos.find((p) => !p.jugado);
   return (
     <section className="px-5 pt-5">
-      {proximo && (
-        <div className="rounded-lg bg-primary p-5 text-primary-foreground">
-          <h1 className="label-club opacity-80">Próximo partido</h1>
-          <p className="title-club mt-3 text-2xl">{EQUIPO}</p>
-          <p className="label-club my-2 opacity-70">vs</p>
-          <p className="title-club text-3xl">{proximo.rival}</p>
-          <div className="mt-4 space-y-2 text-sm">
-            <p className="flex items-center gap-2"><CalendarDays size={16} strokeWidth={1.75} className="shrink-0" /> {proximo.fechaHora || "Fecha y hora por confirmar"}</p>
-            <p className="flex items-center gap-2"><MapPin size={16} strokeWidth={1.75} className="shrink-0" /> {proximo.lugar}</p>
-            {proximo.competicion && <p className="label-club pt-2 opacity-80">{proximo.competicion}</p>}
-          </div>
-        </div>
-      )}
-      <div className="mt-4 rounded-lg bg-suave p-5">
-        <h2 className="label-club text-muted-foreground">Último resultado</h2>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <p className="title-club flex-1 text-xl">R.U. Lucense</p>
-          <p className="title-club whitespace-nowrap text-5xl text-primary">18<span className="mx-1 text-muted-foreground">-</span>0</p>
-          <p className="title-club flex-1 text-right text-xl">P.M. Friol</p>
-        </div>
-        <p className="mt-3 font-bold text-accent">¡Victoria! Gracias por empujar.</p>
+      {proximo && <ProximoPartido partido={proximo} />}
+      <UltimoResultado />
+      <div id="album-friol" className="scroll-mt-20">
+        <h2 className="label-club mt-8">Fotos</h2>
+        <Galeria />
       </div>
-      <h2 className="label-club mt-8">Fotos</h2>
-      <Galeria />
     </section>
   );
 }

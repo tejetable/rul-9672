@@ -4,3 +4,4 @@
 - [x] Verificar número personalizado, giro e identificación en móvil y escritorio.
 - [x] Reorganizar El Equipo y la cabecera de Socia; campana compartida con Negocio.
 - [x] Actualizar partido y aviso sin borrar los datos existentes; verificar lectura y pantallas.
+- [x] Rediseñar tarjetas de partido, cuenta atrás, Maps y calendario; verificar en 390×844.

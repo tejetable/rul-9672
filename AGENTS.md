@@ -34,3 +34,4 @@ use the editor.
 - Render the member card through the shared Carne component in both activation and member views; keep identification QR data unchanged so the business scanner remains compatible.
 - Display both physical-card faces from the uploaded artwork with the member number overlaid; keep digital identification outside the artwork to preserve the printed design.
 - Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.
+- Match cards use pure helpers in src/lib/partidos.ts for Madrid-time countdowns and ICS exports so date behavior is independently tested.
