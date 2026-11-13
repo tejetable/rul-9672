@@ -134,7 +134,12 @@ export const dataService = {
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
   async cargarAjustes(){
     const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual").maybeSingle();
-    check(r.error);settings={...defaultSettings,...r.data,email_club:''};
+    check(r.error);settings={
+      whatsapp_club:r.data?.whatsapp_club??defaultSettings.whatsapp_club,
+      nombre_club:r.data?.nombre_club??defaultSettings.nombre_club,
+      temporada_actual:r.data?.temporada_actual??defaultSettings.temporada_actual,
+      email_club:'',
+    };
     if(this.esSuper()){
       const privateSettings=await supabase.from("ajustes_club").select("email_club").maybeSingle();
       check(privateSettings.error);settings.email_club=privateSettings.data?.email_club??'';
