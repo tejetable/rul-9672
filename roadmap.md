@@ -16,4 +16,5 @@
 - [ ] Conectar la galería a Google Drive según el nuevo documento.
 - [ ] Limitar Drive a lectura y descarga; la subida se realiza fuera de la app.
 - [ ] Conectar mediante la cuenta de la hermana con consentimiento de solo lectura; no usar clave ni compartir públicamente.
+- [ ] Usar la cuenta del usuario, que ya puede ver la carpeta, y excluir el permiso de escritura mostrado en la captura.
 - [x] Explicar cómo obtener y restringir la clave de Google Drive.
