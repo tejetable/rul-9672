@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { Check, Delete, LogOut, MessageCircle, QrCode } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
-import { ListaAvisos } from "@/components/Avisos";
+import { AvisosCampana } from "@/components/AvisosCampana";
+import { Button } from "@/components/ui/button";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { QrScanner } from "@/components/QrScanner";
 import { dataService, type Patrocinador, type Socio, type Visita } from "@/lib/dataService";
@@ -10,7 +11,7 @@ import { waLink } from "@/lib/whatsapp";
 
 export function NegocioApp() {
   const [neg, setNeg] = useState<Patrocinador | null | undefined>(undefined);
-  const [tab, setTab] = useState<"registrar" | "mes" | "avisos">("registrar");
+  const [tab, setTab] = useState<"registrar" | "mes">("registrar");
   useEffect(() => setNeg(dataService.negocioSesion()), []);
   if (neg === undefined) return null;
   if (!neg) return <Pin onOk={(p) => { dataService.abrirNegocio(p.id); setNeg(p); }} />;
@@ -23,19 +24,20 @@ export function NegocioApp() {
           <span className="label-club block text-muted-foreground">Negocio amigo</span>
           <span className="block font-black">{neg.nombre}</span>
         </span>
-        <button onClick={() => { dataService.cerrarNegocio(); setNeg(null); }} aria-label="Cerrar sesión" className="flex size-11 items-center justify-center">
+        <AvisosCampana quien="negocios" />
+        <Button variant="ghost" size="icon" onClick={() => { dataService.cerrarNegocio(); setNeg(null); }} aria-label="Cerrar sesión" className="flex size-11 items-center justify-center">
           <LogOut size={20} strokeWidth={1.75} />
-        </button>
+        </Button>
       </header>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
-      <div className="mx-5 mt-4 grid grid-cols-3 rounded-2xl bg-suave p-1">
-        {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
+      <div className="mx-5 mt-4 grid grid-cols-2 rounded-2xl bg-suave p-1">
+        {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"]] as const).map(([id, l]) => (
           <button key={id} onClick={() => setTab(id)} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
             {l}
           </button>
         ))}
       </div>
-      {tab === "avisos" ? <ListaAvisos quien="negocios" /> : tab === "registrar" ? <Registrar neg={neg} /> : <TuMes neg={neg} />}
+      {tab === "registrar" ? <Registrar neg={neg} /> : <TuMes neg={neg} />}
     </div>
   );
 }

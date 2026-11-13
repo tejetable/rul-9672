@@ -54,6 +54,7 @@ export interface Partido {
   rival: string;
   fechaHora: string;
   lugar: string;
+  competicion?: string;
   esLocal: boolean;
   golesLocal: number | null;
   golesVisitante: number | null;
@@ -161,11 +162,11 @@ function seed(): DB {
   }
   const partidos: Partido[] = [
     { id: "m1", rival: "[Rival]", fechaHora: "", lugar: "Pabellón de Guntín", esLocal: true, golesLocal: null, golesVisitante: null, jugado: true },
-    { id: "m2", rival: "Abella F.C.", fechaHora: "", lugar: "Pabellón de Guntín", esLocal: true, golesLocal: null, golesVisitante: null, jugado: false },
+    { id: "m2", rival: "Abella F.C.", fechaHora: "sábado 14/11/2026 · 19:00", lugar: "Pabellón de Guntín", competicion: "Primera Futgal", esLocal: true, golesLocal: null, golesVisitante: null, jugado: false },
   ];
   const avisos: Aviso[] = [
     { id: "a1", titulo: "Arrancamos temporada", texto: "Primera temporada en Primera Futgal. Te esperamos en Guntín.", fecha: now.toISOString(), tipo: "club" },
-    { id: "a2", titulo: "Próximo partido: vs Abella F.C.", texto: "Concello de Guntín - R.U. Lucense contra Abella F.C. Fecha y hora por confirmar. Te esperamos.", fecha: new Date(now.getTime() + 1000).toISOString(), tipo: "partido" },
+    { id: "a2", titulo: "Próximo partido: vs Abella F.C.", texto: "Concello de Guntín - R.U. Lucense vs Abella F.C. · sábado 14/11/2026 · 19:00 · Pabellón de Guntín · Primera Futgal. Te esperamos.", fecha: new Date(now.getTime() + 1000).toISOString(), tipo: "partido" },
   ];
   // 26 visitas de demo en 8 semanas para el patrocinador piloto (p1)
   const visitas: Visita[] = [];
@@ -195,7 +196,17 @@ function load(): DB {
   const raw = window.localStorage.getItem(KEY);
   if (raw) {
     try {
-      return JSON.parse(raw) as DB;
+      const db = JSON.parse(raw) as DB;
+      const partido = db.partidos.find((p) => p.id === "m2" && p.rival === "Abella F.C.");
+      if (partido && partido.fechaHora === "") {
+        partido.fechaHora = "sábado 14/11/2026 · 19:00";
+        partido.lugar = "Pabellón de Guntín";
+        partido.competicion = "Primera Futgal";
+      }
+      const aviso = db.avisos.find((a) => a.id === "a2" && a.texto.includes("Fecha y hora por confirmar"));
+      if (aviso) aviso.texto = "Concello de Guntín - R.U. Lucense vs Abella F.C. · sábado 14/11/2026 · 19:00 · Pabellón de Guntín · Primera Futgal. Te esperamos.";
+      window.localStorage.setItem(KEY, JSON.stringify(db));
+      return db;
     } catch {
       /* datos corruptos: se vuelve a sembrar */
     }
@@ -382,6 +393,11 @@ export const dataService = {
   marcarAvisoLeido(id: string) {
     const l = new Set(this.avisosLeidos()); l.add(id);
     window.localStorage.setItem("rul-avisos-leidos", JSON.stringify([...l]));
+  },
+  marcarAvisosLeidos(quien: "socias" | "negocios") {
+    const leidos = new Set(this.avisosLeidos());
+    this.avisosPara(quien).forEach((a) => leidos.add(a.id));
+    window.localStorage.setItem("rul-avisos-leidos", JSON.stringify([...leidos]));
   },
   avisosPara(quien: "socias" | "negocios") {
     return [...load().avisos].filter((a) => !a.para || a.para === "todos" || a.para === quien).sort((a, b) => b.fecha.localeCompare(a.fecha));

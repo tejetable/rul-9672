@@ -2,3 +2,5 @@
 - [x] Verificar activación, carné, ventajas y salida en móvil y escritorio.
 - [x] Reproducir ambas caras del carné físico con los originales y quitar «Mis ventajas».
 - [x] Verificar número personalizado, giro e identificación en móvil y escritorio.
+- [x] Reorganizar El Equipo y la cabecera de Socia; campana compartida con Negocio.
+- [x] Actualizar partido y aviso sin borrar los datos existentes; verificar lectura y pantallas.

@@ -33,3 +33,4 @@ use the editor.
 - Visit rules (1 per member/business/day, repeat detection, stats, 90-day goal) live as pure functions in src/lib/visitas.ts with tests, so screens and dataService share one source of truth.
 - Render the member card through the shared Carne component in both activation and member views; keep identification QR data unchanged so the business scanner remains compatible.
 - Display both physical-card faces from the uploaded artwork with the member number overlaid; keep digital identification outside the artwork to preserve the printed design.
+- Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.

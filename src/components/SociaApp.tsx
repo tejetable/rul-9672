@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { Bell, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, Instagram, LogOut, MapPin, Twitch, X } from "lucide-react";
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, MapPin } from "lucide-react";
 import { Galeria } from "@/components/Galeria";
-import { ContactarClub } from "@/components/ContactarClub";
-import { ListaAvisos } from "@/components/Avisos";
-import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
+import { SociaCabecera } from "@/components/SociaCabecera";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
-import { dataService, type Aviso, type DB, type Socio } from "@/lib/dataService";
+import { dataService, type DB, type Socio } from "@/lib/dataService";
 
 type Tab = "equipo" | "ventajas";
 const EQUIPO = "Concello de Guntín - R.U. Lucense";
-const fecha = (f: string) => new Date(f).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
 
 function BalonIcon({ size = 22 }: { size?: number }) {
   return (
@@ -26,35 +23,17 @@ function BalonIcon({ size = 22 }: { size?: number }) {
 export function SociaApp({ socio }: { socio: Socio }) {
   const [tab, setTab] = useState<Tab>("equipo");
   const [db, setDb] = useState<DB | null>(null);
-  const [leidos, setLeidos] = useState<string[]>([]);
   const [carnet, setCarnet] = useState(false);
-  useEffect(() => { dataService.marcarApertura(socio.id); setDb(dataService.get()); setLeidos(dataService.avisosLeidos()); }, []);
+  useEffect(() => { dataService.marcarApertura(socio.id); setDb(dataService.get()); }, []);
   if (!db) return null;
-  const avisos = dataService.avisosPara("socias");
-  const sinLeer = avisos.filter((a) => !leidos.includes(a.id));
-  const leer = (id: string) => { dataService.marcarAvisoLeido(id); setLeidos(dataService.avisosLeidos()); };
-
   const tabCls = (on: boolean) => `relative flex min-h-16 flex-col items-center justify-center gap-1 text-xs ${on ? "font-bold text-primary" : "font-normal text-[rgba(13,70,49,.55)]"}`;
   const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;
 
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="flex items-center gap-3 border-b border-primary/15 px-5 py-4">
-        <img src={escudo.url} alt="Escudo del R.U. Lucense" width={450} height={676} className="crest crest-blend h-10 w-auto" />
-        <span className="flex-1"><span className="label-club block">R.U. Lucense</span><span className="text-xs text-muted-foreground">Somos familia.</span></span>
-        <Button variant="ghost"
-          onClick={() => {
-            dataService.cerrarSesion();
-            window.location.reload();
-          }}
-          className="flex min-h-11 items-center gap-1 text-xs font-bold text-muted-foreground hover:bg-primary/10"
-        >
-          <LogOut size={16} strokeWidth={1.75} /> Salir
-        </Button>
-      </header>
-      <ContactarClub texto={`Hola, soy socia/o del R.U. Lucense y quería consultaros algo.`} />
+    <div className="flex flex-1 flex-col pt-14">
+      <SociaCabecera />
       <div className="flex-1 pb-12">
-        {tab === "equipo" && <Equipo db={db} avisos={avisos} sinLeer={sinLeer} onLeer={leer} />}
+        {tab === "equipo" && <Equipo db={db} />}
         {tab === "ventajas" && <Ventajas db={db} />}
       </div>
       <nav aria-label="Secciones de socio" className="member-navigation sticky bottom-0 z-20 grid grid-cols-3 border-t border-[rgba(13,70,49,.12)] bg-background pt-1">
@@ -62,7 +41,6 @@ export function SociaApp({ socio }: { socio: Socio }) {
           {indicador(tab === "equipo")}
           <span className="relative">
             <BalonIcon />
-            {sinLeer.length > 0 && <span aria-label="Avisos sin leer" className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-accent" />}
           </span>
           El Equipo
         </button>
@@ -107,81 +85,34 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
   );
 }
 
-function Equipo({ db, avisos, sinLeer, onLeer }: { db: DB; avisos: Aviso[]; sinLeer: Aviso[]; onLeer: (id: string) => void }) {
+function Equipo({ db }: { db: DB }) {
   const proximo = db.partidos.find((p) => !p.jugado);
-  const [todos, setTodos] = useState(false);
-  const destacado = sinLeer[0];
-  if (todos) {
-    return (
-      <div>
-        <button onClick={() => setTodos(false)} className="label-club mx-5 mt-4 flex min-h-11 items-center gap-1"><ChevronLeft size={18} strokeWidth={1.75} /> El Equipo</button>
-        <ListaAvisos quien="socias" />
-      </div>
-    );
-  }
   return (
-    <section className="px-5 pt-6">
-      {destacado && (
-        <div className="animate-rise mb-6 flex items-start gap-3 rounded-2xl bg-primary p-4 text-primary-foreground">
-          <Bell size={20} strokeWidth={1.75} className="mt-0.5 shrink-0" />
-          <div className="min-w-0 flex-1">
-            <p className="font-black">{destacado.titulo}</p>
-            <p className="mt-1 line-clamp-2 text-sm opacity-90">{destacado.texto}</p>
-            <p className="mt-2 text-xs opacity-70">{fecha(destacado.fecha)}</p>
+    <section className="px-5 pt-5">
+      {proximo && (
+        <div className="rounded-lg bg-primary p-5 text-primary-foreground">
+          <h1 className="label-club opacity-80">Próximo partido</h1>
+          <p className="title-club mt-3 text-2xl">{EQUIPO}</p>
+          <p className="label-club my-2 opacity-70">vs</p>
+          <p className="title-club text-3xl">{proximo.rival}</p>
+          <div className="mt-4 space-y-2 text-sm">
+            <p className="flex items-center gap-2"><CalendarDays size={16} strokeWidth={1.75} className="shrink-0" /> {proximo.fechaHora || "Fecha y hora por confirmar"}</p>
+            <p className="flex items-center gap-2"><MapPin size={16} strokeWidth={1.75} className="shrink-0" /> {proximo.lugar}</p>
+            {proximo.competicion && <p className="label-club pt-2 opacity-80">{proximo.competicion}</p>}
           </div>
-          <button onClick={() => onLeer(destacado.id)} aria-label="Marcar como leído" className="-mr-2 -mt-2 flex size-11 shrink-0 items-center justify-center"><X size={18} strokeWidth={1.75} /></button>
         </div>
       )}
-      <p className="label-club text-accent">El Equipo</p>
-      <h1 className="title-club mt-2 text-4xl">Vamos, que empieza.</h1>
-      <span className="gold-rule mt-4" />
-
-      <div className="mt-6 rounded-2xl bg-suave p-5">
-        <p className="label-club text-muted-foreground">Último resultado</p>
+      <div className="mt-4 rounded-lg bg-suave p-5">
+        <h2 className="label-club text-muted-foreground">Último resultado</h2>
         <div className="mt-3 flex items-center justify-between gap-3">
           <p className="title-club flex-1 text-xl">R.U. Lucense</p>
-          <p className="title-club text-5xl text-primary">18<span className="mx-1 text-muted-foreground">-</span>0</p>
+          <p className="title-club whitespace-nowrap text-5xl text-primary">18<span className="mx-1 text-muted-foreground">-</span>0</p>
           <p className="title-club flex-1 text-right text-xl">P.M. Friol</p>
         </div>
         <p className="mt-3 font-bold text-accent">¡Victoria! Gracias por empujar.</p>
       </div>
-
-      {proximo && (
-        <div className="mt-4 overflow-hidden rounded-2xl bg-primary p-5 text-primary-foreground">
-          <p className="label-club opacity-80">Próximo partido</p>
-          <p className="title-club mt-3 text-2xl">{EQUIPO}</p>
-          <p className="label-club my-2 opacity-70">vs</p>
-          <p className="title-club text-3xl">{proximo.rival}</p>
-          <div className="mt-4 space-y-1 text-sm opacity-90">
-            <p className="flex items-center gap-2"><CalendarDays size={16} strokeWidth={1.75} /> {proximo.fechaHora || "Fecha y hora por confirmar"}</p>
-            <p className="flex items-center gap-2"><MapPin size={16} strokeWidth={1.75} /> {proximo.lugar}</p>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-8 flex items-center justify-between">
-        <p className="label-club">Avisos</p>
-        {avisos.length > 0 && <button onClick={() => setTodos(true)} className="min-h-11 text-sm font-bold text-accent">Ver todos</button>}
-      </div>
-      {avisos.length === 0 && <p className="mt-2 text-muted-foreground">Todavía no hay avisos.</p>}
-      <ul className="mt-2 space-y-2">
-        {avisos.slice(0, 3).map((a) => (
-          <li key={a.id} className="rounded-2xl bg-suave p-4">
-            <p className="text-xs text-muted-foreground">{fecha(a.fecha)}</p>
-            <p className="font-black">{a.titulo}</p>
-            <p className="line-clamp-2 text-sm">{a.texto}</p>
-          </li>
-        ))}
-      </ul>
-
-      <p className="label-club mt-8">Fotos y vídeos</p>
+      <h2 className="label-club mt-8">Fotos</h2>
       <Galeria />
-
-      <p className="label-club mt-8">Síguenos</p>
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <a href="https://www.instagram.com/realunionlucense/" target="_blank" rel="noreferrer" className="btn-suave flex min-h-14 items-center justify-center gap-2 rounded-2xl font-bold"><Instagram size={20} strokeWidth={1.75} /> Instagram</a>
-        <a href="https://www.twitch.tv/adrifdez_10" target="_blank" rel="noreferrer" className="btn-suave flex min-h-14 items-center justify-center gap-2 rounded-2xl font-bold"><Twitch size={20} strokeWidth={1.75} /> Twitch</a>
-      </div>
     </section>
   );
 }
