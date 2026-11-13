@@ -20,3 +20,10 @@
 - [x] Explicar cómo obtener y restringir la clave de Google Drive.
 - [x] Corregir desplazamientos al abrir menús y revisar ventanas en móvil y escritorio.
 - [x] Autorizar a diegoteje11@gmail.com como Directiva y verificar acceso.
+
+- [x] Super admin único, permisos protegidos e historial; acceso por email sin contraseña.
+- [x] Gestión del equipo directivo, invitaciones y selector Directiva/Socia.
+- [x] Ajustes del club y enlaces WhatsApp centralizados.
+- [x] Verificar acceso de Super admin y rechazos de API sin permisos.
+- [ ] Verificar recepción de invitación y acceso de Directiva por email (falta destinatario de prueba autorizado).
+- [ ] Configurar WhatsApp real del club y comprobar chat final (falta número con prefijo de país).

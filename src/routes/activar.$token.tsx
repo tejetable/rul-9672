@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Check, MessageCircle } from "lucide-react";
 import { Carne } from "@/components/Carne";
 import { dataService, type Socio, runAction } from "@/lib/dataService";
-import { waLink } from "@/lib/whatsapp";
+
 
 export const Route = createFileRoute("/activar/$token")({
   head: () => ({
@@ -31,7 +31,7 @@ function Activar() {
   const [hecho, setHecho] = useState(false);
 
   useEffect(() => {
-    runAction(async () => setSocio(await dataService.porToken(token)));
+    runAction(async () => {await dataService.cargarAjustes();setSocio(await dataService.porToken(token));});
   }, [token]);
 
   const activar = async () => {
@@ -53,9 +53,9 @@ function Activar() {
           <section className="flex flex-1 flex-col justify-center px-6 pb-16">
             <h1 className="title-club text-heading">Este enlace ya no vale.</h1>
                         <p className="mt-4">Pídele uno nuevo al club.</p>
-            <a href={waLink("¡Hola! Mi enlace para activar el carnet del R.U. Lucense ya no vale. ¿Me mandáis uno nuevo?")} target="_blank" rel="noreferrer" className="mt-6 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel bg-primary font-bold text-primary-foreground">
-              <MessageCircle size={18} strokeWidth={1.75} /> Escribir al club
-            </a>
+            {dataService.ajustes().whatsapp_club&&<a href={dataService.whatsapp("¡Hola! Necesito un enlace nuevo para activar mi carnet.")??undefined} target="_blank" rel="noreferrer" className="mt-6 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel bg-primary font-bold text-primary-foreground">
+              <MessageCircle size={18} strokeWidth={1.75} /> Pedir un enlace nuevo
+            </a>}
           </section>
         )}
 

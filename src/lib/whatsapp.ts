@@ -1,7 +1,5 @@
-// [pendiente] Teléfono de WhatsApp de la directiva (sin prefijo). Vacío = WhatsApp deja elegir el chat.
-export const TELEFONO_DIRECTIVA = "";
-
-export function waLink(texto: string, telefono = TELEFONO_DIRECTIVA) {
+// Member invitations keep their Spanish prefix; club contact uses Cloud settings.
+export function waLink(texto: string, telefono = "") {
   const num = telefono.replace(/\D/g, "");
   return `https://wa.me/${num ? "34" + num : ""}?text=${encodeURIComponent(texto)}`;
 }

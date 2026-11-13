@@ -2,6 +2,8 @@ import { useSyncExternalStore } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import {defaultSettings,settingsSchema,canManageTeam,clubWhatsapp} from "./club-settings";
+import {invitarDirectiva} from "./admin.functions";
 import { previewInvitation } from "./club.functions";
 import { getDriveGallery } from './drive.functions';
 import { folderIdFromUrl } from './drive-gallery';
@@ -93,8 +95,9 @@ export interface DB {
 }
 
 const emptyDB = (): DB => ({ socios: [], patrocinadores: [], ventajas: [], canjes: [], partidos: [], avisos: [], visitas: [], socioActualId: null });
+let settings=defaultSettings;
 let db = emptyDB();
-let role: 'socia' | 'negocio' | 'directiva' | null = null;
+let role: 'socia' | 'negocio' | 'directiva' | 'super_admin' | null = null;
 let reads: string[] = [];
 let version = 0;
 let userId: string | null = null;
@@ -125,9 +128,19 @@ export const dataService = {
   estadoSocia:()=>sessionState,
   nombreVisita:(id:string)=>visitNames[id]?.nombre ?? 'Sin carnet',
   rol: () => role,
+  esSuper:()=>canManageTeam(role),
+  esDirectiva:()=>role==='directiva'||role==='super_admin',
+  ajustes:()=>settings,
+  whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
+  async cargarAjustes(){const r=await supabase.from("ajustes_club").select("*").maybeSingle();check(r.error);settings=r.data??defaultSettings;notify();},
+  async guardarAjustes(input:typeof defaultSettings){const r=await supabase.from("ajustes_club").update(settingsSchema.parse(input)).eq("id",true).select();check(r.error);if(!r.data?.length)throw new Error("Solo Super admin puede editar ajustes.");await this.cargarAjustes();},
+  async equipo(){const [p,r,i,h]=await Promise.all([supabase.from("profiles").select("*"),supabase.from("user_roles").select("*"),supabase.from("equipo_invitaciones").select("*"),supabase.from("registro_permisos").select("*").order("fecha",{ascending:false})]);check(p.error);check(i.error);check(h.error);return {personas:(p.data??[]).filter(x=>(r.data??[]).some(y=>y.user_id===x.id&&["directiva","super_admin"].includes(y.role))).map(x=>({...x,role:r.data?.find(y=>y.user_id===x.id)?.role})),invitaciones:i.data??[],historial:h.data??[]};},
+  async invitarDirectiva(nombre:string,email:string,socioId:string|null=null){return invitarDirectiva({data:{nombre,email,socioId,origin:window.location.origin}});},
+  async quitarDirectiva(id:string,motivo:string){const r=await supabase.rpc("quitar_directiva",{p_user:id,p_motivo:motivo});check(r.error);},
   async albumes(){return (await getDriveGallery()).albumes;},
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {
+    await this.cargarAjustes();
     const { data } = await supabase.auth.getUser(); userId = data.user?.id ?? null;
     if (!userId) { db = emptyDB(); role = null; linkedSocio = null; reads = []; sessionState=null;visitNames={};notify(); return; }
     const rr = await supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(); check(rr.error); role = rr.data?.role ?? null;
@@ -173,7 +186,7 @@ export const dataService = {
   dispositivoId() { let d=window.localStorage.getItem('rul-device-id'); if(!d){d=crypto.randomUUID();window.localStorage.setItem('rul-device-id',d);} return d; },
   async anonymous() { const {data}=await supabase.auth.getUser(); if(!data.user){const r=await supabase.auth.signInAnonymously();check(r.error);} },
   async activar(token:string) { await this.anonymous(); const r=await supabase.rpc('enlazar_socio',{p_token:token,p_dispositivo:this.dispositivoId()});check(r.error);await this.init();return this.sesion()?.socio ?? null; },
-  sesion(): {socio:Socio;estado:'ok'|'movido'|'desactivada'} | null { if(role!=='socia')return null; const s=db.socios.find(s=>s.id===linkedSocio); if(!s)return null;return {socio:s,estado:s.estado==='desactivada'?'desactivada':s.dispositivoId===this.dispositivoId()?'ok':'movido'}; },
+  sesion(): {socio:Socio;estado:'ok'|'movido'|'desactivada'} | null { if(role!=='socia'&&!this.esDirectiva())return null; const s=db.socios.find(s=>s.id===linkedSocio); if(!s)return null;return {socio:s,estado:s.estado==='desactivada'?'desactivada':this.esDirectiva()||s.dispositivoId===this.dispositivoId()?'ok':'movido'}; },
   async cerrarSesion(){ if(channel){await supabase.removeChannel(channel);channel=null;} db=emptyDB();reads=[];role=null;userId=null;linkedSocio=null;sessionState=null;visitNames={};notify();const r=await supabase.auth.signOut();check(r.error); },
   async marcarApertura(_id:string){const r=await supabase.rpc('marcar_apertura');check(r.error);},
   pinLibre:()=>String(Math.floor(1000+Math.random()*9000)),

@@ -1,10 +1,11 @@
 import { MessageCircle } from "lucide-react";
-import { waLink } from "@/lib/whatsapp";
+import {dataService,useClubData} from "@/lib/dataService";
 
 export function ContactarClub({ texto }: { texto: string }) {
+  useClubData();const url=dataService.whatsapp(texto);if(!url)return null;
   return (
     <a
-      href={waLink(texto)}
+      href={url}
       target="_blank"
       rel="noopener noreferrer"
       className="club-button mx-5 mt-3 flex items-center justify-center gap-2 bg-surface text-primary transition-transform active:scale-[.98]"

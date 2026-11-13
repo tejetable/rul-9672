@@ -1,3 +1,5 @@
+import {ClubAdmin,ClubAdminMenu} from "@/components/ClubAdmin";
+import {DEMO_MODE} from "@/lib/club-settings";
 import { DirectivaAcceso } from "@/components/DirectivaAcceso";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { Button } from "@/components/ui/button";
@@ -13,7 +15,7 @@ import { SociasPanel } from "@/components/SociasPanel";
 import { PatrocinadoresPanel } from "@/components/PatrocinadoresPanel";
 import { NegocioApp } from "@/components/NegocioApp";
 import { dataService, useClubData, runAction } from "@/lib/dataService";
-import { waLink } from "@/lib/whatsapp";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -45,7 +47,7 @@ function Index() {
     runAction(async () => {
       await dataService.init();
       const actual = dataService.rol();
-      if (actual) setRole(actual);
+      if (actual) setRole(actual==='super_admin'?'directiva':actual);
       setSesion(dataService.sesion());
       setReady(true);
     });
@@ -56,7 +58,7 @@ function Index() {
     return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => { setSesion(dataService.sesion()); }, [db]);
+  useEffect(() => { setSesion(dataService.sesion()); if(dataService.esDirectiva())setRole("directiva"); }, [db]);
 
   const cambiar = (r: Role) => {
     window.localStorage.setItem(ROLE_KEY, r);
@@ -69,9 +71,9 @@ function Index() {
     <AppFrame crema={cargando}>
       {cargando && <Cargando />}
       {!cargando && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : dataService.estadoSocia()==='movido'||dataService.estadoSocia()==='desactivada' ? <CarneMovido estado={dataService.estadoSocia()==='desactivada'?'desactivada':'movido'}/> : <Bienvenida />)}
-      {!cargando && role === "directiva" && (dataService.rol() === "directiva" ? <Directiva /> : <DirectivaAcceso />)}
+      {!cargando && role === "directiva" && (dataService.esDirectiva() ? <Directiva /> : <DirectivaAcceso />)}
       {!cargando && role === "negocio" && <NegocioApp />}
-      {!cargando && <RoleSwitcher role={role} onChange={cambiar} />}
+      {!cargando && DEMO_MODE && <RoleSwitcher role={role} onChange={cambiar} />}
     </AppFrame>
   );
 }
@@ -96,6 +98,7 @@ export function AppFrame({ children, crema = false }: { children: React.ReactNod
 }
 
 function Bienvenida() {
+  useClubData();
   const [ayuda, setAyuda] = useState(false);
   const navigate = useNavigate();
   const simular = () => {
@@ -120,14 +123,15 @@ function Bienvenida() {
       />
 
       <div className="mt-8 flex w-full flex-col gap-3">
-        <a
-          href={waLink("¡Hola! Quiero hacerme socia/o del R.U. Lucense.")}
+        {dataService.ajustes().whatsapp_club&&<a
+          href={dataService.whatsapp("¡Hola! Quiero hacerme socia/o del R.U. Lucense.")??undefined}
           target="_blank"
           rel="noreferrer"
           className="flex h-auto min-h-12 items-center justify-center rounded-panel bg-primary px-6 text-item font-black uppercase tracking-wide text-primary-foreground transition-opacity duration-200 hover:opacity-90"
         >
           Únete a la familia
-        </a>
+        </a>}
+        {!DEMO_MODE&&<Button variant="ghost" onClick={()=>{window.localStorage.setItem(ROLE_KEY,"directiva");window.location.reload();}}>Acceso Directiva</Button>}
         <Button variant="ghost" onClick={() => setAyuda((a) => !a)} className="h-auto min-h-12 rounded-panel btn-suave px-6 font-bold transition-colors duration-200">
           Ya soy socia/o
         </Button>
@@ -135,12 +139,12 @@ function Bienvenida() {
           <div className="animate-rise rounded-panel bg-surface p-4 text-left">
             <p>Busca en tu WhatsApp el enlace que te mandó el club. Si no lo encuentras, pídenos uno nuevo.</p>
             <div className="mt-3 flex gap-2">
-              <a href={waLink("¡Hola! Necesito un enlace nuevo para activar mi carnet del R.U. Lucense.")} target="_blank" rel="noreferrer" className="flex h-auto min-h-11 flex-1 items-center justify-center gap-2 rounded-control bg-primary px-2 text-body-sm font-bold text-primary-foreground">
+              {dataService.ajustes().whatsapp_club&&<a href={dataService.whatsapp("¡Hola! Necesito un enlace nuevo para activar mi carnet.")??undefined} target="_blank" rel="noreferrer" className="flex h-auto min-h-11 flex-1 items-center justify-center gap-2 rounded-control bg-primary px-2 text-body-sm font-bold text-primary-foreground">
                 <MessageCircle size={18} strokeWidth={1.75} /> Pedir enlace
-              </a>
-              <Button variant="ghost" onClick={simular} className="h-auto min-h-11 flex-1 rounded-control border-2 border-dashed border-primary px-2 text-body-sm font-bold">
+              </a>}
+              {DEMO_MODE&&<Button variant="ghost" onClick={simular} className="h-auto min-h-11 flex-1 rounded-control border-2 border-dashed border-primary px-2 text-body-sm font-bold">
                 Simular enlace
-              </Button>
+              </Button>}
             </div>
           </div>
         )}
@@ -157,24 +161,32 @@ function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
             <p className="mt-4">
         {estado === "movido" ? "Tu carnet se ha abierto en otro móvil. Si no has sido tú, habla con el club." : "Habla con el club para volver a activarlo."}
       </p>
-      <a href={waLink("¡Hola! Tengo un problema con mi carnet del R.U. Lucense.")} target="_blank" rel="noreferrer" className="mt-6 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel bg-primary font-bold text-primary-foreground">
+      {dataService.ajustes().whatsapp_club&&<a href={dataService.whatsapp("¡Hola! Tengo un problema con mi carnet del R.U. Lucense.")??undefined} target="_blank" rel="noreferrer" className="mt-6 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel bg-primary font-bold text-primary-foreground">
         <MessageCircle size={18} strokeWidth={1.75} /> Hablar con el club
-      </a>
+      </a>}
     </section>
   );
 }
 
 function Directiva() {
+  const [page,setPage]=useState<"equipo"|"ajustes"|null>(null);
+  const [asMember,setAsMember]=useState(false);
+  const member=dataService.sesion();
   const [t, setT] = useState<"socias" | "patro" | "avisos">("socias");
+  if(page&&dataService.esSuper())return <ClubAdmin page={page} onClose={()=>setPage(null)}/>;
   return (
     <div className="flex flex-1 flex-col">
-      <ClubCabecera etiqueta="Directiva"><Button variant="ghost" onClick={()=>runAction(async()=>{await dataService.cerrarSesion();window.location.reload();})}>Salir</Button></ClubCabecera>
+      <ClubCabecera etiqueta="Directiva"><ClubAdminMenu onOpen={setPage}/></ClubCabecera>
+      {member&&<div className="mx-5 mt-3 flex gap-2"><span className="label-club self-center">Ver como:</span><Button variant="ghost" onClick={()=>setAsMember(false)} aria-pressed={!asMember}>Directiva</Button><Button variant="ghost" onClick={()=>setAsMember(true)} aria-pressed={asMember}>Socia</Button></div>}
+      {!dataService.ajustes().whatsapp_club&&<p className="mx-5 mt-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
+      {asMember&&member?<SociaApp socio={member.socio}/>:<>
       <div className="club-tabs mx-5 mt-4 grid-cols-3">
         {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setT(id)} className={`h-auto min-h-11 rounded-control text-label font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}
       </div>
       {t === "socias" ? <SociasPanel /> : t === "patro" ? <PatrocinadoresPanel /> : <AvisosPanel />}
+      </>}
     </div>
   );
 }

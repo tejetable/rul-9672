@@ -38,5 +38,7 @@ use the editor.
 - Gallery reads use the authenticated getDriveGallery server function and a ten-minute Cloud cache; drive-gallery.ts owns EXIF dates, explicit-first match linking and day-seeded highlights, never legacy filenames.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
 
-- Roles are stored separately from profiles; invitation and hashed-PIN RPCs link anonymous sessions, while Directiva requires an explicitly authorized social account, never the demo selector.
+- Roles remain in protected user_roles; one Super admin manages invitations, role changes and settings through guarded RPCs with audit triggers, while Directiva uses email magic links and retains club-management permissions.
+- Admin invitations use an authenticated TanStack server function that validates Super admin and same-origin redirects before loading the privileged client; no Edge Functions or browser admin credentials.
+- Club WhatsApp comes from the singleton Cloud settings through dataService; empty contact numbers hide club links, while member invitations retain their separate recipient number.
 - Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.

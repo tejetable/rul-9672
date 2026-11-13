@@ -1,3 +1,5 @@
+import {InviteForm} from "./ClubAdmin";
+import {DEMO_MODE} from "@/lib/club-settings";
 import { BajaForm } from "@/components/BajaForm";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
@@ -21,6 +23,7 @@ const ESTADO: Record<Socio["estado"], { label: string; cls: string }> = {
 
 export function SociasPanel() {
   const db = useClubData();
+  const [promote,setPromote]=useState<string|null>(null);
   const [baja, setBaja] = useState<string | null>(null);
   const [socios, setSocios] = useState<Socio[]>([]);
   const [q, setQ] = useState("");
@@ -66,9 +69,9 @@ export function SociasPanel() {
             <Button variant="ghost" onClick={() => enviar(creada)} className="flex h-auto min-h-11 items-center justify-center gap-2 rounded-control bg-primary font-bold text-primary-foreground">
               <MessageCircle size={18} strokeWidth={1.75} /> Enviar invitación
             </Button>
-            <Link to="/activar/$token" params={{ token: creada.tokenInvitacion }} className="flex h-auto min-h-11 items-center justify-center rounded-control border-2 border-dashed border-primary font-bold">
+            {DEMO_MODE&&<Link to="/activar/$token" params={{ token: creada.tokenInvitacion }} className="flex h-auto min-h-11 items-center justify-center rounded-control border-2 border-dashed border-primary font-bold">
               Abrir invitación (demo)
-            </Link>
+            </Link>}
           </div>
         </div>
       )}
@@ -136,6 +139,8 @@ export function SociasPanel() {
                 </Button>
               )}
             </div>
+            {dataService.esSuper()&&<Button variant="ghost" onClick={()=>setPromote(s.id)}>Hacer directiva</Button>}
+            {promote===s.id&&<InviteForm nombreInicial={s.nombre} socioId={s.id} onDone={()=>setPromote(null)}/>}
           </li>
         ))}
       </ul>

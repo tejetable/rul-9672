@@ -43,6 +43,41 @@
       "when": 1794593624570,
       "tag": "0005_protect_business_pin_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794594073513,
+      "tag": "0006_add_super_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794594124883,
+      "tag": "0007_club_admin_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794594138267,
+      "tag": "0008_directiva_invitation_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794594174235,
+      "tag": "0009_super_admin_role_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794594291892,
+      "tag": "0010_preserve_super_admin_during_transfer",
+      "breakpoints": true
     }
   ]
 }

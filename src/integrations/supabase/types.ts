@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ajustes_club: {
+        Row: {
+          email_club: string
+          id: boolean
+          nombre_club: string
+          temporada_actual: string
+          whatsapp_club: string
+        }
+        Insert: {
+          email_club?: string
+          id?: boolean
+          nombre_club?: string
+          temporada_actual?: string
+          whatsapp_club?: string
+        }
+        Update: {
+          email_club?: string
+          id?: boolean
+          nombre_club?: string
+          temporada_actual?: string
+          whatsapp_club?: string
+        }
+        Relationships: []
+      }
       avisos: {
         Row: {
           destinatarios: string
@@ -67,6 +91,44 @@ export type Database = {
           },
           {
             foreignKeyName: "avisos_leidos_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      equipo_invitaciones: {
+        Row: {
+          email: string
+          estado: string
+          fecha_alta: string
+          id: string
+          nombre: string
+          socio_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          email: string
+          estado?: string
+          fecha_alta?: string
+          id?: string
+          nombre: string
+          socio_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          email?: string
+          estado?: string
+          fecha_alta?: string
+          id?: string
+          nombre?: string
+          socio_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "equipo_invitaciones_socio_id_fkey"
             columns: ["socio_id"]
             isOneToOne: false
             referencedRelation: "socios"
@@ -197,19 +259,31 @@ export type Database = {
       profiles: {
         Row: {
           dispositivo_id: string | null
+          email: string | null
+          estado: string
+          fecha_alta: string
           id: string
+          nombre: string
           patrocinador_id: string | null
           socio_id: string | null
         }
         Insert: {
           dispositivo_id?: string | null
+          email?: string | null
+          estado?: string
+          fecha_alta?: string
           id: string
+          nombre?: string
           patrocinador_id?: string | null
           socio_id?: string | null
         }
         Update: {
           dispositivo_id?: string | null
+          email?: string | null
+          estado?: string
+          fecha_alta?: string
           id?: string
+          nombre?: string
           patrocinador_id?: string | null
           socio_id?: string | null
         }
@@ -229,6 +303,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      registro_permisos: {
+        Row: {
+          accion: string
+          actor_id: string | null
+          afectado_id: string
+          fecha: string
+          id: string
+          motivo: string
+        }
+        Insert: {
+          accion: string
+          actor_id?: string | null
+          afectado_id: string
+          fecha?: string
+          id?: string
+          motivo?: string
+        }
+        Update: {
+          accion?: string
+          actor_id?: string | null
+          afectado_id?: string
+          fecha?: string
+          id?: string
+          motivo?: string
+        }
+        Relationships: []
       }
       socios: {
         Row: {
@@ -446,18 +547,36 @@ export type Database = {
         Returns: boolean
       }
       identificar_socio: { Args: { p_numero: number }; Returns: Json }
+      is_directiva: { Args: never; Returns: boolean }
+      is_super_admin: { Args: never; Returns: boolean }
       marcar_apertura: { Args: never; Returns: undefined }
       mi_patrocinador: { Args: never; Returns: string }
       mi_socio: { Args: never; Returns: string }
+      quitar_directiva: {
+        Args: { p_motivo: string; p_user: string }
+        Returns: undefined
+      }
+      reservar_directiva: {
+        Args: { p_email: string; p_nombre: string; p_socio?: string }
+        Returns: string
+      }
       stats_club: { Args: { p_periodo: string }; Returns: Json }
       stats_patrocinador: {
         Args: { p_patrocinador_id: string; p_periodo: string }
         Returns: Json
       }
+      transferir_super_admin: {
+        Args: { nuevo_perfil_id: string }
+        Returns: undefined
+      }
+      vincular_directiva: {
+        Args: { p_invitacion: string; p_user: string }
+        Returns: undefined
+      }
       visit_names_today: { Args: never; Returns: Json }
     }
     Enums: {
-      club_role: "socia" | "negocio" | "directiva"
+      club_role: "socia" | "negocio" | "directiva" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -585,7 +704,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      club_role: ["socia", "negocio", "directiva"],
+      club_role: ["socia", "negocio", "directiva", "super_admin"],
     },
   },
 } as const
