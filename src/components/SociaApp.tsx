@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, MapPin } from "lucide-react";
 import { ProximoPartido, UltimoResultado } from "@/components/PartidoTarjetas";
 import { Galeria } from "@/components/Galeria";
@@ -30,7 +31,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
   const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;
 
   return (
-    <div className="flex flex-1 flex-col pt-14">
+    <div className="flex flex-1 flex-col">
       <SociaCabecera />
       <div className="flex-1 pb-12">
         {tab === "equipo" && <Equipo db={db} />}
@@ -63,7 +64,9 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
   const [dy, setDy] = useState(0);
   const [y0, setY0] = useState<number | null>(null);
   return (
-    <div role="dialog" aria-label="Tu carnet" className="animate-sheet fixed inset-0 z-50 mx-auto flex max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-8"
+    <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}><Dialog.Portal>
+    <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60" />
+    <Dialog.Content aria-describedby={undefined} className="animate-sheet fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-8"
       style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
       onTouchStart={(e) => setY0((e.touches[0]?.clientY ?? 0))}
       onTouchMove={(e) => y0 !== null && setDy(Math.max(0, (e.touches[0]?.clientY ?? 0) - y0))}
@@ -74,13 +77,13 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
         <ChevronDown size={20} strokeWidth={1.75} className="text-muted-foreground" />
       </Button>
       <div className="flex min-h-14 items-center justify-between gap-3 border-b border-border">
-        <h1 className="club-section-title">Tu carnet</h1>
+        <Dialog.Title className="club-section-title">Tu carnet</Dialog.Title>
         <span className="label-club pb-1 text-muted-foreground">{socio.temporada}</span>
       </div>
             <div className="mt-6">
         <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
       </div>
-    </div>
+    </Dialog.Content></Dialog.Portal></Dialog.Root>
   );
 }
 

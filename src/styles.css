@@ -132,6 +132,9 @@
 }
 
 @layer base {
+  html { scrollbar-gutter: stable; }
+  /* Keep the reserved scrollbar track when Radix locks page scrolling. */
+  body[data-scroll-locked] { margin-right: 0 !important; padding-right: 0 !important; }
   * {
     border-color: var(--color-border);
   }

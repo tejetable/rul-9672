@@ -88,7 +88,7 @@ function Cargando() {
 export function AppFrame({ children, crema = false }: { children: React.ReactNode; crema?: boolean }) {
   return (
     <div className="min-h-screen bg-primary sm:py-6">
-      <main className={`relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col sm:min-h-[calc(100vh-3rem)] sm:overflow-hidden sm:rounded-[2rem] ${crema ? "hero-crema" : "bg-background"}`}>
+      <main className={`relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col sm:min-h-[calc(100vh-3rem)] sm:overflow-clip sm:rounded-[2rem] ${crema ? "hero-crema" : "bg-background"}`}>
         {children}
       </main>
     </div>

@@ -18,3 +18,5 @@
 - [x] Limitar Drive a lectura y descarga; la subida se realiza fuera de la app.
 - [x] Usar GOOGLE_API_KEY guardada por el usuario; el acceso OAuth queda sustituido por su última elección.
 - [x] Explicar cómo obtener y restringir la clave de Google Drive.
+- [ ] Corregir desplazamientos al abrir menús y revisar ventanas en móvil y escritorio.
+- [ ] Autorizar a diegoteje11@gmail.com como Directiva y verificar acceso.

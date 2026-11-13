@@ -39,3 +39,4 @@ use the editor.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
 
 - Roles are stored separately from profiles; invitation and hashed-PIN RPCs link anonymous sessions, while Directiva requires an explicitly authorized social account, never the demo selector.
+- Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.
