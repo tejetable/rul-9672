@@ -5,13 +5,12 @@ import { ListaAvisos } from "@/components/Avisos";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { QrScanner } from "@/components/QrScanner";
 import { dataService, type Patrocinador, type Socio, type Visita } from "@/lib/dataService";
-import { desdeRango, estadisticas, fraseMes, porSemana, progresoObjetivo } from "@/lib/visitas";
+import { desdeRango, estadisticas, fraseMes, progresoObjetivo, serieGrafico } from "@/lib/visitas";
 import { waLink } from "@/lib/whatsapp";
 
 export function NegocioApp() {
   const [neg, setNeg] = useState<Patrocinador | null | undefined>(undefined);
   const [tab, setTab] = useState<"registrar" | "mes" | "avisos">("registrar");
-  const [reciente, setReciente] = useState<string | null>(null);
   useEffect(() => setNeg(dataService.negocioSesion()), []);
   if (neg === undefined) return null;
   if (!neg) return <Pin onOk={(p) => { dataService.abrirNegocio(p.id); setNeg(p); }} />;
@@ -31,26 +30,12 @@ export function NegocioApp() {
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
       <div className="mx-5 mt-4 grid grid-cols-3 rounded-2xl bg-suave p-1">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
-          <button key={id} onClick={() => { setTab(id); setReciente(null); }} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
+          <button key={id} onClick={() => setTab(id)} className={`min-h-11 rounded-xl text-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
             {l}
           </button>
         ))}
       </div>
-      {tab === "avisos" ? <ListaAvisos quien="negocios" /> : tab === "registrar" ? (
-        <Registrar neg={neg} onHecho={(id) => { setReciente(id); setTab("mes"); }} />
-      ) : (
-        <>
-          {reciente && (
-            <div className="animate-rise mx-5 mt-4 flex items-center gap-3 rounded-2xl bg-suave p-4">
-              <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
-              <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
-              <button onClick={() => { dataService.anularVisita(reciente); setReciente(null); setTab("registrar"); }} className="min-h-11 rounded-xl btn-suave px-3 text-sm font-bold">Deshacer</button>
-            </div>
-          )}
-          <TuMes key={reciente ?? "x"} neg={neg} />
-          <button onClick={() => { setReciente(null); setTab("registrar"); }} className="mx-5 mt-6 min-h-14 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Registrar otra visita</button>
-        </>
-      )}
+      {tab === "avisos" ? <ListaAvisos quien="negocios" /> : tab === "registrar" ? <Registrar neg={neg} /> : <TuMes neg={neg} />}
     </div>
   );
 }
@@ -98,14 +83,15 @@ function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
 }
 
 
-function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) => void }) {
+function Registrar({ neg }: { neg: Patrocinador }) {
   const [num, setNum] = useState("");
   const [socio, setSocio] = useState<Socio | null>(null);
   const [origen, setOrigen] = useState<Visita["origen"]>("numero");
   const [aviso, setAviso] = useState<string | null>(null);
-  const [noExiste, setNoExiste] = useState<Visita["tipoCliente"] | null>(null);
+  const [sinCarnet, setSinCarnet] = useState(false);
   const [scan, setScan] = useState(false);
   const [hoy, setHoy] = useState<Visita[]>([]);
+  const [reciente, setReciente] = useState<string | null>(null);
 
   const refrescar = useCallback(() => {
     const d = new Date().toDateString();
@@ -113,8 +99,17 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
   }, [neg.id]);
   useEffect(refrescar, [refrescar]);
 
+  const limpiar = () => { setNum(""); setSocio(null); setAviso(null); setSinCarnet(false); };
+
+  useEffect(() => {
+    if (!reciente) return;
+    const t1 = setTimeout(limpiar, 3000);
+    const t2 = setTimeout(() => setReciente(null), 10000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [reciente]);
+
   const buscar = (n: string, o: Visita["origen"] = "numero") => {
-    setNum(n); setOrigen(o); setAviso(null); setNoExiste(null);
+    setNum(n); setOrigen(o); setAviso(null); setSinCarnet(false); setReciente(null);
     const s = n ? dataService.socioPorNumero(Number(n)) : null;
     setSocio(s);
     if (s && dataService.yaHoy(neg.id, s.id)) setAviso("Esta visita ya está registrada hoy.");
@@ -122,43 +117,47 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
 
   const onScan = useCallback((n: number) => { setScan(false); buscar(String(n), "qr"); }, [neg.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const guardar = (tipo: Visita["tipoCliente"], forzarSinNumero = false) => {
-    if (aviso) return;
-    if (num && !socio && !forzarSinNumero) return setNoExiste(tipo);
-    const s = forzarSinNumero ? null : socio;
+  const listo = (!!socio && !aviso) || sinCarnet;
+  const repite = !!socio && dataService.repite(neg.id, socio.id);
+
+  const guardar = (tipo: Visita["tipoCliente"]) => {
+    if (!listo) return;
+    const s = sinCarnet ? null : socio;
     const r = dataService.registrarVisita({ patrocinadorId: neg.id, socio: s, origen: s ? origen : "sin_carne", tipoCliente: tipo });
     if (r === "duplicada") return setAviso("Esta visita ya está registrada hoy.");
     refrescar();
-    onHecho(r.id);
+    setReciente(r.id);
   };
 
   const big = "flex min-h-20 w-full items-center justify-center gap-2 rounded-2xl text-xl font-black uppercase transition-transform duration-200 active:scale-[.98] disabled:opacity-40";
-  const repite = socio && dataService.repite(neg.id, socio.id);
 
   return (
     <section className="flex flex-1 flex-col px-5 pt-6">
       {scan && <QrScanner onResult={onScan} onClose={() => setScan(false)} />}
+      {reciente && (
+        <div className="animate-rise mb-4 flex items-center gap-3 rounded-2xl bg-suave p-4">
+          <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
+          <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
+          <button onClick={() => { dataService.anularVisita(reciente); setReciente(null); refrescar(); }} className="min-h-11 rounded-xl btn-suave px-3 text-sm font-bold">Deshacer</button>
+        </div>
+      )}
       <button onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
         <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
       </button>
-      <label className="label-club mt-5 block">Nº de socio (opcional)</label>
-      <input value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="Si no tiene carnet, déjalo vacío" className="mt-1 min-h-14 w-full rounded-2xl border-2 border-input bg-background px-4 text-xl font-black placeholder:text-base placeholder:font-normal" />
+      <label htmlFor="num-socio" className="label-club mt-5 block">Nº de socio</label>
+      <input id="num-socio" value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 min-h-14 w-full rounded-2xl border-2 border-input bg-background px-4 text-xl font-black placeholder:text-base placeholder:font-normal" />
       {socio && !aviso && (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-lg font-black text-accent">
           <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}
           {repite && <span className="label-club rounded-full bg-accent px-3 py-1 text-accent-foreground">Repite por el club</span>}
         </p>
       )}
-      {num && !socio && !noExiste && <p className="mt-3 text-sm text-muted-foreground">Ese número no está en el club.</p>}
+      {num && !socio && <p className="mt-3 text-sm font-bold">Ese número no está en el club. Revísalo.</p>}
       {aviso && <p className="mt-3 rounded-xl border-2 border-gold p-3 font-bold">{aviso}</p>}
-      {noExiste && (
-        <div className="mt-3 rounded-2xl bg-suave p-4">
-          <p className="font-bold">Ese número no está en el club. ¿Lo registramos sin número?</p>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            <button onClick={() => guardar(noExiste, true)} className="min-h-14 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Sí</button>
-            <button onClick={() => { setNoExiste(null); setNum(""); setSocio(null); }} className="min-h-14 rounded-2xl btn-suave font-black uppercase">Corregir</button>
-          </div>
-        </div>
+      {sinCarnet ? (
+        <p className="mt-3 text-sm text-muted-foreground">Sin carnet: la visita se guarda como declarada. <button onClick={() => setSinCarnet(false)} className="font-bold underline">Cancelar</button></p>
+      ) : (
+        <button onClick={() => { limpiar(); setSinCarnet(true); setReciente(null); }} className="mt-3 self-start text-sm text-muted-foreground underline">Viene de parte del club pero no tiene carnet</button>
       )}
 
       <h2 className="label-club mt-8 text-muted-foreground">Últimas visitas de hoy</h2>
@@ -181,11 +180,17 @@ function Registrar({ neg, onHecho }: { neg: Patrocinador; onHecho: (id: string) 
       )}
 
       <div className="sticky bottom-0 -mx-5 mt-auto bg-background px-5 pb-5 pt-4">
-        <p className="label-club mb-2 text-center text-accent">¿Ya era clienta tuya antes? Pulsa y queda registrada</p>
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => guardar("nueva")} disabled={!!aviso || !!noExiste} className={`${big} bg-primary text-primary-foreground`}>Nueva</button>
-          <button onClick={() => guardar("ya_era_clienta")} disabled={!!aviso || !!noExiste} className={`${big} btn-suave text-lg`}>Ya era clienta</button>
-        </div>
+        {repite && !sinCarnet ? (
+          <button onClick={() => guardar("ya_era_clienta")} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</button>
+        ) : (
+          <>
+            <p className="label-club mb-2 text-center text-accent">{listo ? "¿Ya era clienta tuya antes? Pulsa y queda registrada" : "Escanea el carnet o escribe el número"}</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => guardar("nueva")} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Nueva</button>
+              <button onClick={() => guardar("ya_era_clienta")} disabled={!listo} className={`${big} btn-suave text-lg`}>Ya era clienta</button>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -195,11 +200,10 @@ function TuMes({ neg }: { neg: Patrocinador }) {
   const [rango, setRango] = useState<"mes" | "90" | "temporada">("mes");
   const vs = dataService.get().visitas;
   const s = estadisticas(vs, neg.id, desdeRango(rango));
-  const mes = estadisticas(vs, neg.id, desdeRango("mes"));
   const prog = progresoObjetivo(vs, neg.id);
-  const sem = porSemana(vs, neg.id);
+  const sem = serieGrafico(vs, neg.id, rango);
   const max = Math.max(1, ...sem.map((w) => w.total));
-  const frase = fraseMes(mes);
+  const frase = fraseMes(s, rango);
   const share = `${frase}\n\nVisitas por el club: ${s.visitas} · Clientas nuevas: ${s.nuevas} · Repiten: ${s.repiten}\n— Real Unión Lucense F.S.`;
 
   return (
@@ -235,14 +239,14 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       </div>
 
       <div className="mt-6 rounded-2xl bg-suave p-4">
-        <p className="label-club text-muted-foreground">Visitas por semana</p>
-        <div className="mt-3 flex h-32 items-end gap-2">
+        <p className="label-club text-muted-foreground">{rango === "temporada" ? "Visitas por mes" : "Visitas por semana"}</p>
+        <div className="mt-3 flex h-32 items-end gap-1">
           {sem.map((w) => (
             <div key={w.label} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
               <div className="flex w-full flex-col justify-end overflow-hidden rounded-md bg-primary" style={{ height: `${(w.total / max) * 100}%`, minHeight: w.total ? 4 : 0 }}>
                 <div className="w-full bg-accent" style={{ height: `${w.total ? (w.nuevas / w.total) * 100 : 0}%` }} />
               </div>
-              <span className="text-[11px] font-bold">{w.label}</span>
+              <span className="text-[10px] font-bold">{w.label}</span>
             </div>
           ))}
         </div>

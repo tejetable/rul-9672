@@ -71,6 +71,43 @@ export function porSemana(vs: Visita[], patId: string | null, ahora = new Date()
   });
 }
 
-export function fraseMes(s: { visitas: number; nuevas: number; repiten: number }) {
-  return `Este mes, ${s.visitas} personas de nuestra familia han pasado por tu casa. ${s.nuevas} por primera vez, y ${s.repiten} ya han vuelto.`;
+export type Rango = "mes" | "90" | "temporada";
+
+/** Barras del gráfico según el filtro: semanas del mes, ~13 semanas o meses de temporada */
+export function serieGrafico(vs: Visita[], patId: string | null, rango: Rango, ahora = new Date()) {
+  const r = vivas(vs, patId);
+  const tramo = (label: string, ini: Date, fin: Date) => {
+    const w = r.filter((v) => { const d = new Date(v.fechaHora); return d >= ini && d < fin; });
+    return { label, total: w.length, nuevas: w.filter((v) => v.tipoCliente === "nueva").length };
+  };
+  if (rango === "temporada") {
+    const out = [];
+    const ini = new Date(INICIO_TEMPORADA + "T00:00:00");
+    for (let d = new Date(ini.getFullYear(), ini.getMonth(), 1); d <= ahora; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) {
+      out.push(tramo(d.toLocaleDateString("es-ES", { month: "short" }).replace(".", ""), d, new Date(d.getFullYear(), d.getMonth() + 1, 1)));
+    }
+    return out;
+  }
+  if (rango === "mes") {
+    const out = [];
+    const m0 = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    for (let i = 0; ; i++) {
+      const ini = new Date(m0.getFullYear(), m0.getMonth(), 1 + i * 7);
+      if (ini > ahora || ini.getMonth() !== m0.getMonth()) break;
+      const fin = new Date(m0.getFullYear(), m0.getMonth(), 1 + (i + 1) * 7);
+      out.push(tramo(`S${i + 1}`, ini, fin));
+    }
+    return out;
+  }
+  const fin = new Date(ahora.getTime() + 1);
+  return Array.from({ length: 13 }, (_, i) => {
+    const f = new Date(fin.getTime() - (12 - i) * 7 * 86400000);
+    return tramo(`S${i + 1}`, new Date(f.getTime() - 7 * 86400000), f);
+  });
+}
+
+const PREFIJO: Record<Rango, string> = { mes: "Este mes", "90": "En los últimos 90 días", temporada: "Esta temporada" };
+
+export function fraseMes(s: { visitas: number; nuevas: number; repiten: number }, rango: Rango = "mes") {
+  return `${PREFIJO[rango]}, ${s.visitas} personas de nuestra familia han pasado por tu casa. ${s.nuevas} por primera vez, y ${s.repiten} ya han vuelto.`;
 }

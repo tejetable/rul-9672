@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estadisticas, progresoObjetivo, repiteViaClub, yaRegistradaHoy, type Visita } from "./visitas";
+import { estadisticas, fraseMes, progresoObjetivo, repiteViaClub, serieGrafico, yaRegistradaHoy, type Visita } from "./visitas";
 
 const v = (p: Partial<Visita>): Visita => ({
   id: Math.random().toString(),
@@ -41,5 +41,22 @@ describe("visitas", () => {
     const ahora = new Date("2026-11-07T12:00:00");
     const vs = [...Array(3)].map(() => v({ fechaHora: "2026-11-01T10:00:00" })).concat(v({ fechaHora: "2026-07-01T10:00:00" }));
     expect(progresoObjetivo(vs, "p1", ahora)).toEqual({ nuevas: 3, objetivo: 5, pct: 60 });
+  });
+});
+
+describe("gráfico y frase según el filtro", () => {
+  const ahora = new Date("2027-01-20T12:00:00");
+  it("90 días da 13 barras semanales", () => {
+    expect(serieGrafico([], "p1", "90", ahora)).toHaveLength(13);
+  });
+  it("temporada da una barra por mes desde septiembre", () => {
+    expect(serieGrafico([v({ fechaHora: "2026-10-03T10:00:00" })], "p1", "temporada", ahora).map((b) => b.total)).toEqual([0, 1, 0, 0, 0]);
+  });
+  it("este mes da semanas del mes en curso", () => {
+    expect(serieGrafico([], "p1", "mes", ahora)).toHaveLength(3);
+  });
+  it("la frase cambia con el periodo", () => {
+    expect(fraseMes({ visitas: 3, nuevas: 1, repiten: 1 }, "90").startsWith("En los últimos 90 días,")).toBe(true);
+    expect(fraseMes({ visitas: 3, nuevas: 1, repiten: 1 }, "temporada").startsWith("Esta temporada,")).toBe(true);
   });
 });

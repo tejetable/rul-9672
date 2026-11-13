@@ -16,6 +16,8 @@ export interface Socio {
   fechaActivacion: string | null;
   dispositivoId: string | null;
   cambioDispositivo: boolean;
+  /** Última vez que abrió la app */
+  ultimaApertura?: string | undefined;
 }
 export interface Patrocinador {
   id: string;
@@ -77,7 +79,7 @@ export interface DB {
   socioActualId: string | null;
 }
 
-const KEY = "rul-demo-db-v5";
+const KEY = "rul-demo-db-v6";
 const DEVICE_KEY = "rul-device-id";
 const SESSION_KEY = "rul-session-socio";
 const NEGOCIO_KEY = "rul-session-negocio";
@@ -105,6 +107,7 @@ function seed(): DB {
     fechaActivacion: now.toISOString(),
     dispositivoId: "demo-seed",
     cambioDispositivo: false,
+    ultimaApertura: i % 3 === 0 ? undefined : new Date(now.getTime() - (i % 10) * 86400000).toISOString(),
   }));
   const pend = "[Dirección pendiente]";
   const patrocinadores: Patrocinador[] = [
@@ -123,7 +126,7 @@ function seed(): DB {
     { id: "v5", patrocinadorId: "p3", destacado: "10 %", titulo: "Bonos de estética", descripcion: "Incluye diagnóstico gratis.", condiciones: "Enseña tu carnet al comprar el bono.", ...T },
     { id: "v6", patrocinadorId: "p4", destacado: "5 €", titulo: "Menos en tu psicotécnico", descripcion: "Con tu carnet de socia/o.", condiciones: "Enseña tu carnet al pedir cita.", ...T },
     {
-      id: "v7", patrocinadorId: "p5", destacado: "Tarifas", titulo: "Tarifas de socia/o en consultas y pruebas", descripcion: "Y 5 € menos en psicotécnicos con tu carnet.", condiciones: "Di que eres socia/o al pedir cita. Analítica básica con cita previa martes y jueves.", ...T,
+      id: "v7", patrocinadorId: "p5", destacado: "Tarifas", titulo: "Tarifas de socia/o en consultas y pruebas", descripcion: "Y 5 € menos en psicotécnicos con tu carnet.", condiciones: "Enseña tu carnet en el mostrador. Analítica básica con cita previa martes y jueves.", ...T,
       tarifas: [
         { servicio: "Consulta medicina general", normal: "50 €", socio: "40 €" },
         { servicio: "Revisión medicina general", normal: "30 €", socio: "25 €" },
@@ -158,7 +161,7 @@ function seed(): DB {
   }
   const partidos: Partido[] = [
     { id: "m1", rival: "[Rival]", fechaHora: "", lugar: "Pabellón de Guntín", esLocal: true, golesLocal: null, golesVisitante: null, jugado: true },
-    { id: "m2", rival: "Abella F.C.", fechaHora: "", lugar: "[Pabellón pendiente]", esLocal: true, golesLocal: null, golesVisitante: null, jugado: false },
+    { id: "m2", rival: "Abella F.C.", fechaHora: "", lugar: "Pabellón de Guntín", esLocal: true, golesLocal: null, golesVisitante: null, jugado: false },
   ];
   const avisos: Aviso[] = [
     { id: "a1", titulo: "Arrancamos temporada", texto: "Primera temporada en Primera Futgal. Te esperamos en Guntín.", fecha: now.toISOString(), tipo: "club" },
@@ -293,6 +296,24 @@ export const dataService = {
   /** Cierra la sesión de este móvil (el carnet sigue activo en el club) */
   cerrarSesion() {
     window.localStorage.removeItem(SESSION_KEY);
+  },
+  marcarApertura(id: string) {
+    this.update(id, { ultimaApertura: new Date().toISOString() });
+  },
+  pinLibre(): string {
+    const usados = new Set(load().patrocinadores.map((p) => p.pin));
+    let pin = "";
+    do pin = String(Math.floor(1000 + Math.random() * 9000)); while (usados.has(pin));
+    return pin;
+  },
+  crearPatrocinador(p: Omit<Patrocinador, "id" | "activo">, v: { titulo: string; descripcion: string; condiciones: string }): Patrocinador | "pin_usado" {
+    const db = load();
+    if (db.patrocinadores.some((x) => x.pin === p.pin)) return "pin_usado";
+    const pat: Patrocinador = { ...p, id: "p" + Date.now(), activo: true };
+    db.patrocinadores.push(pat);
+    db.ventajas.push({ id: "v" + Date.now(), patrocinadorId: pat.id, destacado: "Socia/o", ...v, activa: true, fechaInicio: "2026-09-01", fechaFin: "2027-06-30" });
+    save(db);
+    return pat;
   },
   // ---- Negocio ----
   negocioPorPin(pin: string) {

@@ -29,7 +29,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
   const [db, setDb] = useState<DB | null>(null);
   const [leidos, setLeidos] = useState<string[]>([]);
   const [carnet, setCarnet] = useState(false);
-  useEffect(() => { setDb(dataService.get()); setLeidos(dataService.avisosLeidos()); }, []);
+  useEffect(() => { dataService.marcarApertura(socio.id); setDb(dataService.get()); setLeidos(dataService.avisosLeidos()); }, []);
   if (!db) return null;
   const avisos = dataService.avisosPara("socias");
   const sinLeer = avisos.filter((a) => !leidos.includes(a.id));
@@ -271,7 +271,7 @@ function Ventajas({ db }: { db: DB }) {
       <a href={folleto.url} target="_blank" rel="noreferrer" className="mt-6 flex min-h-12 items-center justify-center gap-2 rounded-2xl btn-suave font-bold">
         <FileText size={18} strokeWidth={1.75} /> Ver el folleto completo (PDF)
       </a>
-      <p className="mt-4 text-center text-sm text-muted-foreground">Enseña tu carnet o di que eres socia/o al pedir cita.</p>
+      <p className="mt-4 text-center text-sm text-muted-foreground">Enseña tu carnet en el mostrador. Así el negocio sabe que vienes por el club.</p>
     </section>
   );
 }
