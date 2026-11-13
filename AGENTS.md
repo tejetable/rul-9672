@@ -35,3 +35,4 @@ use the editor.
 - Display both physical-card faces from the uploaded artwork with the member number overlaid; keep digital identification outside the artwork to preserve the printed design.
 - Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.
 - Match cards use pure helpers in src/lib/partidos.ts for Madrid-time countdowns and ICS exports so date behavior is independently tested.
+- Gallery data is exposed through dataService.albumes; src/lib/galeria.ts groups only explicit match assignments, never inferring matches from legacy asset names.

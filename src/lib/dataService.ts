@@ -1,4 +1,5 @@
 import { repiteViaClub, yaRegistradaHoy, type Visita } from "./visitas";
+import { agruparAlbumes, fotosGaleria } from "./galeria";
 export type { Visita } from "./visitas";
 // Capa de datos aislada. Hoy: localStorage. Mañana: se cambia por Lovable Cloud sin tocar pantallas.
 
@@ -222,6 +223,9 @@ function save(db: DB) {
 
 export const dataService = {
   get: load,
+  albumes() {
+    return agruparAlbumes(fotosGaleria);
+  },
   reset() {
     const db = seed();
     save(db);

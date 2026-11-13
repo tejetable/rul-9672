@@ -68,6 +68,6 @@ export function UltimoResultado() {
       <p className="result-score">18 <span className="result-separator">–</span> <span className="result-loser">0</span></p>
       <div className="result-team"><span className="result-opponent">PMF</span><p>P.M. Friol</p></div>
     </div>
-    <Button asChild variant="link" className="h-9 p-0 text-accent text-sm font-bold"><a href="#album-friol">Ver fotos del partido <ArrowRight strokeWidth={1.75} /></a></Button>
+    <Button asChild variant="link" className="h-9 p-0 text-accent text-sm font-bold"><a href="#fotos-equipo">Ver fotos del partido <ArrowRight strokeWidth={1.75} /></a></Button>
   </article>;
 }

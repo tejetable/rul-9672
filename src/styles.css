@@ -281,3 +281,47 @@
   .result-matchup { grid-template-columns: minmax(0,1fr) 116px minmax(0,1fr); }
 }
 @media (prefers-reduced-motion: reduce) { .fixture-live-dot { animation: none; } }
+
+:root {
+  --gallery-dark: oklch(0 0 0);
+  --gallery-ink: var(--primary-foreground);
+  --gallery-caption: linear-gradient(to top, color-mix(in srgb, var(--gallery-dark) 60%, transparent), transparent);
+  --gallery-overlay: color-mix(in srgb, var(--gallery-dark) 50%, transparent);
+  --gallery-shimmer: linear-gradient(110deg, transparent 25%, color-mix(in srgb, var(--primary-foreground) 22%, transparent) 45%, transparent 65%);
+}
+.gallery-mosaic { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 4px; }
+.gallery-tile { position: relative; display: block; width: 100%; height: auto; min-width: 0; overflow: hidden; border-radius: 14px; padding: 0; background: var(--muted); transition: opacity 200ms; }
+.gallery-tile:hover { background: var(--muted); opacity: .95; }
+.gallery-hero { grid-column: 1 / -1; aspect-ratio: 16 / 10; }
+.gallery-square { aspect-ratio: 1; }
+.gallery-image { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: var(--primary); }
+.gallery-image.is-loading::after { content: ""; position: absolute; inset: 0; background: var(--gallery-shimmer); background-size: 250% 100%; animation: gallery-shimmer 1.8s linear infinite; }
+.gallery-crop-image, .gallery-full-image { width: 100%; height: 100%; opacity: 0; transition: opacity 200ms; }
+.gallery-crop-image { object-fit: cover; }
+.gallery-full-image { object-fit: contain; }
+.is-loaded > img { opacity: 1; }
+.gallery-image-error { display: grid; height: 100%; place-items: center; font-size: 12px; color: var(--gallery-ink); }
+.gallery-caption { position: absolute; inset: auto 0 0; padding: 28px 14px 14px; background: var(--gallery-caption); color: var(--gallery-ink); text-align: left; white-space: normal; }
+.gallery-caption strong { display: block; font-size: 16px; font-weight: 900; line-height: 1.2; }
+.gallery-caption > span { display: block; margin-top: 4px; font-size: 12px; opacity: .8; }
+.gallery-more { position: absolute; inset: 0; display: grid; place-items: center; background: var(--gallery-overlay); color: var(--gallery-ink); font-size: 22px; font-weight: 900; }
+.gallery-album-strip { display: flex; gap: 8px; overflow-x: auto; padding: 12px 0 4px; }
+.gallery-album-card { position: relative; flex: 0 0 140px; width: 140px; height: 100px; overflow: hidden; border-radius: 14px; padding: 0; }
+.gallery-album-card .gallery-caption { padding: 22px 8px 8px; }
+.gallery-album-card .gallery-caption strong { font-size: 12px; }
+.gallery-filters { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0; }
+.gallery-filter { flex-shrink: 0; min-height: 40px; border-radius: 999px; background: var(--fixture-chip); color: var(--primary); font-weight: 700; }
+.gallery-filter-active, .gallery-filter-active:hover { background: var(--primary); color: var(--primary-foreground); }
+.gallery-complete-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; padding: 16px; }
+.gallery-viewer-overlay { position: fixed; inset: 0; z-index: 60; background: var(--gallery-dark); }
+.gallery-viewer { position: fixed; inset: 0; z-index: 61; display: flex; flex-direction: column; background: var(--gallery-dark); color: var(--gallery-ink); outline: none; }
+.gallery-viewer-top { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; min-height: 64px; padding: max(12px, env(safe-area-inset-top)) 16px 12px; font-weight: 900; }
+.gallery-viewer-stage { flex: 1; min-height: 0; touch-action: none; user-select: none; }
+.gallery-viewer-stage .gallery-image { background: var(--gallery-dark); }
+.gallery-viewer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 12px max(20px, env(safe-area-inset-bottom)); }
+.gallery-viewer-bottom p { text-align: center; font-size: 14px; font-weight: 700; }
+.gallery-viewer-bottom p span { display: block; margin-top: 4px; font-size: 12px; opacity: .8; }
+.gallery-viewer-control { flex-shrink: 0; width: 44px; height: 44px; color: var(--gallery-ink); }
+.gallery-viewer-control:hover { background: var(--gallery-overlay); color: var(--gallery-ink); }
+@keyframes gallery-shimmer { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .gallery-image.is-loading::after { animation: none; } }

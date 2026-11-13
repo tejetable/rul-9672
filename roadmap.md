@@ -5,3 +5,5 @@
 - [x] Reorganizar El Equipo y la cabecera de Socia; campana compartida con Negocio.
 - [x] Actualizar partido y aviso sin borrar los datos existentes; verificar lectura y pantallas.
 - [x] Rediseñar tarjetas de partido, cuenta atrás, Maps y calendario; verificar en 390×844.
+- [x] Galería por álbumes, mosaico, filtros y visor con gestos; fotos no asignadas en Últimos partidos.
+- [x] Verificar galería completa y visor en móvil y escritorio.

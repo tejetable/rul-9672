@@ -91,8 +91,7 @@ function Equipo({ db }: { db: DB }) {
     <section className="px-5 pt-5">
       {proximo && <ProximoPartido partido={proximo} />}
       <UltimoResultado />
-      <div id="album-friol" className="scroll-mt-20">
-        <h2 className="label-club mt-8">Fotos</h2>
+      <div id="fotos-equipo" className="scroll-mt-20">
         <Galeria />
       </div>
     </section>
