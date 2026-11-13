@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
-import { dataService, type Aviso } from "@/lib/dataService";
+import { dataService, type Aviso, useClubData, runAction } from "@/lib/dataService";
 
 const PARA: Record<NonNullable<Aviso["para"]>, string> = { todos: "Todos", socias: "Socias/os", negocios: "Negocios" };
 const TIPO: Record<Aviso["tipo"], string> = { club: "Club", partido: "Partido", ventaja: "Ventaja" };
 
 export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
+  const db = useClubData();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
-  useEffect(() => setAvisos(dataService.avisosPara(quien)), [quien]);
+  useEffect(() => setAvisos(dataService.avisosPara(quien)), [quien, db]);
   return (
     <section className="px-5 pt-6">
       <h1 className="title-club text-heading">Avisos</h1>
@@ -27,17 +28,18 @@ export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
 }
 
 export function AvisosPanel() {
+  const db = useClubData();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [titulo, setTitulo] = useState("");
   const [texto, setTexto] = useState("");
   const [tipo, setTipo] = useState<Aviso["tipo"]>("club");
   const [para, setPara] = useState<NonNullable<Aviso["para"]>>("todos");
   const refrescar = () => setAvisos([...dataService.get().avisos].sort((a, b) => b.fecha.localeCompare(a.fecha)));
-  useEffect(refrescar, []);
+  useEffect(refrescar, [db]);
 
-  const publicar = () => {
+  const publicar = async () => {
     if (!titulo.trim() || !texto.trim()) return;
-    dataService.crearAviso({ titulo: titulo.trim(), texto: texto.trim(), tipo, para });
+    await dataService.crearAviso({ titulo: titulo.trim(), texto: texto.trim(), tipo, para });
     setTitulo(""); setTexto(""); refrescar();
   };
 
@@ -57,7 +59,7 @@ export function AvisosPanel() {
       <div className="mt-2 flex flex-wrap gap-2">
         {(Object.keys(PARA) as NonNullable<Aviso["para"]>[]).map((k) => <Button variant="ghost" key={k} onClick={() => setPara(k)} className={chip(para === k)}>{PARA[k]}</Button>)}
       </div>
-      <Button variant="ghost" onClick={publicar} disabled={!titulo.trim() || !texto.trim()} className="mt-5 h-auto min-h-14 w-full rounded-panel bg-primary font-black uppercase text-primary-foreground disabled:opacity-40">
+      <Button variant="ghost" onClick={() => runAction(publicar)} disabled={!titulo.trim() || !texto.trim()} className="mt-5 h-auto min-h-14 w-full rounded-panel bg-primary font-black uppercase text-primary-foreground disabled:opacity-40">
         Publicar aviso
       </Button>
 
@@ -70,7 +72,7 @@ export function AvisosPanel() {
               <p className="mt-1 font-black">{a.titulo}</p>
               <p className="mt-1 text-body-sm">{a.texto}</p>
             </div>
-            <Button variant="ghost" onClick={() => { dataService.borrarAviso(a.id); refrescar(); }} aria-label="Borrar aviso" className="flex size-11 items-center justify-center">
+            <Button variant="ghost" onClick={() => { runAction(async () => { await dataService.borrarAviso(a.id); refrescar(); }); }} aria-label="Borrar aviso" className="flex size-11 items-center justify-center">
               <Trash2 size={18} strokeWidth={1.75} />
             </Button>
           </li>

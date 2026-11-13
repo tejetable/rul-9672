@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794591194532,
+      "tag": "0000_club_cloud_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794591232063,
+      "tag": "0001_club_cloud_operations",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794591274536,
+      "tag": "0002_club_demo_seed",
+      "breakpoints": true
+    }
+  ]
 }

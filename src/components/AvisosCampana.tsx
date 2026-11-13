@@ -2,22 +2,23 @@ import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Bell, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { dataService, type Aviso } from "@/lib/dataService";
+import { dataService, type Aviso, useClubData, runAction } from "@/lib/dataService";
 
 export function AvisosCampana({ quien }: { quien: "socias" | "negocios" }) {
+  const db = useClubData();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [leidos, setLeidos] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
   useEffect(() => {
     setAvisos(dataService.avisosPara(quien));
     setLeidos(dataService.avisosLeidos());
-  }, [quien]);
+  }, [quien, db]);
   const cambiar = (value: boolean) => {
     setOpen(value);
     if (!value) return;
     const actuales = dataService.avisosPara(quien);
     setAvisos(actuales);
-    dataService.marcarAvisosLeidos(quien);
+    runAction(async () => { await dataService.marcarAvisosLeidos(quien); setLeidos(dataService.avisosLeidos()); });
     setLeidos(dataService.avisosLeidos());
   };
   return (

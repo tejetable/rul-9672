@@ -1,0 +1,63 @@
+INSERT INTO public.socios(id,nombre,telefono,numero_socio,estado,token_invitacion,mayor_de_edad,consentimiento_at,dispositivo_id,ultima_apertura) VALUES
+('00000000-0000-4000-8000-000000000001','Socia Demo 1','600000000',1,'activa','seed-token-demo-1-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000002','Socia Demo 2','600000000',2,'activa','seed-token-demo-2-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000003','Socia Demo 3','600000000',3,'activa','seed-token-demo-3-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000004','Socia Demo 4','600000000',4,'activa','seed-token-demo-4-xxxxxxxxxxxx',true,now(),'demo-seed',null),
+('00000000-0000-4000-8000-000000000005','Socia Demo 5','600000000',5,'activa','seed-token-demo-5-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000006','Socia Demo 6','600000000',6,'activa','seed-token-demo-6-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000007','Socia Demo 7','600000000',7,'activa','seed-token-demo-7-xxxxxxxxxxxx',true,now(),'demo-seed',null),
+('00000000-0000-4000-8000-000000000008','Socia Demo 8','600000000',8,'activa','seed-token-demo-8-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000009','Socia Demo 9','600000000',9,'activa','seed-token-demo-9-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000010','Socia Demo 10','600000000',10,'activa','seed-token-demo-10-xxxxxxxxxxxx',true,now(),'demo-seed',null),
+('00000000-0000-4000-8000-000000000011','Socia Demo 11','600000000',11,'activa','seed-token-demo-11-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000012','Socia Demo 12','600000000',12,'activa','seed-token-demo-12-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000013','Socia Demo 13','600000000',13,'activa','seed-token-demo-13-xxxxxxxxxxxx',true,now(),'demo-seed',null),
+('00000000-0000-4000-8000-000000000014','Socia Demo 14','600000000',14,'activa','seed-token-demo-14-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000015','Socia Demo 15','600000000',15,'activa','seed-token-demo-15-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000016','Socia Demo 16','600000000',16,'activa','seed-token-demo-16-xxxxxxxxxxxx',true,now(),'demo-seed',null),
+('00000000-0000-4000-8000-000000000017','Socia Demo 17','600000000',17,'activa','seed-token-demo-17-xxxxxxxxxxxx',true,now(),'demo-seed',now()),
+('00000000-0000-4000-8000-000000000018','Socia Demo 18','600000000',18,'activa','seed-token-demo-18-xxxxxxxxxxxx',true,now(),'demo-seed',now());
+SELECT setval(pg_get_serial_sequence('public.socios','numero_socio'),18);
+INSERT INTO public.patrocinadores(id,nombre,categoria,pin_hash) VALUES
+('10000000-0000-4000-8000-000000000001','EFG Parquets','Parquets y suelos',extensions.crypt('1111',extensions.gen_salt('bf'))),
+('10000000-0000-4000-8000-000000000002','Noel López Pinín · Nutrición','Nutrición',extensions.crypt('2222',extensions.gen_salt('bf'))),
+('10000000-0000-4000-8000-000000000003','BajoCero · Mauro Busi','Fisio, entreno y estética',extensions.crypt('3333',extensions.gen_salt('bf'))),
+('10000000-0000-4000-8000-000000000004','Psicotécnico San Roque','Psicotécnicos',extensions.crypt('4444',extensions.gen_salt('bf'))),
+('10000000-0000-4000-8000-000000000005','Clínica Dinam','Salud',extensions.crypt('5555',extensions.gen_salt('bf')));
+INSERT INTO public.ventajas(id,patrocinador_id,destacado,titulo,descripcion,condiciones,tarifas) VALUES
+('20000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','10 %','En trabajos de EFG Parquets','Para que tu casa también juegue en casa.','Enseña tu carnet al pedir presupuesto.',null),
+('20000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000002','15 %','En asesoría mensual','De 90 € a 76,50 € al mes.','Enseña tu carnet al empezar la asesoría.',null),
+('20000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000003','10 %','Primera sesión de fisioterapia','En tu primera visita.','Solo en la primera sesión.',null),
+('20000000-0000-4000-8000-000000000004','10000000-0000-4000-8000-000000000003','10 %','Primera mensualidad de entrenamiento','Incluye una sesión de prueba gratis.','Solo en la primera mensualidad.',null),
+('20000000-0000-4000-8000-000000000005','10000000-0000-4000-8000-000000000003','10 %','Bonos de estética','Incluye diagnóstico gratis.','Enseña tu carnet al comprar el bono.',null),
+('20000000-0000-4000-8000-000000000006','10000000-0000-4000-8000-000000000004','5 €','Menos en tu psicotécnico','Con tu carnet de socia/o.','Enseña tu carnet al pedir cita.',null),
+('20000000-0000-4000-8000-000000000007','10000000-0000-4000-8000-000000000005','Tarifas','Tarifas de socia/o en consultas y pruebas','Y 5 € menos en psicotécnicos con tu carnet.','Enseña tu carnet en el mostrador. Analítica básica con cita previa martes y jueves.','[{"servicio":"Consulta medicina general","normal":"50 €","socio":"40 €"},{"servicio":"Revisión medicina general","normal":"30 €","socio":"25 €"},{"servicio":"Electrocardiograma (ECG)","normal":"20 €","socio":"15 €"},{"servicio":"Audiometría","normal":"15 €","socio":"12 €"},{"servicio":"Espirometría","normal":"15 €","socio":"12 €"},{"servicio":"Radiografía · 1 proyección","normal":"20 €","socio":"18 €"},{"servicio":"Radiografía · 2 proyecciones","normal":"32 €","socio":"30 €"},{"servicio":"Reconocimiento deportivo","normal":"35 €","socio":"25 €"},{"servicio":"Analítica básica","normal":"65 €","socio":"40 €"}]');
+INSERT INTO public.partidos(rival,fecha_hora,lugar,es_local,competicion,goles_favor,goles_contra,jugado) VALUES ('P.M. Friol','2026-11-07T19:00:00+01','Pabellón de Guntín',true,null,18,0,true),('Abella F.C.','2026-11-14T19:00:00+01','Pabellón de Guntín',true,'Primera Futgal',null,null,false);
+INSERT INTO public.avisos(tipo,titulo,texto,destinatarios) VALUES ('club','Arrancamos temporada','Primera temporada en Primera Futgal. Te esperamos en Guntín.','todos'),('partido','Próximo partido: vs Abella F.C.','Concello de Guntín - R.U. Lucense vs Abella F.C. · sábado 14/11/2026 · 19:00 · Pabellón de Guntín · Primera Futgal. Te esperamos.','todos');
+INSERT INTO public.visitas(patrocinador_id,socio_id,fecha_hora,origen,tipo_cliente) VALUES
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000001',now()-interval '55 days','numero','nueva'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000006',now()-interval '53 days','qr','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000011',now()-interval '51 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001',null,now()-interval '49 days','sin_carnet','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000010',now()-interval '47 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000004',now()-interval '45 days','qr','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000009',now()-interval '43 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001',null,now()-interval '41 days','sin_carnet','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000008',now()-interval '39 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002',now()-interval '37 days','qr','nueva'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000007',now()-interval '34 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001',null,now()-interval '32 days','sin_carnet','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000006',now()-interval '30 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000011',now()-interval '28 days','qr','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000005',now()-interval '26 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001',null,now()-interval '24 days','sin_carnet','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000004',now()-interval '22 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000009',now()-interval '20 days','qr','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000003',now()-interval '18 days','numero','nueva'),
+('10000000-0000-4000-8000-000000000001',null,now()-interval '16 days','sin_carnet','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000002',now()-interval '13 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000007',now()-interval '11 days','qr','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000001',now()-interval '9 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001',null,now()-interval '7 days','sin_carnet','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000011',now()-interval '5 days','numero','ya_era_clienta'),
+('10000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000005',now()-interval '3 days','qr','ya_era_clienta');

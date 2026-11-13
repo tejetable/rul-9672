@@ -5,11 +5,13 @@ import { ContactarClub } from "@/components/ContactarClub";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
 import { QrScanner } from "@/components/QrScanner";
-import { dataService, type Patrocinador, type Socio, type Visita } from "@/lib/dataService";
-import { desdeRango, estadisticas, fraseMes, progresoObjetivo, serieGrafico } from "@/lib/visitas";
+import { dataService, type Patrocinador, type Socio, type Visita, useClubData, runAction } from "@/lib/dataService";
+import { fraseMes } from "@/lib/visitas";
+import { adaptarStats, emptyStats, type ClubStats } from "@/lib/club-stats";
 import { waLink } from "@/lib/whatsapp";
 
 export function NegocioApp() {
+  useClubData();
   const [neg, setNeg] = useState<Patrocinador | null | undefined>(undefined);
   const [tab, setTab] = useState<"registrar" | "mes">("registrar");
   useEffect(() => setNeg(dataService.negocioSesion()), []);
@@ -20,7 +22,7 @@ export function NegocioApp() {
     <div className="flex flex-1 flex-col pb-16">
       <ClubCabecera titulo={neg.nombre} etiqueta="Negocio amigo">
         <AvisosCampana quien="negocios" />
-        <Button variant="ghost" size="icon" onClick={() => { dataService.cerrarNegocio(); setNeg(null); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>
+        <Button variant="ghost" size="icon" onClick={() => { runAction(async () => { await dataService.cerrarNegocio(); setNeg(null); }); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>
       </ClubCabecera>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
       <div className="club-tabs mx-5 mt-4 grid-cols-2">
@@ -38,12 +40,12 @@ export function NegocioApp() {
 function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
   const [pin, setPin] = useState("");
   const [err, setErr] = useState(false);
-  const pulsar = (d: string) => {
+  const pulsar = async (d: string) => {
     const n = (pin + d).slice(0, 4);
     setPin(n);
     setErr(false);
     if (n.length === 4) {
-      const p = dataService.negocioPorPin(n);
+      const p = await dataService.negocioPorPin(n);
       if (p) onOk(p);
       else {
         setErr(true);
@@ -65,7 +67,7 @@ function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
       <div className="mt-2 grid w-full max-w-xs grid-cols-3 gap-3">
         {["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "⌫"].map((d) =>
           d === "" ? <span key="x" /> : (
-            <Button variant="ghost" key={d} onClick={() => (d === "⌫" ? setPin(pin.slice(0, -1)) : pulsar(d))} className="flex h-auto min-h-14 items-center justify-center rounded-panel bg-surface text-section font-black active:scale-95">
+            <Button variant="ghost" key={d} onClick={() => (d === "⌫" ? setPin(pin.slice(0, -1)) : runAction(() => pulsar(d)))} className="flex h-auto min-h-14 items-center justify-center rounded-panel bg-surface text-section font-black active:scale-95">
               {d === "⌫" ? <Delete size={22} strokeWidth={1.75} /> : d}
             </Button>
           ),
@@ -80,6 +82,9 @@ function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
 function Registrar({ neg }: { neg: Patrocinador }) {
   const [num, setNum] = useState("");
   const [socio, setSocio] = useState<Socio | null>(null);
+  const [repite, setRepite] = useState(false);
+  const [buscando, setBuscando] = useState(false);
+  const [guardando, setGuardando] = useState(false);
   const [origen, setOrigen] = useState<Visita["origen"]>("numero");
   const [aviso, setAviso] = useState<string | null>(null);
   const [sinCarnet, setSinCarnet] = useState(false);
@@ -93,7 +98,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
   }, [neg.id]);
   useEffect(refrescar, [refrescar]);
 
-  const limpiar = () => { setNum(""); setSocio(null); setAviso(null); setSinCarnet(false); };
+  const limpiar = () => { setRepite(false); setNum(""); setSocio(null); setAviso(null); setSinCarnet(false); };
 
   useEffect(() => {
     if (!reciente) return;
@@ -102,25 +107,29 @@ function Registrar({ neg }: { neg: Patrocinador }) {
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [reciente]);
 
-  const buscar = (n: string, o: Visita["origen"] = "numero") => {
+  const buscar = async (n: string, o: Visita["origen"] = "numero") => {
     setNum(n); setOrigen(o); setAviso(null); setSinCarnet(false); setReciente(null);
-    const s = n ? dataService.socioPorNumero(Number(n)) : null;
+    setBuscando(true);
+    const s = n ? await dataService.socioPorNumero(Number(n)) : null;
+    setBuscando(false); setRepite(!!s?.repite);
     setSocio(s);
-    if (s && dataService.yaHoy(neg.id, s.id)) setAviso("Esta visita ya está registrada hoy.");
+    if (s?.yaHoy) setAviso("Esta visita ya está registrada hoy.");
   };
 
-  const onScan = useCallback((n: number) => { setScan(false); buscar(String(n), "qr"); }, [neg.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const onScan = useCallback((n: number) => { setScan(false); runAction(() => buscar(String(n), "qr")); }, [neg.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const listo = (!!socio && !aviso) || sinCarnet;
-  const repite = !!socio && dataService.repite(neg.id, socio.id);
+  const listo = !buscando && !guardando && ((!!socio && !aviso) || sinCarnet);
 
-  const guardar = (tipo: Visita["tipoCliente"]) => {
+  const guardar = async (tipo: Visita["tipoCliente"]) => {
     if (!listo) return;
     const s = sinCarnet ? null : socio;
-    const r = dataService.registrarVisita({ patrocinadorId: neg.id, socio: s, origen: s ? origen : "sin_carne", tipoCliente: tipo });
+    setGuardando(true);
+    try {
+    const r = await dataService.registrarVisita({ patrocinadorId: neg.id, socio: s, origen: s ? origen : "sin_carne", tipoCliente: tipo });
     if (r === "duplicada") return setAviso("Esta visita ya está registrada hoy.");
     refrescar();
     setReciente(r.id);
+    } finally { setGuardando(false); }
   };
 
   const big = "flex h-auto min-h-14 w-full items-center justify-center gap-2 rounded-control text-item font-black uppercase transition-transform duration-200 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
@@ -132,14 +141,14 @@ function Registrar({ neg }: { neg: Patrocinador }) {
         <div className="animate-rise mb-4 flex items-center gap-3 rounded-panel bg-surface p-4">
           <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
           <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
-          <Button variant="ghost" onClick={() => { dataService.anularVisita(reciente); setReciente(null); refrescar(); }} className="h-auto min-h-11 rounded-control btn-suave px-3 text-body-sm font-bold">Deshacer</Button>
+          <Button variant="ghost" onClick={() => { runAction(async () => { await dataService.anularVisita(reciente); setReciente(null); refrescar(); }); }} className="h-auto min-h-11 rounded-control btn-suave px-3 text-body-sm font-bold">Deshacer</Button>
         </div>
       )}
       <Button variant="ghost" onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
         <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
       </Button>
       <label htmlFor="num-socio" className="label-club mt-5 block">Nº de socio</label>
-      <input id="num-socio" value={num} onChange={(e) => buscar(e.target.value.replace(/\D/g, ""))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-14 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
+      <input id="num-socio" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-14 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
       {socio && !aviso && (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black text-accent">
           <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}
@@ -175,13 +184,13 @@ function Registrar({ neg }: { neg: Patrocinador }) {
 
       <div className="sticky bottom-0 -mx-5 mt-auto bg-background px-5 pb-5 pt-4">
         {repite && !sinCarnet ? (
-          <Button variant="ghost" onClick={() => guardar("ya_era_clienta")} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
+          <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
         ) : (
           <>
             <p className="label-club mb-2 text-center text-accent">{listo ? "¿Ya era clienta tuya antes? Pulsa y queda registrada" : "Escanea el carnet o escribe el número"}</p>
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="ghost" onClick={() => guardar("nueva")} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Nueva</Button>
-              <Button variant="ghost" onClick={() => guardar("ya_era_clienta")} disabled={!listo} className={`${big} btn-suave text-item`}>Ya era clienta</Button>
+              <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Nueva</Button>
+              <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} btn-suave text-item`}>Ya era clienta</Button>
             </div>
           </>
         )}
@@ -192,10 +201,12 @@ function Registrar({ neg }: { neg: Patrocinador }) {
 
 function TuMes({ neg }: { neg: Patrocinador }) {
   const [rango, setRango] = useState<"mes" | "90" | "temporada">("mes");
-  const vs = dataService.get().visitas;
-  const s = estadisticas(vs, neg.id, desdeRango(rango));
-  const prog = progresoObjetivo(vs, neg.id);
-  const sem = serieGrafico(vs, neg.id, rango);
+  const db = useClubData();
+  const [stats, setStats] = useState<ClubStats>(emptyStats);
+  useEffect(() => { runAction(async () => setStats(await dataService.statsPatrocinador(neg.id, rango))); }, [neg.id, rango, db]);
+  const s = adaptarStats(stats);
+  const prog = { nuevas: stats.objetivo_nuevas_90d, objetivo: 5, pct: Math.min(100, stats.objetivo_nuevas_90d * 20) };
+  const sem = stats.serie;
   const max = Math.max(1, ...sem.map((w) => w.total));
   const frase = fraseMes(s, rango);
   const share = `${frase}\n\nVisitas por el club: ${s.visitas} · Clientas nuevas: ${s.nuevas} · Repiten: ${s.repiten}\n— Real Unión Lucense F.S.`;

@@ -1,3 +1,4 @@
+import { DirectivaAcceso } from "@/components/DirectivaAcceso";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { Button } from "@/components/ui/button";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -11,13 +12,15 @@ import { AvisosPanel } from "@/components/Avisos";
 import { SociasPanel } from "@/components/SociasPanel";
 import { PatrocinadoresPanel } from "@/components/PatrocinadoresPanel";
 import { NegocioApp } from "@/components/NegocioApp";
-import { dataService } from "@/lib/dataService";
+import { dataService, useClubData, runAction } from "@/lib/dataService";
 import { waLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "R.U. Lucense · Carnet de la afición" },
+      { property: "og:image", content: pina.url },
+      { name: "twitter:image", content: pina.url },
       { name: "description", content: "Tu carnet de socia/o del Real Unión Lucense F.S. y lo que te da ser de los nuestros en Guntín." },
       { property: "og:title", content: "R.U. Lucense · Carnet de la afición" },
       { property: "og:description", content: "Más que un club, un grupo de amigos. Tu carnet y tus ventajas en el móvil." },
@@ -32,20 +35,28 @@ const ROLE_KEY = "rul-demo-role";
 type Sesion = ReturnType<typeof dataService.sesion>;
 
 function Index() {
+  const db = useClubData();
   const [role, setRole] = useState<Role>("socia");
   const [sesion, setSesion] = useState<Sesion>(null);
   const [ready, setReady] = useState(false);
   const [espera, setEspera] = useState(true);
 
   useEffect(() => {
-    dataService.get();
+    runAction(async () => {
+      await dataService.init();
+      const actual = dataService.rol();
+      if (actual) setRole(actual);
+      setSesion(dataService.sesion());
+      setReady(true);
+    });
     const r = window.localStorage.getItem(ROLE_KEY) as Role | null;
     if (r) setRole(r);
-    setSesion(dataService.sesion());
-    setReady(true);
+
     const t = setTimeout(() => setEspera(false), 1500);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => { setSesion(dataService.sesion()); }, [db]);
 
   const cambiar = (r: Role) => {
     window.localStorage.setItem(ROLE_KEY, r);
@@ -58,7 +69,7 @@ function Index() {
     <AppFrame crema={cargando}>
       {cargando && <Cargando />}
       {!cargando && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
-      {!cargando && role === "directiva" && <Directiva />}
+      {!cargando && role === "directiva" && (dataService.rol() === "directiva" ? <Directiva /> : <DirectivaAcceso />)}
       {!cargando && role === "negocio" && <NegocioApp />}
       {!cargando && <RoleSwitcher role={role} onChange={cambiar} />}
     </AppFrame>
@@ -88,7 +99,7 @@ function Bienvenida() {
   const [ayuda, setAyuda] = useState(false);
   const navigate = useNavigate();
   const simular = () => {
-    const inv = dataService.get().socios.find((x) => x.estado === "invitada") ?? dataService.crearSocio("Socia Demo", "600000000");
+    const inv = {tokenInvitacion:"seed-token-demo-18-xxxxxxxxxxxx"};
     navigate({ to: "/activar/$token", params: { token: inv.tokenInvitacion } });
   };
   return (
@@ -157,7 +168,7 @@ function Directiva() {
   const [t, setT] = useState<"socias" | "patro" | "avisos">("socias");
   return (
     <div className="flex flex-1 flex-col">
-      <ClubCabecera etiqueta="Directiva" />
+      <ClubCabecera etiqueta="Directiva"><Button variant="ghost" onClick={()=>runAction(async()=>{await dataService.cerrarSesion();window.location.reload();})}>Salir</Button></ClubCabecera>
       <div className="club-tabs mx-5 mt-4 grid-cols-3">
         {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setT(id)} className={`h-auto min-h-11 rounded-control text-label font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>

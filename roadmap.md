@@ -9,3 +9,8 @@
 - [x] Verificar galería completa y visor en móvil y escritorio.
 - [x] Unificar tokens, cabeceras, tarjetas y controles de Socia, activación, Negocio y Directiva.
 - [x] Verificar todas las pantallas y sus flujos sin cambiar las reglas existentes.
+- [ ] Migrar datos y sesiones a Cloud con permisos separados, PIN cifrado y reglas de visitas en la base de datos.
+- [ ] Conectar estadísticas compartidas, avisos leídos y bajas con fecha y motivo.
+- [ ] Verificar el flujo Directiva → activación en otro navegador → visita → panel actualizado.
+- [ ] Autorizar la cuenta real de Directiva (pendiente de identificar la cuenta del club).
+- [ ] Conectar la galería a Google Drive según el nuevo documento.

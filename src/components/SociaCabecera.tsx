@@ -3,7 +3,7 @@ import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { dataService } from "@/lib/dataService";
+import { dataService, runAction } from "@/lib/dataService";
 import { waLink } from "@/lib/whatsapp";
 
 export function SociaCabecera() {
@@ -18,7 +18,7 @@ export function SociaCabecera() {
         <DropdownMenuItem asChild><a href="https://www.instagram.com/realunionlucense/" target="_blank" rel="noopener noreferrer" className="min-h-11"><Instagram strokeWidth={1.75} />Instagram</a></DropdownMenuItem>
         <DropdownMenuItem asChild><a href="https://www.twitch.tv/adrifdez_10" target="_blank" rel="noopener noreferrer" className="min-h-11"><Twitch strokeWidth={1.75} />Twitch</a></DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => { dataService.cerrarSesion(); window.location.reload(); }} className="min-h-11"><LogOut strokeWidth={1.75} />Salir</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => { runAction(async () => { await dataService.cerrarSesion(); window.location.reload(); }); }} className="min-h-11"><LogOut strokeWidth={1.75} />Salir</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </header>;

@@ -4,7 +4,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Check, MessageCircle } from "lucide-react";
 import { Carne } from "@/components/Carne";
-import { dataService, type Socio } from "@/lib/dataService";
+import { dataService, type Socio, runAction } from "@/lib/dataService";
 import { waLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/activar/$token")({
@@ -31,13 +31,14 @@ function Activar() {
   const [hecho, setHecho] = useState(false);
 
   useEffect(() => {
-    dataService.get();
-    setSocio(dataService.porToken(token));
+    runAction(async () => setSocio(await dataService.porToken(token)));
   }, [token]);
 
-  const activar = () => {
+  const activar = async () => {
     if (!mayor || !rgpd) return;
-    dataService.activar(token);
+    const activada = await dataService.activar(token);
+    if (!activada) return;
+    setSocio(activada);
     window.localStorage.setItem("rul-demo-role", "socia");
     setHecho(true);
     setTimeout(() => navigate({ to: "/" }), 1800);
@@ -93,7 +94,7 @@ function Activar() {
             </label>
 
             <Button variant="ghost"
-              onClick={activar}
+              onClick={() => runAction(activar)}
               disabled={!mayor || !rgpd}
               className="mt-8 h-auto min-h-12 rounded-panel bg-primary text-item font-black uppercase text-primary-foreground transition-opacity duration-200 disabled:opacity-40"
             >

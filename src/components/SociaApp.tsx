@@ -6,7 +6,7 @@ import { SociaCabecera } from "@/components/SociaCabecera";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
-import { dataService, type DB, type Socio } from "@/lib/dataService";
+import { dataService, type DB, type Socio, useClubData, runAction } from "@/lib/dataService";
 
 type Tab = "equipo" | "ventajas";
 
@@ -22,9 +22,9 @@ function BalonIcon({ size = 22 }: { size?: number }) {
 
 export function SociaApp({ socio }: { socio: Socio }) {
   const [tab, setTab] = useState<Tab>("equipo");
-  const [db, setDb] = useState<DB | null>(null);
+  const db = useClubData();
   const [carnet, setCarnet] = useState(false);
-  useEffect(() => { dataService.marcarApertura(socio.id); setDb(dataService.get()); }, []);
+  useEffect(() => { runAction(() => dataService.marcarApertura(socio.id)); }, []);
   if (!db) return null;
   const tabCls = (on: boolean) => `member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1 text-body-sm ${on ? "font-bold text-primary" : "font-normal text-muted-foreground"}`;
   const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;

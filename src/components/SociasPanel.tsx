@@ -1,8 +1,9 @@
+import { BajaForm } from "@/components/BajaForm";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { MessageCircle, Plus, Search, Smartphone } from "lucide-react";
-import { dataService, type Socio } from "@/lib/dataService";
+import { dataService, type Socio, useClubData, runAction } from "@/lib/dataService";
 import { textoInvitacion, waLink } from "@/lib/whatsapp";
 
 function enlace(s: Socio) {
@@ -19,6 +20,8 @@ const ESTADO: Record<Socio["estado"], { label: string; cls: string }> = {
 };
 
 export function SociasPanel() {
+  const db = useClubData();
+  const [baja, setBaja] = useState<string | null>(null);
   const [socios, setSocios] = useState<Socio[]>([]);
   const [q, setQ] = useState("");
   const [form, setForm] = useState(false);
@@ -27,7 +30,7 @@ export function SociasPanel() {
   const [creada, setCreada] = useState<Socio | null>(null);
 
   const refresh = () => setSocios([...dataService.get().socios].sort((a, b) => b.numeroSocio - a.numeroSocio));
-  useEffect(refresh, []);
+  useEffect(refresh, [db]);
 
   const lista = useMemo(
     () => socios.filter((s) => s.nombre.toLowerCase().includes(q.toLowerCase()) || String(s.numeroSocio).includes(q)),
@@ -35,9 +38,9 @@ export function SociasPanel() {
   );
   const activas = socios.filter((s) => s.estado === "activa").length;
 
-  const guardar = () => {
+  const guardar = async () => {
     if (!nombre.trim() || tel.replace(/\D/g, "").length < 9) return;
-    const s = dataService.crearSocio(nombre, tel);
+    const s = await dataService.crearSocio(nombre, tel);
     setCreada(s);
     setNombre("");
     setTel("");
@@ -77,7 +80,7 @@ export function SociasPanel() {
           <label className="label-club mt-3 block">Teléfono</label>
           <input value={tel} onChange={(e) => setTel(e.target.value)} inputMode="tel" placeholder="600 000 000" className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
           <div className="mt-4 flex gap-2">
-            <Button variant="ghost" onClick={guardar} className="h-auto min-h-11 flex-1 rounded-control bg-primary font-bold text-primary-foreground">Guardar</Button>
+            <Button variant="ghost" onClick={() => runAction(guardar)} className="h-auto min-h-11 flex-1 rounded-control bg-primary font-bold text-primary-foreground">Guardar</Button>
             <Button variant="ghost" onClick={() => setForm(false)} className="h-auto min-h-11 rounded-control px-4 font-bold">Cancelar</Button>
           </div>
         </div>
@@ -92,6 +95,7 @@ export function SociasPanel() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o número" className="h-auto min-h-11 min-w-0 flex-1 bg-transparent outline-none" />
       </div>
 
+      {baja && <BajaForm onCancel={() => setBaja(null)} onSave={async (fecha, motivo) => { await dataService.desactivar(baja, fecha, motivo); setBaja(null); }} />}
       <ul className="mt-4 flex flex-col gap-3">
         {lista.map((s) => (
           <li key={s.id} className="rounded-panel bg-surface p-4">
@@ -109,14 +113,14 @@ export function SociasPanel() {
             )}
             <div className="mt-3 flex gap-2">
               <Button variant="ghost"
-                onClick={() => {
-                  const n = dataService.regenerarToken(s.id);
+                onClick={() => runAction(async () => {
+                  const n = await dataService.regenerarToken(s.id);
                   refresh();
                   if (n) {
                     setCreada(n);
                     enviar(n);
                   }
-                }}
+                })}
                 className="h-auto min-h-11 flex-1 rounded-control border border-primary text-body-sm font-bold"
               >
                 Reenviar invitación
@@ -124,8 +128,7 @@ export function SociasPanel() {
               {s.estado !== "desactivada" && (
                 <Button variant="ghost"
                   onClick={() => {
-                    dataService.desactivar(s.id);
-                    refresh();
+                    setBaja(s.id);
                   }}
                   className="h-auto min-h-11 rounded-control px-3 text-body-sm font-bold text-muted-foreground"
                 >

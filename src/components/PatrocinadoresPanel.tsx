@@ -1,8 +1,10 @@
+import { BajaForm } from "@/components/BajaForm";
+import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Download, Plus } from "lucide-react";
-import { dataService } from "@/lib/dataService";
-import { desdeRango, estadisticas, progresoObjetivo, type Rango } from "@/lib/visitas";
+import { dataService, useClubData, runAction } from "@/lib/dataService";
+import { type Rango } from "@/lib/visitas";
 
 function exportarCSV() {
   const db = dataService.get();
@@ -33,14 +35,14 @@ export function PatrocinadoresPanel() {
   const [, setV] = useState(0);
   const [rango, setRango] = useState<Rango>("mes");
   const [form, setForm] = useState(false);
-  const db = dataService.get();
-  const desde = desdeRango(rango);
-  const semana = Date.now() - 7 * 86400000;
-  const mes = estadisticas(db.visitas, null, desdeRango("mes"));
+  const db = useClubData();
+  const [baja, setBaja] = useState<string | null>(null);
+  const [summary, setSummary] = useState<ClubSummary>({socios_activos:0,activos_semana:0,visitas:0,nuevas_verificadas:0,patrocinadores:{},bajas:{}});
+  useEffect(() => { runAction(async () => setSummary(await dataService.statsClub(rango))); }, [db, rango]);
   const club = [
-    ["Socias/os activos", db.socios.filter((x) => x.estado === "activa").length],
-    ["Activos esta semana", db.socios.filter((x) => x.ultimaApertura && new Date(x.ultimaApertura).getTime() >= semana).length],
-    ["Visitas del mes", mes.visitas],
+    ["Socias/os activos", summary.socios_activos],
+    ["Activos esta semana", summary.activos_semana],
+    ["Visitas del mes", summary.visitas],
   ] as const;
   return (
     <section className="px-5 pb-28 pt-6">
@@ -54,7 +56,7 @@ export function PatrocinadoresPanel() {
           </div>
         ))}
         <div className="rounded-panel bg-primary p-4 text-primary-foreground">
-          <p className="text-heading font-black leading-none text-gold">{mes.nuevasVerificadas}</p>
+          <p className="text-heading font-black leading-none text-gold">{summary.nuevas_verificadas}</p>
           <p className="label-club mt-2 text-[11px] opacity-80">Clientas nuevas del mes (verificadas)</p>
         </div>
       </div>
@@ -68,13 +70,16 @@ export function PatrocinadoresPanel() {
       {form ? <NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }} /> : (
         <Button variant="ghost" onClick={() => setForm(true)} className="mt-4 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel btn-suave font-black uppercase"><Plus size={18} strokeWidth={1.75} /> Nuevo patrocinador</Button>
       )}
+      {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
+      <h2 className="club-section-title mt-5">Bajas</h2><div className="mt-2 grid grid-cols-2 gap-2">{["no ve retorno","precio","cierre del negocio","otro"].map(m => <div key={m} className="rounded-panel bg-surface p-3"><p className="font-black">{summary.bajas[m] ?? 0}</p><p className="text-body-sm">{m}</p></div>)}</div>
       <ul className="mt-5 space-y-3">
         {db.patrocinadores.map((p) => {
-          const s = estadisticas(db.visitas, p.id, desde);
-          const prog = progresoObjetivo(db.visitas, p.id);
+          const raw = summary.patrocinadores[p.id] ?? emptyStats;
+          const s = adaptarStats(raw);
+          const prog = { nuevas:raw.objetivo_nuevas_90d,pct:Math.min(100,raw.objetivo_nuevas_90d*20) };
           return (
             <li key={p.id} className="rounded-panel bg-surface p-4">
-              <p className="font-black">{p.nombre} <span className="text-label font-bold text-muted-foreground">· PIN {p.pin}</span></p>
+              <p className="font-black">{p.nombre}</p>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                 {[["Visitas", s.visitas], ["Nuevas verif.", s.nuevasVerificadas], ["Nuevas decl.", s.nuevasDeclaradas], ["Repiten", s.repiten], ["% nuevas", `${s.pctNuevas}%`], ["90 días", `${prog.nuevas}/5`]].map(([l, n]) => (
                   <div key={l} className="py-2">
@@ -86,6 +91,7 @@ export function PatrocinadoresPanel() {
               <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
                 <div className="h-full rounded-full bg-accent" style={{ width: `${prog.pct}%` }} />
               </div>
+              {p.activo && <Button variant="ghost" onClick={() => setBaja(p.id)}>Desactivar</Button>}
             </li>
           );
         })}
@@ -109,10 +115,10 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
     r.onload = () => setF((x) => ({ ...x, logoUrl: String(r.result) }));
     r.readAsDataURL(file);
   };
-  const guardar = () => {
+  const guardar = async () => {
     if (!f.nombre.trim() || !f.titulo.trim()) return setErr("Pon al menos el nombre y la ventaja.");
     if (!/^\d{4}$/.test(f.pin)) return setErr("El PIN tiene que ser de 4 números.");
-    const r = dataService.crearPatrocinador(
+    const r = await dataService.crearPatrocinador(
       { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", pin: f.pin, logoUrl: f.logoUrl },
       { titulo: f.titulo.trim(), descripcion: f.descripcion.trim(), condiciones: f.condiciones.trim() },
     );
@@ -138,7 +144,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       {campo("condiciones", "Condiciones")}
       {err && <p className="mt-3 text-body-sm font-bold">{err}</p>}
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <Button variant="ghost" onClick={guardar} className="h-auto min-h-12 rounded-panel bg-primary font-black uppercase text-primary-foreground">Guardar</Button>
+        <Button variant="ghost" onClick={() => runAction(guardar)} className="h-auto min-h-12 rounded-panel bg-primary font-black uppercase text-primary-foreground">Guardar</Button>
         <Button variant="ghost" onClick={onDone} className="h-auto min-h-12 rounded-panel btn-suave font-black uppercase">Cancelar</Button>
       </div>
     </div>

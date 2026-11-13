@@ -14,16 +14,430 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      avisos: {
+        Row: {
+          destinatarios: string
+          id: string
+          publicado_at: string
+          texto: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          destinatarios?: string
+          id?: string
+          publicado_at?: string
+          texto: string
+          tipo: string
+          titulo: string
+        }
+        Update: {
+          destinatarios?: string
+          id?: string
+          publicado_at?: string
+          texto?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      avisos_leidos: {
+        Row: {
+          aviso_id: string
+          socio_id: string | null
+          user_id: string
+        }
+        Insert: {
+          aviso_id: string
+          socio_id?: string | null
+          user_id: string
+        }
+        Update: {
+          aviso_id?: string
+          socio_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_leidos_aviso_id_fkey"
+            columns: ["aviso_id"]
+            isOneToOne: false
+            referencedRelation: "avisos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avisos_leidos_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partidos: {
+        Row: {
+          competicion: string | null
+          drive_folder_id: string | null
+          es_local: boolean
+          fecha_hora: string | null
+          goles_contra: number | null
+          goles_favor: number | null
+          id: string
+          jugado: boolean
+          lugar: string
+          rival: string
+        }
+        Insert: {
+          competicion?: string | null
+          drive_folder_id?: string | null
+          es_local?: boolean
+          fecha_hora?: string | null
+          goles_contra?: number | null
+          goles_favor?: number | null
+          id?: string
+          jugado?: boolean
+          lugar?: string
+          rival: string
+        }
+        Update: {
+          competicion?: string | null
+          drive_folder_id?: string | null
+          es_local?: boolean
+          fecha_hora?: string | null
+          goles_contra?: number | null
+          goles_favor?: number | null
+          id?: string
+          jugado?: boolean
+          lugar?: string
+          rival?: string
+        }
+        Relationships: []
+      }
+      patrocinadores: {
+        Row: {
+          activo: boolean
+          categoria: string
+          detalle_baja: string | null
+          direccion: string
+          fecha_alta: string
+          fecha_baja: string | null
+          id: string
+          importe_patrocinio: number
+          logo_url: string
+          motivo_baja: string | null
+          nombre: string
+          pin_hash: string
+        }
+        Insert: {
+          activo?: boolean
+          categoria?: string
+          detalle_baja?: string | null
+          direccion?: string
+          fecha_alta?: string
+          fecha_baja?: string | null
+          id?: string
+          importe_patrocinio?: number
+          logo_url?: string
+          motivo_baja?: string | null
+          nombre: string
+          pin_hash: string
+        }
+        Update: {
+          activo?: boolean
+          categoria?: string
+          detalle_baja?: string | null
+          direccion?: string
+          fecha_alta?: string
+          fecha_baja?: string | null
+          id?: string
+          importe_patrocinio?: number
+          logo_url?: string
+          motivo_baja?: string | null
+          nombre?: string
+          pin_hash?: string
+        }
+        Relationships: []
+      }
+      pin_intentos: {
+        Row: {
+          intentos: number
+          user_id: string
+          ventana: string
+        }
+        Insert: {
+          intentos?: number
+          user_id: string
+          ventana?: string
+        }
+        Update: {
+          intentos?: number
+          user_id?: string
+          ventana?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          dispositivo_id: string | null
+          id: string
+          patrocinador_id: string | null
+          socio_id: string | null
+        }
+        Insert: {
+          dispositivo_id?: string | null
+          id: string
+          patrocinador_id?: string | null
+          socio_id?: string | null
+        }
+        Update: {
+          dispositivo_id?: string | null
+          id?: string
+          patrocinador_id?: string | null
+          socio_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_patrocinador_id_fkey"
+            columns: ["patrocinador_id"]
+            isOneToOne: false
+            referencedRelation: "patrocinadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: true
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      socios: {
+        Row: {
+          cambio_dispositivo: boolean
+          consentimiento_at: string | null
+          dispositivo_id: string | null
+          estado: string
+          fecha_activacion: string | null
+          fecha_alta: string
+          fecha_baja: string | null
+          id: string
+          mayor_de_edad: boolean
+          motivo_baja: string | null
+          nombre: string
+          numero_socio: number
+          telefono: string
+          temporada: string
+          token_invitacion: string
+          ultima_apertura: string | null
+        }
+        Insert: {
+          cambio_dispositivo?: boolean
+          consentimiento_at?: string | null
+          dispositivo_id?: string | null
+          estado?: string
+          fecha_activacion?: string | null
+          fecha_alta?: string
+          fecha_baja?: string | null
+          id?: string
+          mayor_de_edad?: boolean
+          motivo_baja?: string | null
+          nombre: string
+          numero_socio?: number
+          telefono: string
+          temporada?: string
+          token_invitacion?: string
+          ultima_apertura?: string | null
+        }
+        Update: {
+          cambio_dispositivo?: boolean
+          consentimiento_at?: string | null
+          dispositivo_id?: string | null
+          estado?: string
+          fecha_activacion?: string | null
+          fecha_alta?: string
+          fecha_baja?: string | null
+          id?: string
+          mayor_de_edad?: boolean
+          motivo_baja?: string | null
+          nombre?: string
+          numero_socio?: number
+          telefono?: string
+          temporada?: string
+          token_invitacion?: string
+          ultima_apertura?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          role: Database["public"]["Enums"]["club_role"]
+          user_id: string
+        }
+        Insert: {
+          role: Database["public"]["Enums"]["club_role"]
+          user_id: string
+        }
+        Update: {
+          role?: Database["public"]["Enums"]["club_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ventajas: {
+        Row: {
+          activa: boolean
+          condiciones: string
+          descripcion: string
+          destacado: string | null
+          fecha_fin: string
+          fecha_inicio: string
+          id: string
+          patrocinador_id: string
+          tarifas: Json | null
+          titulo: string
+        }
+        Insert: {
+          activa?: boolean
+          condiciones?: string
+          descripcion?: string
+          destacado?: string | null
+          fecha_fin?: string
+          fecha_inicio?: string
+          id?: string
+          patrocinador_id: string
+          tarifas?: Json | null
+          titulo: string
+        }
+        Update: {
+          activa?: boolean
+          condiciones?: string
+          descripcion?: string
+          destacado?: string | null
+          fecha_fin?: string
+          fecha_inicio?: string
+          id?: string
+          patrocinador_id?: string
+          tarifas?: Json | null
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ventajas_patrocinador_id_fkey"
+            columns: ["patrocinador_id"]
+            isOneToOne: false
+            referencedRelation: "patrocinadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitas: {
+        Row: {
+          anulada: boolean
+          fecha: string | null
+          fecha_hora: string
+          id: string
+          origen: string
+          patrocinador_id: string
+          repite_via_club: boolean
+          socio_id: string | null
+          tipo_cliente: string
+          tramo_gasto: string | null
+          ventaja_id: string | null
+          verificada: boolean
+        }
+        Insert: {
+          anulada?: boolean
+          fecha?: string | null
+          fecha_hora?: string
+          id?: string
+          origen: string
+          patrocinador_id: string
+          repite_via_club?: boolean
+          socio_id?: string | null
+          tipo_cliente: string
+          tramo_gasto?: string | null
+          ventaja_id?: string | null
+          verificada?: boolean
+        }
+        Update: {
+          anulada?: boolean
+          fecha?: string | null
+          fecha_hora?: string
+          id?: string
+          origen?: string
+          patrocinador_id?: string
+          repite_via_club?: boolean
+          socio_id?: string | null
+          tipo_cliente?: string
+          tramo_gasto?: string | null
+          ventaja_id?: string | null
+          verificada?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitas_patrocinador_id_fkey"
+            columns: ["patrocinador_id"]
+            isOneToOne: false
+            referencedRelation: "patrocinadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitas_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visitas_ventaja_id_fkey"
+            columns: ["ventaja_id"]
+            isOneToOne: false
+            referencedRelation: "ventajas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      crear_patrocinador: {
+        Args: {
+          p_categoria: string
+          p_condiciones: string
+          p_descripcion: string
+          p_direccion: string
+          p_importe?: number
+          p_logo: string
+          p_nombre: string
+          p_pin: string
+          p_titulo: string
+        }
+        Returns: string
+      }
+      enlazar_socio: {
+        Args: { p_dispositivo: string; p_token: string }
+        Returns: string
+      }
+      entrar_negocio: { Args: { p_pin: string }; Returns: string }
+      has_club_role: {
+        Args: { r: Database["public"]["Enums"]["club_role"] }
+        Returns: boolean
+      }
+      identificar_socio: { Args: { p_numero: number }; Returns: Json }
+      marcar_apertura: { Args: never; Returns: undefined }
+      mi_patrocinador: { Args: never; Returns: string }
+      mi_socio: { Args: never; Returns: string }
+      stats_club: { Args: { p_periodo: string }; Returns: Json }
+      stats_patrocinador: {
+        Args: { p_patrocinador_id: string; p_periodo: string }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      club_role: "socia" | "negocio" | "directiva"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +564,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      club_role: ["socia", "negocio", "directiva"],
+    },
   },
 } as const
