@@ -132,7 +132,15 @@ export const dataService = {
   esDirectiva:()=>role==='directiva'||role==='super_admin',
   ajustes:()=>settings,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
-  async cargarAjustes(){const r=await supabase.from("ajustes_club").select("*").maybeSingle();check(r.error);settings=r.data??defaultSettings;notify();},
+  async cargarAjustes(){
+    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual").maybeSingle();
+    check(r.error);settings={...defaultSettings,...r.data,email_club:''};
+    if(this.esSuper()){
+      const privateSettings=await supabase.from("ajustes_club").select("email_club").maybeSingle();
+      check(privateSettings.error);settings.email_club=privateSettings.data?.email_club??'';
+    }
+    notify();
+  },
   async guardarAjustes(input:typeof defaultSettings){const r=await supabase.from("ajustes_club").update(settingsSchema.parse(input)).eq("id",true).select();check(r.error);if(!r.data?.length)throw new Error("Solo Super admin puede editar ajustes.");await this.cargarAjustes();},
   async equipo(){const [p,r,i,h]=await Promise.all([supabase.from("profiles").select("*"),supabase.from("user_roles").select("*"),supabase.from("equipo_invitaciones").select("*"),supabase.from("registro_permisos").select("*").order("fecha",{ascending:false})]);check(p.error);check(i.error);check(h.error);return {personas:(p.data??[]).filter(x=>(r.data??[]).some(y=>y.user_id===x.id&&["directiva","super_admin"].includes(y.role))).map(x=>({...x,role:r.data?.find(y=>y.user_id===x.id)?.role})),invitaciones:i.data??[],historial:h.data??[]};},
   async invitarDirectiva(nombre:string,email:string,socioId:string|null=null){return invitarDirectiva({data:{nombre,email,socioId,origin:window.location.origin}});},
@@ -140,10 +148,12 @@ export const dataService = {
   async albumes(){return (await getDriveGallery()).albumes;},
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {
+    role=null;
     await this.cargarAjustes();
     const { data } = await supabase.auth.getUser(); userId = data.user?.id ?? null;
     if (!userId) { db = emptyDB(); role = null; linkedSocio = null; reads = []; sessionState=null;visitNames={};notify(); return; }
     const rr = await supabase.from('user_roles').select('role').eq('user_id', userId).maybeSingle(); check(rr.error); role = rr.data?.role ?? null;
+    if(this.esSuper())await this.cargarAjustes();
     const pr = await supabase.from('profiles').select('socio_id').eq('id', userId).maybeSingle(); check(pr.error); linkedSocio = pr.data?.socio_id ?? null;
     const status=role==='socia'?await supabase.rpc('estado_sesion_socia'):null;
     sessionState=status?.data as typeof sessionState ?? null;

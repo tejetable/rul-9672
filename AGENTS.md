@@ -41,4 +41,5 @@ use the editor.
 - Roles remain in protected user_roles; one Super admin manages invitations, role changes and settings through guarded RPCs with audit triggers, while Directiva uses email magic links and retains club-management permissions.
 - Admin invitations use an authenticated TanStack server function that validates Super admin and same-origin redirects before loading the privileged client; no Edge Functions or browser admin credentials.
 - Club WhatsApp comes from the singleton Cloud settings through dataService; empty contact numbers hide club links, while member invitations retain their separate recipient number.
+- Public settings reads use the explicitly projected ajustes_club_publicos view; the underlying settings and club email are readable only by Super admin so public contact links never expose administrative fields.
 - Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.

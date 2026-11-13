@@ -519,7 +519,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ajustes_club_publicos: {
+        Row: {
+          id: boolean | null
+          nombre_club: string | null
+          temporada_actual: string | null
+          whatsapp_club: string | null
+        }
+        Insert: {
+          id?: boolean | null
+          nombre_club?: string | null
+          temporada_actual?: string | null
+          whatsapp_club?: string | null
+        }
+        Update: {
+          id?: boolean | null
+          nombre_club?: string | null
+          temporada_actual?: string | null
+          whatsapp_club?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       crear_patrocinador: {
