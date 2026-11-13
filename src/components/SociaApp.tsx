@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Bell, CalendarDays, ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, Instagram, LogOut, MapPin, Twitch, X } from "lucide-react";
-import { PhotoSlot } from "@/components/PhotoSlot";
+import { Galeria } from "@/components/Galeria";
 import { ContactarClub } from "@/components/ContactarClub";
 import { ListaAvisos } from "@/components/Avisos";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
-import pina from "@/assets/pina-equipo-ru-lucense.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
@@ -176,12 +175,7 @@ function Equipo({ db, avisos, sinLeer, onLeer }: { db: DB; avisos: Aviso[]; sinL
       </ul>
 
       <p className="label-club mt-8">Fotos y vídeos</p>
-      <div className="-mx-5 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2">
-        <img src={pina.url} alt="El equipo en el pabellón de Guntín" width={1920} height={1280} className="aspect-[3/2] w-[85%] shrink-0 snap-center rounded-2xl object-cover" />
-        {["Celebración del 18-0", "Vídeo: resumen del partido", "La grada en Guntín"].map((t) => (
-          <div key={t} className="w-[85%] shrink-0 snap-center"><PhotoSlot label={t} /></div>
-        ))}
-      </div>
+      <Galeria />
 
       <p className="label-club mt-8">Síguenos</p>
       <div className="mt-3 grid grid-cols-2 gap-3">
