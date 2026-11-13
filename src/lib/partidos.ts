@@ -2,6 +2,10 @@ import type { Partido } from "./dataService";
 
 /** The prototype's confirmed fixture times are Madrid local time. */
 export function inicioPartido(partido: Partido): Date | null {
+  if (/^\d{4}-\d{2}-\d{2}T/.test(partido.fechaHora)) {
+    const fecha = new Date(partido.fechaHora);
+    return Number.isNaN(fecha.getTime()) ? null : fecha;
+  }
   const match = partido.fechaHora.match(/(\d{2})\/(\d{2})\/(\d{4}).*?(\d{2}):(\d{2})/);
   if (!match) return null;
   const [, dia, mes, ano, hora, minuto] = match;
