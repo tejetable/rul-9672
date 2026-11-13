@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as ActivarTokenRouteImport } from './routes/activar.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GaleriaRoute = GaleriaRouteImport.update({
+  id: '/galeria',
+  path: '/galeria',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadRoute = PrivacidadRouteImport.update({
@@ -31,30 +37,34 @@ const ActivarTokenRoute = ActivarTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
   '/activar/$token': typeof ActivarTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
   '/activar/$token': typeof ActivarTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
   '/activar/$token': typeof ActivarTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacidad' | '/activar/$token'
+  fullPaths: '/' | '/galeria' | '/privacidad' | '/activar/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacidad' | '/activar/$token'
-  id: '__root__' | '/' | '/privacidad' | '/activar/$token'
+  to: '/' | '/galeria' | '/privacidad' | '/activar/$token'
+  id: '__root__' | '/' | '/galeria' | '/privacidad' | '/activar/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GaleriaRoute: typeof GaleriaRoute
   PrivacidadRoute: typeof PrivacidadRoute
   ActivarTokenRoute: typeof ActivarTokenRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/galeria': {
+      id: '/galeria'
+      path: '/galeria'
+      fullPath: '/galeria'
+      preLoaderRoute: typeof GaleriaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidad': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GaleriaRoute: GaleriaRoute,
   PrivacidadRoute: PrivacidadRoute,
   ActivarTokenRoute: ActivarTokenRoute,
 }
