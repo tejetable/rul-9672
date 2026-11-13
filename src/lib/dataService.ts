@@ -103,13 +103,13 @@ let channel: ReturnType<typeof supabase.channel> | null = null;
 const notify = () => { version++; listeners.forEach((fn) => fn()); };
 const check = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 const socioFrom = (s: Record<string, unknown>): Socio => ({
-  id: String(s.id), nombre: String(s.nombre), telefono: String(s.telefono ?? ''), numeroSocio: Number(s.numero_socio),
-  temporada: String(s.temporada ?? '2026/27'), fechaAlta: String(s.fecha_alta ?? ''),
-  consentimientoRGPD: { aceptado: !!s.consentimiento_at, fecha: s.consentimiento_at ? String(s.consentimiento_at) : null },
-  mayorDeEdad: !!s.mayor_de_edad, estado: s.estado as Socio['estado'], tokenInvitacion: String(s.token_invitacion ?? ''),
-  fechaActivacion: s.fecha_activacion ? String(s.fecha_activacion) : null, dispositivoId: s.dispositivo_id ? String(s.dispositivo_id) : null,
-  cambioDispositivo: !!s.cambio_dispositivo, ultimaApertura: s.ultima_apertura ? String(s.ultima_apertura) : undefined,
-  fechaBaja: s.fecha_baja ? String(s.fecha_baja) : null, motivoBaja: s.motivo_baja ? String(s.motivo_baja) : null,
+  id: String(s['id']), nombre: String(s['nombre']), telefono: String(s['telefono'] ?? ''), numeroSocio: Number(s['numero_socio']),
+  temporada: String(s['temporada'] ?? '2026/27'), fechaAlta: String(s['fecha_alta'] ?? ''),
+  consentimientoRGPD: { aceptado: !!s['consentimiento_at'], fecha: s['consentimiento_at'] ? String(s['consentimiento_at']) : null },
+  mayorDeEdad: !!s['mayor_de_edad'], estado: s['estado'] as Socio['estado'], tokenInvitacion: String(s['token_invitacion'] ?? ''),
+  fechaActivacion: s['fecha_activacion'] ? String(s['fecha_activacion']) : null, dispositivoId: s['dispositivo_id'] ? String(s['dispositivo_id']) : null,
+  cambioDispositivo: !!s['cambio_dispositivo'], ultimaApertura: s['ultima_apertura'] ? String(s['ultima_apertura']) : undefined,
+  fechaBaja: s['fecha_baja'] ? String(s['fecha_baja']) : null, motivoBaja: s['motivo_baja'] ? String(s['motivo_baja']) : null,
 });
 async function allRows<T>(query: (start: number, end: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>): Promise<T[]> {
   const rows: T[] = [];
@@ -146,7 +146,7 @@ export const dataService = {
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:v.titulo,descripcion:v.descripcion,condiciones:v.condiciones,activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
       partidos: partidos.map(p=>({id:p.id,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.lugar,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
-      avisos:avisos.map(a=>({id:a.id,titulo:a.titulo,texto:a.texto,fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as Aviso['para']})),canjes:[],socioActualId:linkedSocio };
+      avisos:avisos.map(a=>({id:a.id,titulo:a.titulo,texto:a.texto,fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
     reads = leidos.map(l=>l.aviso_id); notify();
   },
   async crearSocio(nombre: string, telefono: string) {

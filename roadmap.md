@@ -14,3 +14,4 @@
 - [ ] Verificar el flujo Directiva → activación en otro navegador → visita → panel actualizado.
 - [ ] Autorizar la cuenta real de Directiva (pendiente de identificar la cuenta del club).
 - [ ] Conectar la galería a Google Drive según el nuevo documento.
+- [ ] Limitar Drive a lectura y descarga; la subida se realiza fuera de la app.
