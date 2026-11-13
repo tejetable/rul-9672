@@ -7,3 +7,5 @@
 - [x] Rediseñar tarjetas de partido, cuenta atrás, Maps y calendario; verificar en 390×844.
 - [x] Galería por álbumes, mosaico, filtros y visor con gestos; fotos no asignadas en Últimos partidos.
 - [x] Verificar galería completa y visor en móvil y escritorio.
+- [x] Unificar tokens, cabeceras, tarjetas y controles de Socia, activación, Negocio y Directiva.
+- [x] Verificar todas las pantallas y sus flujos sin cambiar las reglas existentes.

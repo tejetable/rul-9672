@@ -65,6 +65,26 @@
   --color-verde: var(--verde);
   --color-esmeralda: var(--esmeralda);
   --font-sans: var(--font-lato);
+  --spacing: 4px;
+  --spacing-club-1: 4px;
+  --spacing-club-2: 8px;
+  --spacing-club-3: 12px;
+  --spacing-club-4: 16px;
+  --spacing-club-5: 20px;
+  --spacing-club-6: 24px;
+  --spacing-club-8: 32px;
+  --radius-control: 12px;
+  --radius-tile: 14px;
+  --radius-panel: 20px;
+  --radius-xl: 12px;
+  --radius-2xl: 20px;
+  --text-heading: 28px;
+  --text-section: 20px;
+  --text-item: 16px;
+  --text-body: 15px;
+  --text-body-sm: 13px;
+  --text-label: 11px;
+  --color-surface: var(--result-surface);
 }
 
 :root {
@@ -120,7 +140,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-lato);
-    font-size: 16px;
+    font-size: 15px;
     -webkit-font-smoothing: antialiased;
   }
 }
@@ -128,13 +148,13 @@
 @utility title-club {
   font-weight: 900;
   text-transform: uppercase;
-  line-height: 0.95;
+  line-height: 1.15;
   letter-spacing: 0;
 }
 
 @utility label-club {
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0;
 }
@@ -217,7 +237,7 @@
 .physical-card-number { position: absolute; left: 61%; top: 53%; width: 11%; height: 9%; display: flex; justify-content: center; align-items: center; font-size: 5cqw; font-weight: 900; line-height: 1; color: var(--card-printed-ink); transform: scaleX(.8); }
 .physical-card-benefits-qr { position: absolute; left: 73.15%; top: 25.5%; width: 14.8%; height: 25%; background: var(--roto); padding: 2px; }
 .card-kicker { font-size: 10px; font-weight: 700; text-transform: uppercase; line-height: 1.4; letter-spacing: 0; }
-.card-member-name { font-size: 24px; font-weight: 900; line-height: 1.1; text-transform: uppercase; overflow-wrap: anywhere; }
+.card-member-name { font-size: 20px; font-weight: 900; line-height: 1.2; text-transform: uppercase; overflow-wrap: anywhere; }
 .card-motto { font-size: 22px; font-style: italic; font-weight: 900; line-height: 1.1; }
 .card-qr-code > path:first-child { fill: var(--roto); }
 .card-qr-code > path:last-child { fill: var(--verde); }
@@ -325,3 +345,16 @@
 .gallery-viewer-control:hover { background: var(--gallery-overlay); color: var(--gallery-ink); }
 @keyframes gallery-shimmer { from { background-position: 150% 0; } to { background-position: -100% 0; } }
 @media (prefers-reduced-motion: reduce) { .gallery-image.is-loading::after { animation: none; } }
+
+.club-header { position: sticky; top: 0; z-index: 30; display: flex; flex-shrink: 0; align-items: center; gap: 12px; height: 56px; padding: 0 20px; border-bottom: 1px solid var(--border); background: var(--background); }
+.club-title { font-size: var(--text-heading); font-weight: 900; line-height: 1.15; text-transform: uppercase; overflow-wrap: anywhere; }
+.club-section-title { font-size: var(--text-section); font-weight: 900; line-height: 1.2; }
+.club-chip { display: inline-flex; width: fit-content; align-items: center; border-radius: 999px; padding: 6px 10px; background: var(--fixture-chip); color: var(--accent); font-size: var(--text-label); font-weight: 700; line-height: 1.2; text-transform: uppercase; }
+.club-tabs { display: grid; gap: 4px; padding: 4px; border-radius: var(--radius-tile); background: var(--result-surface); }
+.club-input { border-width: 1px; border-radius: var(--radius-control); background: var(--result-surface); font-size: var(--text-body); }
+.club-button { min-height: 44px; height: auto; border-radius: var(--radius-control); font-size: var(--text-body-sm); font-weight: 700; box-shadow: none; transition-duration: 200ms; }
+.club-stat { font-size: var(--text-heading); font-weight: 900; line-height: 1.1; }
+.member-tab:hover { background: transparent; color: var(--primary); }
+.member-tab svg { width: 22px; height: 22px; }
+.member-tab[aria-label="Abrir carnet"] svg { width: 26px; height: 26px; }
+.club-tabs > button[aria-pressed="true"], .club-tabs > button.bg-primary:hover { background: var(--primary); color: var(--primary-foreground); }

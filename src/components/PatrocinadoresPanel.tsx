@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Download, Plus } from "lucide-react";
 import { dataService } from "@/lib/dataService";
@@ -42,44 +43,43 @@ export function PatrocinadoresPanel() {
     ["Visitas del mes", mes.visitas],
   ] as const;
   return (
-    <section className="px-5 pb-28 pt-8">
-      <p className="label-club text-accent">Directiva</p>
-      <h1 className="title-club mt-2 text-4xl">El club</h1>
-      <span className="gold-rule mt-4" />
-      <div className="mt-5 grid grid-cols-2 gap-3">
+    <section className="px-5 pb-28 pt-6">
+      <p className="club-chip">Directiva</p>
+      <h1 className="title-club mt-2 text-heading">El club</h1>
+            <div className="mt-5 grid grid-cols-2 gap-3">
         {club.map(([l, n]) => (
-          <div key={l} className="rounded-2xl bg-suave p-4">
-            <p className="text-4xl font-black leading-none">{n}</p>
+          <div key={l} className="rounded-panel bg-surface p-4">
+            <p className="text-heading font-black leading-none">{n}</p>
             <p className="label-club mt-2 text-[11px] text-muted-foreground">{l}</p>
           </div>
         ))}
-        <div className="rounded-2xl bg-primary p-4 text-primary-foreground">
-          <p className="text-4xl font-black leading-none text-gold">{mes.nuevasVerificadas}</p>
+        <div className="rounded-panel bg-primary p-4 text-primary-foreground">
+          <p className="text-heading font-black leading-none text-gold">{mes.nuevasVerificadas}</p>
           <p className="label-club mt-2 text-[11px] opacity-80">Clientas nuevas del mes (verificadas)</p>
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-3 gap-1 rounded-2xl bg-suave p-1">
+      <div className="mt-5 club-tabs grid-cols-3">
         {([["mes", "Este mes"], ["90", "90 días"], ["temporada", "Temporada"]] as const).map(([id, l]) => (
-          <button key={id} onClick={() => setRango(id)} className={`min-h-11 rounded-xl text-sm font-bold ${rango === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</button>
+          <Button variant="ghost" key={id} onClick={() => setRango(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold ${rango === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}
       </div>
-      <h2 className="title-club mt-8 text-3xl">Patrocinadores</h2>
+      <h2 className="club-section-title mt-8">Patrocinadores</h2>
       <span className="label-club mt-3 inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
       {form ? <NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }} /> : (
-        <button onClick={() => setForm(true)} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl btn-suave font-black uppercase"><Plus size={18} strokeWidth={1.75} /> Nuevo patrocinador</button>
+        <Button variant="ghost" onClick={() => setForm(true)} className="mt-4 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel btn-suave font-black uppercase"><Plus size={18} strokeWidth={1.75} /> Nuevo patrocinador</Button>
       )}
       <ul className="mt-5 space-y-3">
         {db.patrocinadores.map((p) => {
           const s = estadisticas(db.visitas, p.id, desde);
           const prog = progresoObjetivo(db.visitas, p.id);
           return (
-            <li key={p.id} className="rounded-2xl bg-suave p-4">
-              <p className="font-black">{p.nombre} <span className="text-xs font-bold text-muted-foreground">· PIN {p.pin}</span></p>
+            <li key={p.id} className="rounded-panel bg-surface p-4">
+              <p className="font-black">{p.nombre} <span className="text-label font-bold text-muted-foreground">· PIN {p.pin}</span></p>
               <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                 {[["Visitas", s.visitas], ["Nuevas verif.", s.nuevasVerificadas], ["Nuevas decl.", s.nuevasDeclaradas], ["Repiten", s.repiten], ["% nuevas", `${s.pctNuevas}%`], ["90 días", `${prog.nuevas}/5`]].map(([l, n]) => (
-                  <div key={l} className="rounded-xl bg-background p-2">
-                    <p className="text-xl font-black">{n}</p>
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">{l}</p>
+                  <div key={l} className="py-2">
+                    <p className="text-section font-black">{n}</p>
+                    <p className="text-label font-bold uppercase text-muted-foreground">{l}</p>
                   </div>
                 ))}
               </div>
@@ -90,9 +90,9 @@ export function PatrocinadoresPanel() {
           );
         })}
       </ul>
-      <button onClick={exportarCSV} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary font-black uppercase text-primary-foreground">
+      <Button variant="ghost" onClick={exportarCSV} className="mt-6 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
         <Download size={18} strokeWidth={1.75} /> Exportar CSV
-      </button>
+      </Button>
     </section>
   );
 }
@@ -119,16 +119,16 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
     if (r === "pin_usado") return setErr("Ese PIN ya lo tiene otro negocio.");
     onDone();
   };
-  const inp = "mt-1 min-h-12 w-full rounded-xl border-2 border-input bg-background px-3";
+  const inp = "mt-1 h-auto min-h-12 w-full rounded-control club-input border-input px-3";
   const campo = (k: keyof typeof f, l: string, extra: Partial<React.InputHTMLAttributes<HTMLInputElement>> = {}) => (
     <label className="mt-3 block"><span className="label-club">{l}</span><input value={f[k]} onChange={set(k)} className={inp} {...extra} /></label>
   );
   return (
-    <div className="mt-4 rounded-2xl bg-suave p-4">
+    <div className="mt-4 border-y border-border py-4">
       <p className="font-black">Nuevo patrocinador</p>
       {campo("nombre", "Nombre")}
       {campo("categoria", "Categoría")}
-      <label className="mt-3 block"><span className="label-club">Logo</span><input type="file" accept="image/*" onChange={logo} className="mt-1 block w-full text-sm" /></label>
+      <label className="mt-3 block"><span className="label-club">Logo</span><input type="file" accept="image/*" onChange={logo} className="mt-1 block w-full text-body-sm" /></label>
       {f.logoUrl && <img src={f.logoUrl} alt="Logo del patrocinador" className="mt-2 h-14 w-auto object-contain" />}
       {campo("direccion", "Dirección")}
       {campo("pin", "PIN (4 dígitos)", { inputMode: "numeric", maxLength: 4 })}
@@ -136,10 +136,10 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       {campo("titulo", "Título")}
       {campo("descripcion", "Descripción")}
       {campo("condiciones", "Condiciones")}
-      {err && <p className="mt-3 text-sm font-bold">{err}</p>}
+      {err && <p className="mt-3 text-body-sm font-bold">{err}</p>}
       <div className="mt-4 grid grid-cols-2 gap-3">
-        <button onClick={guardar} className="min-h-12 rounded-2xl bg-primary font-black uppercase text-primary-foreground">Guardar</button>
-        <button onClick={onDone} className="min-h-12 rounded-2xl btn-suave font-black uppercase">Cancelar</button>
+        <Button variant="ghost" onClick={guardar} className="h-auto min-h-12 rounded-panel bg-primary font-black uppercase text-primary-foreground">Guardar</Button>
+        <Button variant="ghost" onClick={onDone} className="h-auto min-h-12 rounded-panel btn-suave font-black uppercase">Cancelar</Button>
       </div>
     </div>
   );

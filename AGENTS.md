@@ -36,3 +36,4 @@ use the editor.
 - Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.
 - Match cards use pure helpers in src/lib/partidos.ts for Madrid-time countdowns and ICS exports so date behavior is independently tested.
 - Gallery data is exposed through dataService.albumes; src/lib/galeria.ts groups only explicit match assignments, never inferring matches from legacy asset names.
+- Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.

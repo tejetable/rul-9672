@@ -7,7 +7,7 @@ export function ContactarClub({ texto }: { texto: string }) {
       href={waLink(texto)}
       target="_blank"
       rel="noopener noreferrer"
-      className="mx-5 mt-3 flex min-h-11 items-center justify-center gap-2 rounded-2xl btn-suave text-sm font-bold transition-transform duration-200 active:scale-[.98]"
+      className="club-button mx-5 mt-3 flex items-center justify-center gap-2 bg-surface text-primary transition-transform active:scale-[.98]"
     >
       <MessageCircle size={18} strokeWidth={1.75} /> Contactar con el club
     </a>
