@@ -1,5 +1,5 @@
 import { ClubCabecera } from "@/components/ClubCabecera";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Delete, LogOut, MessageCircle, QrCode } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
 import { AvisosCampana } from "@/components/AvisosCampana";
@@ -80,6 +80,8 @@ function Pin({ onOk }: { onOk: (p: Patrocinador) => void }) {
 
 
 function Registrar({ neg }: { neg: Patrocinador }) {
+  const db = useClubData();
+  const lookupVersion = useRef(0);
   const [num, setNum] = useState("");
   const [socio, setSocio] = useState<Socio | null>(null);
   const [repite, setRepite] = useState(false);
@@ -96,7 +98,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
     const d = new Date().toDateString();
     setHoy(dataService.get().visitas.filter((v) => v.patrocinadorId === neg.id && new Date(v.fechaHora).toDateString() === d).reverse());
   }, [neg.id]);
-  useEffect(refrescar, [refrescar]);
+  useEffect(refrescar, [refrescar, db]);
 
   const limpiar = () => { setRepite(false); setNum(""); setSocio(null); setAviso(null); setSinCarnet(false); };
 
@@ -109,8 +111,9 @@ function Registrar({ neg }: { neg: Patrocinador }) {
 
   const buscar = async (n: string, o: Visita["origen"] = "numero") => {
     setNum(n); setOrigen(o); setAviso(null); setSinCarnet(false); setReciente(null);
-    setBuscando(true);
+    const lookup=++lookupVersion.current;setSocio(null);setRepite(false);setBuscando(true);
     const s = n ? await dataService.socioPorNumero(Number(n)) : null;
+    if(lookup!==lookupVersion.current)return;
     setBuscando(false); setRepite(!!s?.repite);
     setSocio(s);
     if (s?.yaHoy) setAviso("Esta visita ya está registrada hoy.");
@@ -141,7 +144,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
         <div className="animate-rise mb-4 flex items-center gap-3 rounded-panel bg-surface p-4">
           <span className="animate-check flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={28} strokeWidth={3} /></span>
           <p className="flex-1 font-bold">Hecho. Gracias por apoyar a quien nos apoya.</p>
-          <Button variant="ghost" onClick={() => { runAction(async () => { await dataService.anularVisita(reciente); setReciente(null); refrescar(); }); }} className="h-auto min-h-11 rounded-control btn-suave px-3 text-body-sm font-bold">Deshacer</Button>
+          <Button variant="ghost" onClick={() => { runAction(async () => { await dataService.anularVisita(reciente); setReciente(null); limpiar(); refrescar(); }); }} className="h-auto min-h-11 rounded-control btn-suave px-3 text-body-sm font-bold">Deshacer</Button>
         </div>
       )}
       <Button variant="ghost" onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
@@ -173,7 +176,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
             return (
               <li key={v.id} className={`flex flex-wrap items-center gap-2 py-3 ${v.anulada ? "opacity-40 line-through" : ""}`}>
                 <span className="w-12 text-body-sm font-bold">{new Date(v.fechaHora).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</span>
-                <span className="flex-1 font-bold">{s ? s.nombre : "Sin carnet"}</span>
+                <span className="flex-1 font-bold">{s ? s.nombre : v.socioId ? dataService.nombreVisita(v.socioId) : "Sin carnet"}</span>
                 <span className="label-club rounded-full border border-primary px-2 py-0.5">{v.tipoCliente === "nueva" ? "Nueva" : "Ya era clienta"}</span>
                 {v.repiteViaClub && <span className="label-club rounded-full bg-accent px-2 py-0.5 text-accent-foreground">Repite</span>}
               </li>

@@ -74,6 +74,24 @@ export type Database = {
           },
         ]
       }
+      gallery_cache: {
+        Row: {
+          id: string
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       partidos: {
         Row: {
           competicion: string | null
@@ -422,6 +440,7 @@ export type Database = {
         Returns: string
       }
       entrar_negocio: { Args: { p_pin: string }; Returns: string }
+      estado_sesion_socia: { Args: never; Returns: string }
       has_club_role: {
         Args: { r: Database["public"]["Enums"]["club_role"] }
         Returns: boolean
@@ -435,6 +454,7 @@ export type Database = {
         Args: { p_patrocinador_id: string; p_periodo: string }
         Returns: Json
       }
+      visit_names_today: { Args: never; Returns: Json }
     }
     Enums: {
       club_role: "socia" | "negocio" | "directiva"

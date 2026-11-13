@@ -22,6 +22,27 @@
       "when": 1794591274536,
       "tag": "0002_club_demo_seed",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794593384934,
+      "tag": "0003_gallery_cache_and_validation",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794593522426,
+      "tag": "0004_visit_update_guard_and_member_session",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794593624570,
+      "tag": "0005_protect_business_pin_columns",
+      "breakpoints": true
     }
   ]
 }

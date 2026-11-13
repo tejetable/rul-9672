@@ -14,6 +14,7 @@ export interface FotoGaleria {
   src: string;
   thumb: string;
   pos: string;
+  video?: boolean;
   partido?: { id: string; rival: string; resultado?: string; fecha: string };
 }
 export interface AlbumGaleria {

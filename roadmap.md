@@ -9,12 +9,12 @@
 - [x] Verificar galería completa y visor en móvil y escritorio.
 - [x] Unificar tokens, cabeceras, tarjetas y controles de Socia, activación, Negocio y Directiva.
 - [x] Verificar todas las pantallas y sus flujos sin cambiar las reglas existentes.
-- [ ] Migrar datos y sesiones a Cloud con permisos separados, PIN cifrado y reglas de visitas en la base de datos.
-- [ ] Conectar estadísticas compartidas, avisos leídos y bajas con fecha y motivo.
-- [ ] Verificar el flujo Directiva → activación en otro navegador → visita → panel actualizado.
+- [x] Migrar datos y sesiones a Cloud con permisos separados, PIN cifrado y reglas de visitas en la base de datos.
+- [x] Conectar estadísticas compartidas, avisos leídos y bajas con fecha y motivo.
+- [ ] Verificar el flujo completo con Directiva (bloqueado: falta autorizar e identificar la cuenta del club).
+- [x] Verificar activación y visita en dos navegadores, estadísticas SQL, avisos persistentes, privacidad, álbumes y visor Drive.
 - [ ] Autorizar la cuenta real de Directiva (pendiente de identificar la cuenta del club).
-- [ ] Conectar la galería a Google Drive según el nuevo documento.
-- [ ] Limitar Drive a lectura y descarga; la subida se realiza fuera de la app.
-- [ ] Conectar mediante la cuenta de la hermana con consentimiento de solo lectura; no usar clave ni compartir públicamente.
-- [ ] Usar la cuenta del usuario, que ya puede ver la carpeta, y excluir el permiso de escritura mostrado en la captura.
+- [x] Conectar la galería a Google Drive según el nuevo documento.
+- [x] Limitar Drive a lectura y descarga; la subida se realiza fuera de la app.
+- [x] Usar GOOGLE_API_KEY guardada por el usuario; el acceso OAuth queda sustituido por su última elección.
 - [x] Explicar cómo obtener y restringir la clave de Google Drive.

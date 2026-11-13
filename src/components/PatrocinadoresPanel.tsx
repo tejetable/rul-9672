@@ -105,7 +105,7 @@ export function PatrocinadoresPanel() {
 
 
 function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
-  const [f, setF] = useState({ nombre: "", categoria: "", direccion: "", pin: dataService.pinLibre(), logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
+  const [f, setF] = useState({ importe: "", nombre: "", categoria: "", direccion: "", pin: dataService.pinLibre(), logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
   const [err, setErr] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });
   const logo = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +119,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
     if (!f.nombre.trim() || !f.titulo.trim()) return setErr("Pon al menos el nombre y la ventaja.");
     if (!/^\d{4}$/.test(f.pin)) return setErr("El PIN tiene que ser de 4 números.");
     const r = await dataService.crearPatrocinador(
-      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", pin: f.pin, logoUrl: f.logoUrl },
+      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", pin: f.pin, logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
       { titulo: f.titulo.trim(), descripcion: f.descripcion.trim(), condiciones: f.condiciones.trim() },
     );
     if (r === "pin_usado") return setErr("Ese PIN ya lo tiene otro negocio.");
@@ -138,6 +138,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       {f.logoUrl && <img src={f.logoUrl} alt="Logo del patrocinador" className="mt-2 h-14 w-auto object-contain" />}
       {campo("direccion", "Dirección")}
       {campo("pin", "PIN (4 dígitos)", { inputMode: "numeric", maxLength: 4 })}
+      {campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
       <p className="label-club mt-5 text-accent">Ventaja</p>
       {campo("titulo", "Título")}
       {campo("descripcion", "Descripción")}

@@ -68,7 +68,7 @@ function Index() {
   return (
     <AppFrame crema={cargando}>
       {cargando && <Cargando />}
-      {!cargando && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : <Bienvenida />)}
+      {!cargando && role === "socia" && (sesion?.estado === "ok" ? <SociaApp socio={sesion.socio} /> : sesion ? <CarneMovido estado={sesion.estado} /> : dataService.estadoSocia()==='movido'||dataService.estadoSocia()==='desactivada' ? <CarneMovido estado={dataService.estadoSocia()==='desactivada'?'desactivada':'movido'}/> : <Bienvenida />)}
       {!cargando && role === "directiva" && (dataService.rol() === "directiva" ? <Directiva /> : <DirectivaAcceso />)}
       {!cargando && role === "negocio" && <NegocioApp />}
       {!cargando && <RoleSwitcher role={role} onChange={cambiar} />}

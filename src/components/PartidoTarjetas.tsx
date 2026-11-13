@@ -1,3 +1,6 @@
+import {Link} from "@tanstack/react-router";
+import {useDriveGallery} from "@/hooks/use-drive-gallery";
+import {useClubData} from "@/lib/dataService";
 import { useEffect, useState } from "react";
 import { ArrowRight, CalendarPlus, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
@@ -61,6 +64,7 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
 }
 
 export function UltimoResultado() {
+  const db=useClubData();const ultimo=db.partidos.find(p=>p.jugado);const {data}=useDriveGallery();const album=data?.albumes.find(a=>a.partidoId===ultimo?.id);
   return <article className="result-card" aria-label="Último resultado">
     <div className="flex items-center justify-between gap-2"><h2 className="result-kicker">ÚLTIMO RESULTADO · 07 NOV</h2><span className="result-victory">VICTORIA</span></div>
     <div className="result-matchup">
@@ -68,6 +72,6 @@ export function UltimoResultado() {
       <p className="result-score">18 <span className="result-separator">–</span> <span className="result-loser">0</span></p>
       <div className="result-team"><span className="result-opponent">PMF</span><p>P.M. Friol</p></div>
     </div>
-    <Button asChild variant="link" className="h-9 p-0 text-accent text-sm font-bold"><a href="#fotos-equipo">Ver fotos del partido <ArrowRight strokeWidth={1.75} /></a></Button>
+    {album && <Button asChild variant="link" className="h-9 p-0 text-accent text-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:album.id}} search={{foto:''}}>Ver fotos del partido <ArrowRight strokeWidth={1.75}/></Link></Button>}
   </article>;
 }

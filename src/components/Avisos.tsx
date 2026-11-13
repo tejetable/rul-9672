@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import {PartidosPanel} from '@/components/PartidosPanel';
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { dataService, type Aviso, useClubData, runAction } from "@/lib/dataService";
@@ -78,6 +79,7 @@ export function AvisosPanel() {
           </li>
         ))}
       </ul>
+      <PartidosPanel />
     </section>
   );
 }

@@ -29,11 +29,13 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 
-- All app data goes through src/lib/dataService.ts (localStorage today) so the backend can be swapped without touching screens.
-- Visit rules (1 per member/business/day, repeat detection, stats, 90-day goal) live as pure functions in src/lib/visitas.ts with tests, so screens and dataService share one source of truth.
+- All club data goes through src/lib/dataService.ts with a Cloud-backed in-memory read cache and async writes; browser storage holds only SDK sessions and device/demo-view preferences.
+- PostgreSQL owns visit uniqueness in Europe/Madrid, verification/repeat triggers, undo limits and role-checked statistics; legacy pure visit helpers remain only as testable reference, never for dashboard calculations.
 - Render the member card through the shared Carne component in both activation and member views; keep identification QR data unchanged so the business scanner remains compatible.
 - Display both physical-card faces from the uploaded artwork with the member number overlaid; keep digital identification outside the artwork to preserve the printed design.
 - Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.
 - Match cards use pure helpers in src/lib/partidos.ts for Madrid-time countdowns and ICS exports so date behavior is independently tested.
-- Gallery data is exposed through dataService.albumes; src/lib/galeria.ts groups only explicit match assignments, never inferring matches from legacy asset names.
+- Gallery reads use the authenticated getDriveGallery server function and a ten-minute Cloud cache; drive-gallery.ts owns EXIF dates, explicit-first match linking and day-seeded highlights, never legacy filenames.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
+
+- Roles are stored separately from profiles; invitation and hashed-PIN RPCs link anonymous sessions, while Directiva requires an explicitly authorized social account, never the demo selector.

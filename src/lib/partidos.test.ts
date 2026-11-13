@@ -5,6 +5,7 @@ import type { Partido } from "./dataService";
 const partido: Partido = { id: "m2", rival: "Abella F.C.", fechaHora: "sábado 14/11/2026 · 19:00", lugar: "Pabellón de Guntín", competicion: "Primera Futgal", esLocal: true, jugado: false, golesLocal: null, golesVisitante: null };
 const inicio = new Date("2026-11-14T18:00:00Z");
 describe("Fecha y cuenta atrás del partido", () => {
+  it("interpreta el inicio ISO recibido de Cloud",()=>expect(inicioPartido({...partido,fechaHora:"2026-11-14T18:00:00Z"})?.toISOString()).toBe("2026-11-14T18:00:00.000Z"));
   it("interpreta las 19:00 en Madrid, no en la zona horaria del móvil", () => {
     expect(inicioPartido(partido)?.toISOString()).toBe("2026-11-14T18:00:00.000Z");
   });
