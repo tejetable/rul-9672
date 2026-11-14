@@ -1,3 +1,6 @@
+- [x] Retirar variantes oscuras, fijar «only light» y beige exacto del navegador/manifest; colores idénticos con preferencia clara/oscura emulada.
+- [x] Reiniciar filtros en scroll 0 al cargar/volver y mantener «+» a 16px sobre barras inferiores y zona segura; acceso real comprobado en 360/390/430px y con barra inferior añadida para la prueba.
+- [ ] Comprobar antioscurecimiento en Chrome Android y Samsung Internet reales (requiere dispositivos físicos; Chromium emulado verificado).
 - [x] Unificar lenguaje visible y accesible de miembros en los tres roles, WhatsApp y mensajes; conservar artwork físico y PDF originales.
 - [x] Editar número único con auditoría, preservar relaciones por id y QR actualizado; verificar ficha real 11 → 12 → 11, conflicto en Cloud y bloqueo anónimo. Prueba temporal retirada.
 - [x] Rediseñar el carné digital siguiendo el carné físico y darle protagonismo en la pantalla de socios.

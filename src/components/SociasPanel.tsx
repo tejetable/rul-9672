@@ -6,7 +6,7 @@ import {emailSchema,formatoImporte} from '@/lib/email-validation';
 import {InitialPassword,PersonPassword} from './PasswordManagement';
 import {passwordSchema} from '@/lib/password-access';
 import {ListCard,ListRow} from './ListRow';
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowUp,ArrowDown,Search,ChevronLeft,ChevronRight} from 'lucide-react';
 import {DirectivaFab} from './DirectivaFab';
 import {toast} from 'sonner';
@@ -17,8 +17,10 @@ import {GestionSheet,PagoFields,RolesPersona} from './GestionPersonas';
 import {dataService,useClubData,type Socio} from '@/lib/dataService';
 import {rolPrincipal,primerNumeroLibre,conflictoNumero,conflictoNumeroEdicion,numeroSocioSchema,hoyMadrid,listaSocios,paginaSocios,SEARCH_DELAY,type Filtro,type Orden,type Direccion,type PagoInput} from '@/lib/socios-management';
 const empty=()=>({pagos:[],roles:[],passwords:{},accesos:{}} as Awaited<ReturnType<typeof dataService.gestionSocios>>);
-const filtros:[Filtro,string][]=[['todas','Todos'],['activas','En activo'],['sin_acceder','Sin acceder'],['desactivadas','De baja'],['sin_pago','Sin pago']];
+const filtros:[Filtro,string][]=[['todas','Todas'],['activas','En activo'],['sin_acceder','Sin acceder'],['desactivadas','De baja'],['sin_pago','Sin pago']];
 export function SociasPanel(){
+ const filtersRef=useRef<HTMLDivElement>(null);
+ useEffect(()=>{filtersRef.current?.scrollTo({left:0,behavior:'instant'});},[]);
  const db=useClubData();const [meta,setMeta]=useState(empty),[q,setQ]=useState(''),[search,setSearch]=useState(''),[filter,setFilter]=useState<Filtro>('todas'),[order,setOrder]=useState<Orden>('numero'),[page,setPage]=useState(1),[selected,setSelected]=useState<string|null>(null),[add,setAdd]=useState(false);
  const refresh=async()=>setMeta(await dataService.gestionSocios());
  useEffect(()=>{let alive=true;void dataService.gestionSocios().then(v=>{if(alive)setMeta(v);}).catch(e=>toast.error(e.message));return()=>{alive=false;};},[db]);
@@ -30,7 +32,7 @@ export function SociasPanel(){
  return <section className="px-4 pb-32 pt-4">
   <div className="member-list-tools sticky top-14 z-20 space-y-3 bg-background pb-3">
    <label className="relative block"><Search size={18} className="pointer-events-none absolute left-3 top-3"/><input aria-label="Buscar socios o socias" placeholder="Nombre, email, teléfono o nº" value={q} onChange={e=>setQ(e.target.value)} className="club-input member-search"/></label>
-   <div className="member-filters-edge"><div className="member-filters">{filtros.map(([f,l])=><Button key={f} variant="ghost" aria-pressed={filter===f} className={`member-filter ${filter===f?'bg-primary text-primary-foreground':'bg-surface'}`} onClick={()=>setFiltro(f)}>{l}</Button>)}</div></div>
+   <div className="member-filters-edge"><div ref={filtersRef} className="member-filters">{filtros.map(([f,l])=><Button key={f} variant="ghost" aria-pressed={filter===f} className={`member-filter ${filter===f?'bg-primary text-primary-foreground':'bg-surface'}`} onClick={()=>setFiltro(f)}>{l}</Button>)}</div></div>
   </div>
   <div className="member-columns" aria-label="Orden de socios o socias">{([['numero','Nº'],['nombre','Nombre'],['fecha','Alta']] as const).map(([column,label])=><Button key={column} variant="ghost" aria-label={`Ordenar por ${label}`} aria-pressed={order===column} className={`member-column ${order===column?'is-sorted':''}`} onClick={()=>ordenar(column)}><span>{label}</span>{order===column&&(direction==='asc'?<ArrowUp/>:<ArrowDown/>)}</Button>)}</div>
   <ListCard label="Socios o socias">{paged.rows.map(s=>{const highest=rolPrincipal(meta.roles.filter(r=>r.email===s.email));return <ListRow key={s.id} leading={s.numeroSocio} name={s.nombre} subtitle={s.email} chip={highest?(highest==='super_admin'?'SUPER ADMIN':highest==='directiva'?'DIRECTIVA':'NEGOCIO'):undefined} date={new Date(s.fechaAlta).toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'2-digit',year:'2-digit'})} dateTime={s.fechaAlta} status={s.estado==='desactivada'?'off':meta.accesos[s.email?.toLowerCase()??'']?'active':'pending'} onClick={()=>setSelected(s.id)}/>;})}</ListCard>

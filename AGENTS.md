@@ -56,7 +56,7 @@ use the editor.
 - Shared Button and Switch states and control dimensions are defined centrally, so screen-level hover rules cannot change text contrast or alignment.
 
 - Member access metadata comes from the guarded gestion_socios RPC using Auth last_sign_in_at, independently of password readiness, so Google users count as having accessed.
-- Directiva creation actions use the shared DirectivaFab and modal forms, preserving a consistent safe-area-aware action without losing list position.
+- Directiva creation actions use the shared portal-based DirectivaFab, which measures bottom-fixed obstructions and maintains 16px clearance plus safe-area/keyboard insets, so actions remain visible without losing list position.
 - Repeated club lists use ListRow inside ListCard; secondary editing and full details live in sheets so rows keep a stable two-line grid without nested controls.
 - Mandatory changes are derived from protected password-change state and verified JWT AMR: Google OAuth clears the visible flag without consuming the pending password change; password sessions must change the Auth hash. Hashes never leave the database.
 - Account administration uses authenticated server functions and role-checked RPCs; member deletion atomically anonymizes visits before removal, then deletes Auth only if no other roles remain. Logical password availability lives in protected profiles, not Auth hash presence.
