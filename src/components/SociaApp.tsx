@@ -148,10 +148,8 @@ function Ventajas({ db }: { db: DB }) {
   }
 
   return (
-    <section className="px-4 pt-6">
-      <p className="club-chip">Ventajas 2026/27</p>
-      <h1 className="club-section-title mt-3">Ventajas</h1>
-            <p className="mt-4 text-muted-foreground">Negocios de nuestra tierra que empujan con nosotros.</p>
+    <section className="px-4 pt-4">
+      <p className="text-muted-foreground">Negocios de nuestra tierra que empujan con nosotros.</p>
       <ul className="mt-6 space-y-3">
         {pats.map((pt) => {
           const vs = db.ventajas.filter((v) => v.patrocinadorId === pt.id && v.activa);

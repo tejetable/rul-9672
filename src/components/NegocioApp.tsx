@@ -1,8 +1,9 @@
+import {BusinessAccountMenu} from './PasswordManagement';
 import {ListCard,ListRow} from './ListRow';
 import {VerComo} from "@/components/VerComo";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, LogOut, MessageCircle, QrCode } from "lucide-react";
+import { Check, MessageCircle, QrCode } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export function NegocioApp({onExit}:{onExit?:()=>void}={}) {
       {onExit&&<div className="business-test-banner"><span>Accediendo como {neg.nombre}</span><span>·</span><Button variant="link" onClick={onExit}>Salir</Button></div>}
       <ClubCabecera titulo={neg.nombre} etiqueta="Negocio amigo">
         {!onExit&&<VerComo/>}<AvisosCampana quien="negocios" />
-        {!onExit&&<Button variant="ghost" size="icon" onClick={() => { runAction(async () => { await dataService.cerrarNegocio(); setNeg(null); }); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>}
+        {!onExit&&<BusinessAccountMenu/>}
       </ClubCabecera>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
       <div className="club-tabs mx-4 mt-4 grid-cols-2">
@@ -169,7 +170,6 @@ function TuMes({ neg }: { neg: Patrocinador }) {
 
   return (
     <section className="px-4 pt-6">
-      <h1 className="club-section-title mb-3">Tu mes con el club</h1>
       {dataService.negocioPrueba()&&<label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label>}
       <div className="mt-4 club-tabs grid-cols-3">
         {([["mes", "Este mes"], ["90", "90 días"], ["temporada", "Temporada"]] as const).map(([id, l]) => (

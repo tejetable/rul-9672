@@ -279,6 +279,29 @@ export type Database = {
         }
         Relationships: []
       }
+      password_cambios: {
+        Row: {
+          password_anterior: string
+          user_id: string
+        }
+        Insert: {
+          password_anterior: string
+          user_id: string
+        }
+        Update: {
+          password_anterior?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "password_cambios_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patrocinadores: {
         Row: {
           activo: boolean
@@ -347,6 +370,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          debe_cambiar_password: boolean
           dispositivo_id: string | null
           email: string | null
           estado: string
@@ -357,6 +381,7 @@ export type Database = {
           socio_id: string | null
         }
         Insert: {
+          debe_cambiar_password?: boolean
           dispositivo_id?: string | null
           email?: string | null
           estado?: string
@@ -367,6 +392,7 @@ export type Database = {
           socio_id?: string | null
         }
         Update: {
+          debe_cambiar_password?: boolean
           dispositivo_id?: string | null
           email?: string | null
           estado?: string
@@ -835,6 +861,7 @@ export type Database = {
         Returns: undefined
       }
       borrar_visitas_prueba: { Args: { p_negocio: string }; Returns: undefined }
+      completar_cambio_password: { Args: never; Returns: undefined }
       crear_negocio_email: {
         Args: {
           p_categoria: string
@@ -883,6 +910,7 @@ export type Database = {
         Returns: string
       }
       entrar_negocio: { Args: { p_pin: string }; Returns: string }
+      estado_acceso_personal: { Args: never; Returns: Json }
       estado_sesion_socia: { Args: never; Returns: string }
       gestion_socios: { Args: never; Returns: Json }
       gestionar_rol_persona: {
@@ -930,6 +958,7 @@ export type Database = {
       mi_socio: { Args: never; Returns: string }
       negocio_prueba_actual: { Args: never; Returns: string }
       personas_club: { Args: never; Returns: Json }
+      preparar_password_usuario: { Args: { p_email: string }; Returns: string }
       quitar_directiva: {
         Args: { p_motivo: string; p_user: string }
         Returns: undefined
@@ -937,6 +966,15 @@ export type Database = {
       registrar_pago_socio: {
         Args: { p_pago: Json; p_socio: string }
         Returns: string
+      }
+      registrar_password_usuario: {
+        Args: {
+          p_accion: string
+          p_actor: string
+          p_email: string
+          p_usuario: string
+        }
+        Returns: undefined
       }
       reservar_directiva: {
         Args: { p_email: string; p_nombre: string; p_socio?: string }

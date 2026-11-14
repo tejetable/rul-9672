@@ -16,7 +16,6 @@ export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
   useEffect(() => setAvisos(dataService.avisosPara(quien)), [quien, db]);
   return (
     <section className="px-4 pt-6">
-      <h1 className="club-section-title">Avisos</h1>
             {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
       <ListCard label="Avisos" className="mt-6">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={a.texto} chip={TIPO[a.tipo]} date={new Date(a.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>
       <GestionSheet title={selected?.titulo??'Aviso'} open={!!selected} onClose={()=>setSelected(null)}>{selected&&<p className="whitespace-pre-line">{selected.texto}</p>}</GestionSheet>
@@ -45,8 +44,7 @@ export function AvisosPanel() {
   const chip = (on: boolean) => `club-button h-auto min-h-11 rounded-control px-3 text-body-sm font-bold ${on ? "bg-primary text-primary-foreground" : "btn-suave"}`;
 
   return (
-    <section className="px-4 pb-32 pt-6">
-      <h1 className="club-section-title">Avisos</h1>
+    <section className="px-4 pb-32 pt-4">
       {!form&&<DirectivaFab label="Nuevo aviso" onClick={()=>setForm(true)}/>}
       <GestionSheet title="Nuevo aviso" open={form} onClose={()=>setForm(false)}>
       <h1 className="club-section-title mt-3">Nuevo aviso</h1>

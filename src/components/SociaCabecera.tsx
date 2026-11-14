@@ -1,3 +1,4 @@
+import {PasswordMenuItem} from './PasswordManagement';
 import {VerComo} from "@/components/VerComo";
 import { Instagram, LogOut, MessageCircle, MoreHorizontal, Twitch } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
@@ -20,7 +21,7 @@ export function SociaCabecera() {
         {contact&&<DropdownMenuItem asChild><a href={contact} target="_blank" rel="noopener noreferrer" className="min-h-11"><MessageCircle strokeWidth={1.75} />Contactar con el club</a></DropdownMenuItem>}
         <DropdownMenuItem asChild><a href="https://www.instagram.com/realunionlucense/" target="_blank" rel="noopener noreferrer" className="min-h-11"><Instagram strokeWidth={1.75} />Instagram</a></DropdownMenuItem>
         <DropdownMenuItem asChild><a href="https://www.twitch.tv/adrifdez_10" target="_blank" rel="noopener noreferrer" className="min-h-11"><Twitch strokeWidth={1.75} />Twitch</a></DropdownMenuItem>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator /><PasswordMenuItem/>
         <DropdownMenuItem onSelect={() => { runAction(async () => { await dataService.cerrarSesion(); window.location.reload(); }); }} className="min-h-11"><LogOut strokeWidth={1.75} />Salir</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

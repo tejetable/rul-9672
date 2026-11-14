@@ -4,5 +4,5 @@ import {PartidosPanel} from './PartidosPanel';
 import {AvisosPanel} from './Avisos';
 export function ClubPanel() {
   const [segmento,setSegmento]=useState<'partidos'|'avisos'>('partidos');
-  return <div><div className="club-tabs mx-4 mt-6 grid-cols-2" aria-label="Gestión del club">{(['partidos','avisos'] as const).map(s=><Button key={s} variant="ghost" aria-pressed={segmento===s} onClick={()=>setSegmento(s)}>{s==='partidos'?'Partidos':'Avisos'}</Button>)}</div>{segmento==='partidos'?<PartidosPanel/>:<AvisosPanel/>}</div>;
+  return <div><div className="club-tabs mx-4 mt-4 grid-cols-2" aria-label="Gestión del club">{(['partidos','avisos'] as const).map(s=><Button key={s} variant="ghost" aria-pressed={segmento===s} onClick={()=>setSegmento(s)}>{s==='partidos'?'Partidos':'Avisos'}</Button>)}</div>{segmento==='partidos'?<PartidosPanel/>:<AvisosPanel/>}</div>;
 }

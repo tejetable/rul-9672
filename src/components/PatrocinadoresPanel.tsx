@@ -1,5 +1,9 @@
 import {ListCard,ListRow} from './ListRow';
-import {PasswordAccessStatus} from './PasswordAccessStatus';
+import {InitialPassword,PersonPassword} from './PasswordManagement';
+import {emailSchema} from '@/lib/email-validation';
+import {useServerFn} from '@tanstack/react-start';
+import {setClubUserPassword} from '@/lib/password.functions';
+import {passwordSchema} from '@/lib/password-access';
 import { BajaForm } from "@/components/BajaForm";
 import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
 import { Button } from "@/components/ui/button";
@@ -55,9 +59,7 @@ export function PatrocinadoresPanel() {
   ] as const;
   if(preview)return <NegocioApp onExit={()=>runAction(async()=>{await dataService.salirNegocioPrueba();setPreview(false);})}/>;
   return (
-    <section className="px-4 pb-28 pt-6">
-      <p className="club-chip">Directiva</p>
-      <h1 className="club-section-title mt-3">El club</h1>
+    <section className="px-4 pb-28 pt-4">
             <div className="mt-6 grid grid-cols-2 gap-3">
         {club.map(([l, n]) => (
           <div key={l} className="rounded-panel bg-surface p-4">
@@ -75,14 +77,14 @@ export function PatrocinadoresPanel() {
           <Button variant="ghost" key={id} onClick={() => setRango(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold ${rango === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}
       </div>
-      <h2 className="club-section-title mt-8">Patrocinadores</h2>
+
       <span className="label-club mt-3 inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
       <GestionSheet title="Nuevo patrocinador" open={form} onClose={()=>setForm(false)}>{form&&<NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }}/>}</GestionSheet>
       {!form&&!selected&&!baja&&<DirectivaFab label="Nuevo patrocinador" onClick={()=>setForm(true)}/>}
       {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
       <h2 className="club-section-title mt-6">Bajas</h2><div className="mt-2 grid grid-cols-2 gap-2">{["no ve retorno","precio","cierre del negocio","otro"].map(m => <div key={m} className="rounded-panel bg-surface p-4"><p className="font-black">{summary.bajas[m] ?? 0}</p><p className="text-body-sm">{m}</p></div>)}</div>
       <ListCard label="Patrocinadores" className="mt-6">{db.patrocinadores.map(p=>{const stats=adaptarStats(summary.patrocinadores[p.id]??emptyStats);return <ListRow key={p.id} leading={<Store/>} name={p.nombre} subtitle={p.emailAcceso||p.categoria} date={`${stats.visitas} visitas`} status={p.activo?'active':'off'} onClick={()=>setSelected(p.id)}/>;})}</ListCard>
-      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><div className="grid grid-cols-2 gap-3">{(()=>{const raw=summary.patrocinadores[pat.id]??emptyStats;const stats=adaptarStats(raw);return [["Visitas",stats.visitas],["Nuevas verif.",stats.nuevasVerificadas],["Nuevas decl.",stats.nuevasDeclaradas],["Repiten",stats.repiten],["% nuevas",`${stats.pctNuevas}%`],["90 días",`${raw.objetivo_nuevas_90d}/5`]].map(([label,value])=><div key={label} className="py-2"><p className="font-black">{value}</p><p className="label-club">{label}</p></div>);})()}</div><EmailNegocio id={pat.id} email={pat.emailAcceso??''}/>{pat.activo&&<Button variant="outline" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Desactivar</Button>}<PasswordAccessStatus email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
+      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><div className="grid grid-cols-2 gap-3">{(()=>{const raw=summary.patrocinadores[pat.id]??emptyStats;const stats=adaptarStats(raw);return [["Visitas",stats.visitas],["Nuevas verif.",stats.nuevasVerificadas],["Nuevas decl.",stats.nuevasDeclaradas],["Repiten",stats.repiten],["% nuevas",`${stats.pctNuevas}%`],["90 días",`${raw.objetivo_nuevas_90d}/5`]].map(([label,value])=><div key={label} className="py-2"><p className="font-black">{value}</p><p className="label-club">{label}</p></div>);})()}</div><EmailNegocio id={pat.id} email={pat.emailAcceso??''}/>{pat.activo&&<Button variant="outline" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Desactivar</Button>}<PersonPassword email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
       <Button variant="ghost" onClick={exportarCSV} className="mt-6 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
         <Download size={18} strokeWidth={1.75} /> Exportar CSV
       </Button>
@@ -92,6 +94,7 @@ export function PatrocinadoresPanel() {
 
 
 function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
+ const savePassword=useServerFn(setClubUserPassword);const [initial,setInitial]=useState('');
   const [f, setF] = useState({ importe: "", nombre: "", categoria: "", direccion: "", emailAcceso: "", logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
   const [err, setErr] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });
@@ -104,12 +107,13 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
   };
   const guardar = async () => {
     if (!f.nombre.trim() || !f.titulo.trim()) return setErr("Pon al menos el nombre y la ventaja.");
-    if (!f.emailAcceso.includes("@")) return setErr("Indica el email de acceso.");
+    const checked=emailSchema.safeParse(f.emailAcceso);if(!checked.success)return setErr("Dirección de email no válida.");if(initial&&!passwordSchema.safeParse(initial).success)return setErr("Usa al menos 8 caracteres.");
     const r = await dataService.crearPatrocinador(
-      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", emailAcceso: f.emailAcceso, logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
+      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", emailAcceso: checked.data, logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
       { titulo: f.titulo.trim(), descripcion: f.descripcion.trim(), condiciones: f.condiciones.trim() },
     );
     if (r === "pin_usado") return setErr("No se pudo guardar.");
+    if(initial&&dataService.esSuper())await savePassword({data:{email:checked.data,password:initial,mode:'initial'}});
     onDone();
   };
   const inp = "mt-1 h-auto min-h-12 w-full rounded-control club-input border-input px-3";
@@ -125,7 +129,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       {f.logoUrl && <img src={f.logoUrl} alt="Logo del patrocinador" className="mt-2 h-14 w-auto object-contain" />}
       {campo("direccion", "Dirección")}
       {campo("emailAcceso", "Email de acceso del negocio", {type:"email",required:true})}
-      {campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
+      <InitialPassword value={initial} onChange={setInitial}/>{campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
       <p className="label-club mt-6 text-accent">Ventaja</p>
       {campo("titulo", "Título")}
       {campo("descripcion", "Descripción")}

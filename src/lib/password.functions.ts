@@ -1,13 +1,18 @@
 import {createServerFn} from '@tanstack/react-start';
 import {z} from 'zod';
 import {requireSupabaseAuth} from '@/integrations/supabase/auth-middleware';
-const input=z.object({email:z.string().trim().toLowerCase().email(),origin:z.string().url()});
-function redirectUrl(origin:string){const url=new URL(origin);if(url.username||url.password||url.pathname!=='/'||url.search||url.hash)throw new Error('Dirección no válida');const valid=url.hostname==='rul-9672.lovable.app'||url.hostname==='id-preview--6a75f78a-56db-4f8a-b65b-1ee613502b56.lovable.app'||(url.hostname==='localhost'&&url.port==='8080');if(!valid||(url.protocol!=='https:'&&url.hostname!=='localhost'))throw new Error('Dirección no válida');return `${url.origin}/create-password`;}
-export const sendPasswordInvitation=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator((v:unknown)=>input.parse(v)).handler(async({data,context})=>{
- const status=await context.supabase.rpc('acceso_password_club',{p_email:data.email});if(status.error||!status.data)throw new Error('No autorizado');
- const value=status.data as {user_id:string|null;activo:boolean};const redirectTo=redirectUrl(data.origin);
+import {emailSchema} from './email-validation';
+import {passwordSchema} from './password-access';
+const input=z.object({email:emailSchema,password:passwordSchema.max(128),mode:z.enum(['initial','reset'])});
+export const setClubUserPassword=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator((v:unknown)=>input.parse(v)).handler(async({data,context})=>{
+ const permission=await context.supabase.rpc('is_super_admin');
+ if(permission.error||permission.data!==true)throw new Error('Solo Super admin puede gestionar contraseñas.');
+ const target=await context.supabase.rpc('preparar_password_usuario',{p_email:data.email});
+ if(target.error)throw new Error('La persona debe tener acceso al club antes de poner una contraseña.');
  const {supabaseAdmin}=await import('@/integrations/supabase/client.server');
- // Existing Auth accounts cannot be invited again; recovery is the supported secure resend.
- const result=value.user_id?await supabaseAdmin.auth.resetPasswordForEmail(data.email,{redirectTo}):await supabaseAdmin.auth.admin.inviteUserByEmail(data.email,{redirectTo});
- if(result.error)throw new Error('El acceso está guardado, pero no se pudo enviar el email. Reenvíalo desde la ficha.');return {sent:true};
+ const result=target.data?await supabaseAdmin.auth.admin.updateUserById(target.data,{password:data.password,email_confirm:true}):await supabaseAdmin.auth.admin.createUser({email:data.email,password:data.password,email_confirm:true});
+ if(result.error||!result.data.user)throw new Error('No se pudo guardar la contraseña. Los datos del club se mantienen; inténtalo otra vez.');
+ const audit=await supabaseAdmin.rpc('registrar_password_usuario',{p_actor:context.userId,p_usuario:result.data.user.id,p_email:data.email,p_accion:data.mode==='initial'?'password_inicial':'password_cambiada_admin'});
+ if(audit.error)throw new Error('La contraseña se guardó, pero no se pudo completar su registro. Inténtalo otra vez.');
+ return {saved:true};
 });

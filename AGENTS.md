@@ -40,7 +40,7 @@ use the editor.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
 
 - Verified email roles live in protected usuario_roles; RPCs bind them only to confirmed auth emails, guard assignments and keep session-scoped role selections in usuario_vista; browser role preferences never confer permissions.
-- Sign-in uses managed Google OAuth or Cloud password auth; admin assignments stay role-checked and password invitations use authenticated server functions with role verification before admin access.
+- Sign-in uses managed Google OAuth or Cloud password auth; Super-admin password management uses authenticated server functions with role verification before admin Auth access, never automatic invitation emails.
 - Club WhatsApp comes from singleton Cloud settings through dataService; empty contact numbers hide club links and access messages use each member’s optional recipient number.
 - Public settings reads use the explicitly projected ajustes_club_publicos view; the underlying settings and club email are readable only by Super admin so public contact links never expose administrative fields.
 - Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.
@@ -58,3 +58,6 @@ use the editor.
 - Member access metadata comes from the guarded gestion_socios RPC using Auth last_sign_in_at, independently of password readiness, so Google users count as having accessed.
 - Directiva creation actions use the shared DirectivaFab and modal forms, preserving a consistent safe-area-aware action without losing list position.
 - Repeated club lists use ListRow inside ListCard; secondary editing and full details live in sheets so rows keep a stable two-line grid without nested controls.
+- Mandatory password changes use protected profile state and guarded completion that verifies the Auth password hash changed; hashes never leave the database and plaintext is only transient form memory.
+- All email inputs share email-validation.ts normalization and Zod validation; password management never logs credential values.
+- Optional access sharing keeps the entered password only in the success form and builds a validated WhatsApp recipient link; closing the form discards it.

@@ -58,3 +58,8 @@
 - [x] Botón flotante compartido en cinco vistas de Directiva; verificar móvil y formularios.
 - [x] Sustituir las seis listas por ListRow, alinear tarjeta, buscador y columnas, y ocultar paginación única.
 - [x] Comprobar filas de 64px, chips y estados dentro de la tarjeta en 360/390/430 con acceso real; visita de prueba deshecha.
+- [x] Contraseña inicial y reinicio de contraseña solo Super admin, sin invitaciones por email y con auditoría segura.
+- [x] Cambio obligatorio inicial y cambio/creación de contraseña desde los menús de todos los roles.
+- [x] Validación común de emails, importes españoles y limpieza de títulos repetidos.
+- [x] Verificar alta pagada con contraseña → cambio obligatorio → entrada privada; reinicio y cambio personal, email de Manuel y rechazo de Directiva. Datos temporales retirados.
+- [ ] Verificar Google con un Gmail nuevo sin contraseña (requiere autorización interactiva de la cuenta Google).

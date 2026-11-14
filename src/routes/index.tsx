@@ -1,3 +1,4 @@
+import {ForcedPassword} from '@/components/PasswordManagement';
 import {GoogleAcceso} from '@/components/GoogleAcceso';
 import {ClubAdmin,ClubAdminMenu} from "@/components/ClubAdmin";
 import {DEMO_MODE} from "@/lib/club-settings";
@@ -43,7 +44,7 @@ function Index() {
  useEffect(()=>{void dataService.init().catch(e=>runAction(async()=>{throw e;})).finally(()=>setReady(true));const saved=window.localStorage.getItem(ROLE_KEY) as Role|null;if(saved)setDemoRole(saved);const t=setTimeout(()=>setWait(false),1500);return()=>clearTimeout(t);},[]);
  const role=dataService.rol(),sesion=dataService.sesion(),roles=dataService.roles();
  const unknown=dataService.autenticado()&&roles.length===0;
- const content=!ready||wait?<Cargando/>:dataService.autenticado()?unknown?<section className="space-y-5 px-4 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><UneteFamilia/><Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<EleccionRol/>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')}/>;
+ const content=!ready||wait?<Cargando/>:dataService.autenticado()?dataService.acceso().debe_cambiar_password?<ForcedPassword/>:unknown?<section className="space-y-5 px-4 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><UneteFamilia/><Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<EleccionRol/>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')}/>;
  return <AppFrame>{page==='login'&&!dataService.autenticado()?<EmailAcceso onBack={()=>setPage('welcome')} onDone={()=>setPage('welcome')}/>:content}{ready&&!wait&&DEMO_MODE&&<RoleSwitcher role={demoRole} onChange={r=>{window.localStorage.setItem(ROLE_KEY,r);setDemoRole(r);}}/>}</AppFrame>;
 }
 
