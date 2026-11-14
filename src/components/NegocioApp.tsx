@@ -1,3 +1,4 @@
+import {ListCard,ListRow} from './ListRow';
 import {VerComo} from "@/components/VerComo";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -133,19 +134,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
       {hoy.length === 0 ? (
         <p className="mt-2 text-body-sm text-muted-foreground">Todavía ninguna hoy.</p>
       ) : (
-        <ul className="mt-2 divide-y divide-border rounded-panel bg-surface px-4">
-          {hoy.map((v) => {
-            const s = v.socioId ? dataService.get().socios.find((x) => x.id === v.socioId) : null;
-            return (
-              <li key={v.id} className={`flex flex-wrap items-center gap-2 py-3 ${v.anulada ? "opacity-40 line-through" : ""}`}>
-                <span className="w-12 text-body-sm font-bold">{new Date(v.fechaHora).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</span>
-                <span className="flex-1 font-bold">{s ? s.nombre : v.socioId ? dataService.nombreVisita(v.socioId) : "Sin carnet"}</span>
-                <span className="label-club rounded-full border border-primary px-2 py-0.5">{v.tipoCliente === "nueva" ? "Nueva" : "Ya era clienta"}</span>
-                {v.repiteViaClub && <span className="label-club rounded-full bg-accent px-2 py-0.5 text-accent-foreground">Repite</span>}
-              </li>
-            );
-          })}
-        </ul>
+        <ListCard label="Últimas visitas de hoy" className="mt-2">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTA'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
       )}
 
       <div className="sticky bottom-0 -mx-4 mt-auto bg-background px-4 pb-5 pt-4">

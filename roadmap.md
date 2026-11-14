@@ -56,3 +56,5 @@
 - [x] Socias/os sin subtítulos y estado de acceso según último inicio de sesión.
 - [x] Orden ascendente/descendente por columnas Nº, Nombre y Alta.
 - [x] Botón flotante compartido en cinco vistas de Directiva; verificar móvil y formularios.
+- [x] Sustituir las seis listas por ListRow, alinear tarjeta, buscador y columnas, y ocultar paginación única.
+- [x] Comprobar filas de 64px, chips y estados dentro de la tarjeta en 360/390/430 con acceso real; visita de prueba deshecha.

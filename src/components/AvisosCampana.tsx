@@ -1,3 +1,4 @@
+import {ListCard,ListRow} from './ListRow';
 import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Bell, X } from "lucide-react";
@@ -9,12 +10,14 @@ export function AvisosCampana({ quien }: { quien: "socias" | "negocios" }) {
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   const [leidos, setLeidos] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
+  const [selected,setSelected]=useState<Aviso|null>(null);
   useEffect(() => {
     setAvisos(dataService.avisosPara(quien));
     setLeidos(dataService.avisosLeidos());
   }, [quien, db]);
   const cambiar = (value: boolean) => {
     setOpen(value);
+    setSelected(null);
     if (!value) return;
     const actuales = dataService.avisosPara(quien);
     setAvisos(actuales);
@@ -37,13 +40,7 @@ export function AvisosCampana({ quien }: { quien: "socias" | "negocios" }) {
             <Dialog.Close asChild><Button variant="ghost" size="icon" aria-label="Cerrar avisos"><X size={20} strokeWidth={1.75} /></Button></Dialog.Close>
           </div>
           {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
-          <ul className="mt-4 space-y-3">
-            {avisos.map((a) => <li key={a.id} className="rounded-lg bg-suave p-4">
-              <p className="text-xs text-muted-foreground">{new Date(a.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</p>
-              <p className="mt-1 font-black">{a.titulo}</p>
-              <p className="mt-1 whitespace-pre-line">{a.texto}</p>
-            </li>)}
-          </ul>
+          {selected?<div className="mt-4 space-y-3"><Button variant="link" onClick={()=>setSelected(null)}>Volver a avisos</Button><h2 className="font-bold">{selected.titulo}</h2><p className="whitespace-pre-line">{selected.texto}</p></div>:<ListCard label="Avisos" className="mt-4">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={a.texto} date={new Date(a.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

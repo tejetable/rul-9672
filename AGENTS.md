@@ -57,3 +57,4 @@ use the editor.
 
 - Member access metadata comes from the guarded gestion_socios RPC using Auth last_sign_in_at, independently of password readiness, so Google users count as having accessed.
 - Directiva creation actions use the shared DirectivaFab and modal forms, preserving a consistent safe-area-aware action without losing list position.
+- Repeated club lists use ListRow inside ListCard; secondary editing and full details live in sheets so rows keep a stable two-line grid without nested controls.

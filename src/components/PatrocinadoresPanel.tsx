@@ -1,9 +1,10 @@
+import {ListCard,ListRow} from './ListRow';
 import {PasswordAccessStatus} from './PasswordAccessStatus';
 import { BajaForm } from "@/components/BajaForm";
 import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Download, LogIn } from "lucide-react";
+import { Download, LogIn, Store } from "lucide-react";
 import {DirectivaFab} from './DirectivaFab';
 import {GestionSheet} from './GestionPersonas';
 import {NegocioApp} from './NegocioApp';
@@ -80,31 +81,8 @@ export function PatrocinadoresPanel() {
       {!form&&!selected&&!baja&&<DirectivaFab label="Nuevo patrocinador" onClick={()=>setForm(true)}/>}
       {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
       <h2 className="club-section-title mt-6">Bajas</h2><div className="mt-2 grid grid-cols-2 gap-2">{["no ve retorno","precio","cierre del negocio","otro"].map(m => <div key={m} className="rounded-panel bg-surface p-4"><p className="font-black">{summary.bajas[m] ?? 0}</p><p className="text-body-sm">{m}</p></div>)}</div>
-      <ul className="mt-6 space-y-3">
-        {db.patrocinadores.map((p) => {
-          const raw = summary.patrocinadores[p.id] ?? emptyStats;
-          const s = adaptarStats(raw);
-          const prog = { nuevas:raw.objetivo_nuevas_90d,pct:Math.min(100,raw.objetivo_nuevas_90d*20) };
-          return (
-            <li key={p.id} className="rounded-panel bg-surface p-4">
-              <div className="flex items-center justify-between gap-2"><Button variant="ghost" className="flex-1 justify-start whitespace-normal text-left font-black" onClick={()=>setSelected(p.id)}>{p.nombre}</Button>{dataService.esSuper()&&p.activo&&<Button variant="ghost" size="icon" title={`Acceder como ${p.nombre}`} aria-label={`Acceder como ${p.nombre}`} onClick={()=>enter(p.id)}><LogIn/></Button>}</div>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-left">
-                {[["Visitas", s.visitas], ["Nuevas verif.", s.nuevasVerificadas], ["Nuevas decl.", s.nuevasDeclaradas], ["Repiten", s.repiten], ["% nuevas", `${s.pctNuevas}%`], ["90 días", `${prog.nuevas}/5`]].map(([l, n]) => (
-                  <div key={l} className="py-2">
-                    <p className="text-section font-black">{n}</p>
-                    <p className="text-label font-bold uppercase text-muted-foreground">{l}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
-                <div className="h-full rounded-full bg-accent" style={{ width: `${prog.pct}%` }} />
-              </div>
-              <PasswordAccessStatus email={p.emailAcceso??''}/><EmailNegocio id={p.id} email={p.emailAcceso??""}/>{p.activo && <Button variant="ghost" onClick={() => setBaja(p.id)}>Desactivar</Button>}
-            </li>
-          );
-        })}
-      </ul>
-      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><PasswordAccessStatus email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
+      <ListCard label="Patrocinadores" className="mt-6">{db.patrocinadores.map(p=>{const stats=adaptarStats(summary.patrocinadores[p.id]??emptyStats);return <ListRow key={p.id} leading={<Store/>} name={p.nombre} subtitle={p.emailAcceso||p.categoria} date={`${stats.visitas} visitas`} status={p.activo?'active':'off'} onClick={()=>setSelected(p.id)}/>;})}</ListCard>
+      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><div className="grid grid-cols-2 gap-3">{(()=>{const raw=summary.patrocinadores[pat.id]??emptyStats;const stats=adaptarStats(raw);return [["Visitas",stats.visitas],["Nuevas verif.",stats.nuevasVerificadas],["Nuevas decl.",stats.nuevasDeclaradas],["Repiten",stats.repiten],["% nuevas",`${stats.pctNuevas}%`],["90 días",`${raw.objetivo_nuevas_90d}/5`]].map(([label,value])=><div key={label} className="py-2"><p className="font-black">{value}</p><p className="label-club">{label}</p></div>);})()}</div><EmailNegocio id={pat.id} email={pat.emailAcceso??''}/>{pat.activo&&<Button variant="outline" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Desactivar</Button>}<PasswordAccessStatus email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
       <Button variant="ghost" onClick={exportarCSV} className="mt-6 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
         <Download size={18} strokeWidth={1.75} /> Exportar CSV
       </Button>

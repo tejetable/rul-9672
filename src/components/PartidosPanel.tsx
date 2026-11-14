@@ -1,5 +1,6 @@
+import {ListCard,ListRow} from './ListRow';
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, CircleDot } from 'lucide-react';
 import {DirectivaFab} from './DirectivaFab';
 import {GestionSheet} from './GestionPersonas';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { fechaMadridCampos, fechaMadridISO, inicioPartido, proximoPartido } from
 
 const PABELLON = 'Pavillón Municipal de Guntín';
 export function PartidosPanel() {
-  const db=useClubData();const [edit,setEdit]=useState<Partido|'nuevo'|null>(null),[resultado,setResultado]=useState<string|null>(null);
+  const db=useClubData();const [edit,setEdit]=useState<Partido|'nuevo'|null>(null),[resultado,setResultado]=useState<string|null>(null),[selected,setSelected]=useState<Partido|null>(null);
   const ahora=new Date(),proximo=proximoPartido(db.partidos,ahora);
   const lista=[...db.partidos].sort((a,b)=>Number(a.jugado)-Number(b.jugado)||(a.jugado ? -1:1)*((inicioPartido(a)?.getTime()??Infinity)-(inicioPartido(b)?.getTime()??Infinity)));
   return <section className="px-4 pt-6 pb-32">
@@ -16,11 +17,8 @@ export function PartidosPanel() {
     <article className="mt-4 rounded-panel bg-surface p-4"><p className="label-club">Próximo partido</p><p className="mt-2 font-black">{proximo?`vs. ${proximo.rival}`:'Por confirmar'}</p>{proximo&&<><p className="text-body-sm">Jornada {proximo.jornada} · {fechaMadridCampos(proximo).fecha} · {fechaMadridCampos(proximo).hora}</p></>}</article>
     <DirectivaFab label="Editar próximo partido" onClick={()=>setEdit(proximo??'nuevo')}/>
     <GestionSheet title={edit==='nuevo'?'Añadir partido':'Editar próximo partido'} open={!!edit} onClose={()=>setEdit(null)}>{edit&&<PartidoForm key={edit==='nuevo'?'nuevo':edit.id} partido={edit==='nuevo'?undefined:edit} onClose={()=>setEdit(null)}/>}</GestionSheet>
-    <div className="mt-6 space-y-3">{lista.map(p=>{
-      const pasado=(inicioPartido(p)?.getTime()??Infinity)<=ahora.getTime();const campos=fechaMadridCampos(p);
-      const favor=p.esLocal?p.golesLocal:p.golesVisitante,contra=p.esLocal?p.golesVisitante:p.golesLocal;
-      return <article key={p.id} className="rounded-panel bg-surface p-4"><p className="label-club">Jornada {p.jornada??'—'} · {p.esLocal?'En casa':'Fuera'}</p><p className="mt-1 font-black">R.U. Lucense {p.jugado?`${favor} – ${contra}`:'vs.'} {p.rival}</p><p className="text-body-sm mt-1">{campos.fecha||'Fecha por confirmar'} · {p.horaConfirmada===false?'Hora por confirmar':campos.hora}</p><p className="text-body-sm">{p.lugar}</p>{pasado&&!p.jugado&&<p className="mt-3 font-bold text-body-sm">Falta el resultado</p>}<div className="mt-2 flex flex-wrap gap-2"><Button variant="ghost" onClick={()=>setEdit(p)}><Pencil size={16}/>Editar partido</Button>{(pasado||p.jugado)&&<Button onClick={()=>setResultado(p.id)}>{p.jugado?'Corregir resultado':'METER RESULTADO'}</Button>}</div>{resultado===p.id&&<ResultadoForm partido={p} onClose={()=>setResultado(null)}/>}</article>;
-    })}</div>
+    <ListCard label="Partidos" className="mt-6">{lista.map(p=>{const campos=fechaMadridCampos(p);const favor=p.esLocal?p.golesLocal:p.golesVisitante,contra=p.esLocal?p.golesVisitante:p.golesLocal;return <ListRow key={p.id} leading={p.jornada??<CircleDot/>} name={`${p.jugado?`${favor} – ${contra}`:'vs.'} ${p.rival}`} chip={p.esLocal?'CASA':'FUERA'} subtitle={p.horaConfirmada===false?'Hora por confirmar':`${campos.hora} · ${p.lugar}`} date={campos.fecha} status={p.jugado?'off':(inicioPartido(p)?.getTime()??Infinity)<=ahora.getTime()?'pending':'active'} statusLabel={p.jugado?'Jugado':(inicioPartido(p)?.getTime()??Infinity)<=ahora.getTime()?'Falta el resultado':'Pendiente'} onClick={()=>setSelected(p)}/>;})}</ListCard>
+    <GestionSheet title={selected?`vs. ${selected.rival}`:'Partido'} open={!!selected} onClose={()=>{setSelected(null);setResultado(null);}}>{selected&&<><p>Jornada {selected.jornada} · {selected.esLocal?'En casa':'Fuera'}</p><p>{fechaMadridCampos(selected).fecha} · {selected.horaConfirmada===false?'Hora por confirmar':fechaMadridCampos(selected).hora}</p><p>{selected.lugar}</p>{!selected.jugado&&(inicioPartido(selected)?.getTime()??Infinity)<=ahora.getTime()&&<p className="font-bold">Falta el resultado</p>}<Button variant="outline" onClick={()=>{setEdit(selected);setSelected(null);}}><Pencil/>Editar partido</Button>{(selected.jugado||(inicioPartido(selected)?.getTime()??Infinity)<=ahora.getTime())&&<Button onClick={()=>setResultado(selected.id)}>{selected.jugado?'Corregir resultado':'METER RESULTADO'}</Button>}{resultado===selected.id&&<ResultadoForm partido={selected} onClose={()=>setResultado(null)}/>}</>}</GestionSheet>
   </section>;
 }
 function PartidoForm({partido,onClose}:{partido?:Partido|undefined;onClose:()=>void}) {

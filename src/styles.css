@@ -517,16 +517,43 @@ main .directiva-fab svg { width:24px; height:24px; }
 main .directiva-fab:hover { background:var(--control-primary-hover); color:var(--primary-foreground); }
 main .directiva-fab.is-reduced { transform:scale(.88); }
 main .directiva-fab:active { transform:scale(.94); }
-.member-columns,.member-data-row { display:grid; grid-template-columns:32px minmax(0,1fr) 62px 16px; gap:8px; align-items:center; }
-.member-columns { height:24px; margin:10px 0; }
+/* ListRow owns only list presentation; parent sections supply the 16px inset. */
+:root {
+  --list-surface:var(--result-surface);
+  --list-hover:color-mix(in srgb,var(--primary-foreground) 75%,transparent);
+  --list-pressed:color-mix(in srgb,var(--primary-foreground) 90%,transparent);
+  --list-number:color-mix(in srgb,var(--primary) 50%,transparent);
+  --list-muted:var(--result-muted);
+  --list-chip-ink:#1F7A57;
+  --list-pending:#D4A72C;
+}
+.club-list-card { width:100%; min-width:0; margin-inline:0; padding:0; list-style:none; background:var(--list-surface); border-radius:16px; overflow:hidden; }
+.club-list-item { position:relative; min-width:0; }
+.club-list-item:not(:last-child)::after { content:""; position:absolute; bottom:0; left:68px; right:0; height:1px; background:var(--result-border); pointer-events:none; }
+.club-list-row,.member-columns { display:grid; grid-template-columns:40px minmax(0,1fr) auto; column-gap:12px; align-items:center; padding:12px 16px; }
+.club-list-row { width:100%; height:64px; min-height:64px; border:0; border-radius:0; background:transparent; color:var(--primary); text-align:left; white-space:nowrap; font-family:var(--font-lato); box-shadow:none; }
+.club-list-row.club-interactive:not(:disabled):hover { background:var(--list-hover); color:var(--primary); }
+.club-list-row.club-interactive:not(:disabled):active { background:var(--list-pressed); color:var(--primary); transform:none; }
+.club-list-row:focus-visible { outline-offset:-2px!important; }
+.list-row-leading { display:flex; align-items:center; justify-content:center; min-width:0; width:40px; font-size:18px; line-height:22px; font-weight:900; color:var(--list-number); }
+.list-row-leading svg { width:20px; height:20px; }
+.list-row-text { display:block; min-width:0; overflow:hidden; }
+.list-row-name-line { display:flex; align-items:center; gap:8px; min-width:0; height:20px; }
+.list-row-name { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:15px; line-height:20px; font-weight:700; }
+.list-row-chip { flex-shrink:0; height:18px; display:inline-flex; align-items:center; padding:0 6px; border-radius:4px; background:var(--fixture-chip); color:var(--list-chip-ink); font-size:10px; line-height:18px; font-weight:700; text-transform:uppercase; }
+.list-row-subtitle { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; line-height:20px; font-weight:400; color:var(--list-muted); }
+.list-row-meta { display:flex; align-items:center; gap:8px; font-size:12px; line-height:20px; font-weight:400; color:var(--list-muted); white-space:nowrap; }
+.list-row-status { width:8px; height:8px; flex-shrink:0; border-radius:50%; }
+.list-row-status-active { background:var(--accent); }
+.list-row-status-pending { background:var(--list-pending); }
+.list-row-status-off { background:var(--member-off); }
+.member-columns { height:44px; padding-block:0; margin:0 0 8px; }
 .member-columns .member-column { height:44px; min-height:44px; padding:0; justify-content:flex-start; gap:3px; font-size:11px; font-weight:700; text-transform:uppercase; color:var(--member-column-muted); background:transparent; border:0; box-shadow:none; }
 .member-columns .member-column:hover { background:transparent; color:var(--member-column-muted); }
 .member-columns .member-column.is-sorted,.member-columns .member-column.is-sorted:hover { color:var(--primary); }
 .member-columns .member-column svg { width:10px; height:10px; }
-.member-columns .member-column:nth-child(3) { justify-content:flex-end; }
-.member-columns .member-column:first-child { position:relative; }
-.member-columns .member-column:first-child::before { content:""; position:absolute; inset:0 -6px; }
-.member-date { font-size:11px; text-align:right; white-space:nowrap; }
-.member-data-row .member-status { margin-right:8px; }
-.member-data-row .member-role { display:inline-block; padding:1px 3px; font-size:8px; }
+.member-columns .member-column:nth-child(3) { width:66px; justify-content:flex-start; }
+.member-search.club-input { padding-left:40px; }
+.list-pagination { display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center; height:44px; margin-top:16px; text-align:center; font-size:13px; }
+.list-pagination > button { width:44px; height:44px; padding:0; }
 @media(prefers-reduced-motion:reduce) { main .directiva-fab { transition:none; } }

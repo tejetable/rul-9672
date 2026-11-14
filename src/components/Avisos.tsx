@@ -1,8 +1,9 @@
+import {ListCard,ListRow} from './ListRow';
 import {DirectivaFab} from './DirectivaFab';
 import {GestionSheet} from './GestionPersonas';
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Bell } from "lucide-react";
 import { dataService, type Aviso, useClubData, runAction } from "@/lib/dataService";
 
 const PARA: Record<NonNullable<Aviso["para"]>, string> = { todos: "Todos", socias: "Socias/os", negocios: "Negocios" };
@@ -11,20 +12,14 @@ const TIPO: Record<Aviso["tipo"], string> = { club: "Club", ventaja: "Ventaja", 
 export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
   const db = useClubData();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
+  const [selected,setSelected]=useState<Aviso|null>(null);
   useEffect(() => setAvisos(dataService.avisosPara(quien)), [quien, db]);
   return (
     <section className="px-4 pt-6">
       <h1 className="club-section-title">Avisos</h1>
             {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
-      <ul className="mt-6 space-y-3">
-        {avisos.map((a) => (
-          <li key={a.id} className="rounded-panel bg-surface p-4">
-            <p className="label-club text-accent">{TIPO[a.tipo]} · {new Date(a.fecha).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}</p>
-            <p className="mt-1 font-black">{a.titulo}</p>
-            <p className="mt-1 whitespace-pre-line">{a.texto}</p>
-          </li>
-        ))}
-      </ul>
+      <ListCard label="Avisos" className="mt-6">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={a.texto} chip={TIPO[a.tipo]} date={new Date(a.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>
+      <GestionSheet title={selected?.titulo??'Aviso'} open={!!selected} onClose={()=>setSelected(null)}>{selected&&<p className="whitespace-pre-line">{selected.texto}</p>}</GestionSheet>
     </section>
   );
 }
@@ -32,6 +27,7 @@ export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
 export function AvisosPanel() {
   const db = useClubData();
   const [avisos, setAvisos] = useState<Aviso[]>([]);
+  const [selected,setSelected]=useState<Aviso|null>(null);
   const [form,setForm]=useState(false);
   const [titulo, setTitulo] = useState("");
   const [texto, setTexto] = useState("");
@@ -70,20 +66,8 @@ export function AvisosPanel() {
 
       </GestionSheet>
       <h2 className="label-club mt-6 text-muted-foreground">Avisos publicados</h2>
-      <ul className="mt-2 space-y-3">
-        {avisos.map((a) => (
-          <li key={a.id} className="flex items-start gap-3 rounded-panel bg-surface p-4">
-            <div className="flex-1">
-              <p className="label-club text-accent">{TIPO[a.tipo]} · {PARA[a.para ?? "todos"]}</p>
-              <p className="mt-1 font-black">{a.titulo}</p>
-              <p className="mt-1 text-body-sm">{a.texto}</p>
-            </div>
-            <Button variant="ghost" onClick={() => { runAction(async () => { await dataService.borrarAviso(a.id); refrescar(); }); }} aria-label="Borrar aviso" className="flex size-11 items-center justify-center">
-              <Trash2 size={18} strokeWidth={1.75} />
-            </Button>
-          </li>
-        ))}
-      </ul>
+      <ListCard label="Avisos publicados" className="mt-2">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={`${PARA[a.para??'todos']} · ${a.texto}`} chip={TIPO[a.tipo]} date={new Date(a.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>
+      <GestionSheet title={selected?.titulo??'Aviso'} open={!!selected} onClose={()=>setSelected(null)}>{selected&&<><p className="label-club">{TIPO[selected.tipo]} · {PARA[selected.para??'todos']}</p><p className="whitespace-pre-line">{selected.texto}</p><Button variant="outline" onClick={()=>runAction(async()=>{await dataService.borrarAviso(selected.id);setSelected(null);refrescar();})}><Trash2/>Borrar aviso</Button></>}</GestionSheet>
     </section>
   );
 }
