@@ -6,7 +6,7 @@ import { ArrowRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
-import { directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido } from "@/lib/partidos";
+import { directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
 
 function LugoSilueta() {
   return <svg className="fixture-silhouette" viewBox="0 0 260 130" aria-hidden="true" fill="currentColor">
@@ -61,30 +61,47 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
 function EquipoPartido({rival}:{rival?:string}) {
   return <div className="fixture-team">{rival ? <span className="fixture-opponent">{rival.split(' ').slice(0,3).map(w=>w[0]).join('').toUpperCase()}</span> : <img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-14 object-contain"/>}<p>{rival??'R.U. LUCENSE'}</p></div>;
 }
-export function UltimoResultado({partido}:{partido:Partido}) {
-  const {data}=useDriveGallery();const album=data?.albumes.find(a=>a.partidoId===partido.id);
+function Escudo36({rival}:{rival?:string}){return rival?<span className="result-opponent">{rival.replace(/["'.]/g,'').split(' ').filter(Boolean).slice(0,3).map(w=>w[0]).join('').toUpperCase()}</span>:<img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-9 object-contain"/>;}
+export function UltimoResultado({partidos}:{partidos:Partido[]}) {
+  const {data}=useDriveGallery();
+  const jugados=[...partidos].filter(p=>p.jugado).sort((a,b)=>(inicioPartido(a)?.getTime()??0)-(inicioPartido(b)?.getTime()??0));
+  const [idx,setIdx]=useState<number|null>(null);const [fade,setFade]=useState(false);const [x0,setX0]=useState<number|null>(null);
+  if(!jugados.length)return null;
+  const last=jugados.length-1,i=Math.min(idx??last,last),partido=jugados[i];
+  const ir=(n:number)=>{if(n<0||n>last||n===i)return;setFade(true);setTimeout(()=>{setIdx(n);setFade(false);},100);};
+  const album=data?.albumes.find(a=>a.partidoId===partido.id);
   const resultado=resultadoPartido(partido);
-  const fecha=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'');
-  return <article className="result-card" aria-label="Último partido">
-    <div className="flex items-center justify-between gap-2"><h2 className="result-kicker">ÚLTIMO PARTIDO</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
-    <div className="result-matchup">
-      <div className="result-team">{partido.esLocal&&<img src={escudo.url} alt="R.U. Lucense" className="size-9 object-contain"/>}<p>{partido.esLocal?'R.U. Lucense':partido.rival}</p></div>
-      <p className="result-score">{partido.golesLocal} <span className="result-separator">–</span> {partido.golesVisitante}</p>
-      <div className="result-team">{!partido.esLocal&&<img src={escudo.url} alt="R.U. Lucense" className="size-9 object-contain"/>}<p>{partido.esLocal?partido.rival:'R.U. Lucense'}</p></div>
+  const f=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';
+  const fecha=f.charAt(0).toUpperCase()+f.slice(1);
+  const folder=album?.id??partido.driveFolderId;
+  return <><article className="result-card" aria-label="Resultado del partido" onTouchStart={e=>setX0(e.touches[0].clientX)} onTouchEnd={e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)ir(d<0?i+1:i-1);setX0(null);}}>
+    <div className="result-nav">
+      <button type="button" className="result-arrow" aria-label="Partido anterior" disabled={i===0} onClick={()=>ir(i-1)}>‹</button>
+      <div className="flex min-w-0 flex-1 items-center justify-center gap-2"><h2 className="result-kicker">{i===last?'ÚLTIMO PARTIDO':`JORNADA ${partido.jornada??'—'}`}</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
+      <button type="button" className="result-arrow" aria-label="Partido siguiente" disabled={i===last} onClick={()=>ir(i+1)}>›</button>
+      {i!==last&&<button type="button" className="result-latest" onClick={()=>ir(last)}>Ver el último</button>}
     </div>
-    <p className="mt-3 text-body-sm">{fecha} · Jornada {partido.jornada} · {partido.lugar}</p>
-    {(album||partido.driveFolderId)&&<Button asChild variant="link" className="h-9 p-0 text-accent text-body-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:album?.id??partido.driveFolderId??''}} search={{foto:''}}>Ver fotos del partido <ArrowRight/></Link></Button>}
-  </article>;
+    <div className="result-body" style={{opacity:fade?0:1}}>
+      <div className="result-matchup">
+        <div className="result-team"><Escudo36 rival={partido.esLocal?undefined:partido.rival}/><p>{partido.esLocal?'R.U. Lucense':partido.rival}</p></div>
+        <p className="result-score">{partido.golesLocal} <span className="result-separator">–</span> {partido.golesVisitante}</p>
+        <div className="result-team"><Escudo36 rival={partido.esLocal?partido.rival:undefined}/><p>{partido.esLocal?partido.rival:'R.U. Lucense'}</p></div>
+      </div>
+      <p className="mt-3 text-center text-body-sm">{fecha} · Jornada {partido.jornada} · {partido.lugar}</p>
+      {folder&&<div className="flex justify-center"><Button asChild variant="link" className="h-9 p-0 text-accent text-body-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:folder}} search={{foto:''}}>Ver fotos del partido <ArrowRight/></Link></Button></div>}
+    </div>
+  </article>
+  {jugados.length>8?<p className="mt-2 text-center text-body-sm font-bold">J{partido.jornada??i+1} / {jugados.length}</p>:<div className="result-dots" aria-hidden="true">{jugados.map((p,n)=><span key={p.id} className={n===i?'is-active':''}/>)}</div>}</>;
 }
 export function Liga() {
   const db=useClubData();const [ahora,setAhora]=useState(()=>new Date());
   useEffect(()=>{const timer=setInterval(()=>setAhora(new Date()),30000);return()=>clearInterval(timer);},[]);
-  const proximo=proximoPartido(db.partidos,ahora),enCurso=partidoEnCurso(db.partidos,ahora),ultimo=ultimoPartido(db.partidos);
+  const proximo=proximoPartido(db.partidos,ahora),enCurso=partidoEnCurso(db.partidos,ahora);
   const stats=dataService.liga(),tabla=dataService.clasificacion();
   return <section aria-label="Liga">
     {enCurso&&<ProximoPartido partido={enCurso}/>}
     {proximo ? <div className={enCurso?'mt-4':''}><ProximoPartido partido={proximo}/></div> : <div className="mt-4 border-y border-border py-4"><p className="label-club">Próximo partido</p><p className="font-black">Por confirmar</p></div>}
     <div className="league-strip" aria-label="Nuestra liga"><div><p className="label-club">NUESTRA LIGA</p><p className="club-stat">{tabla?`${tabla.posicion}.º`:'—'}</p></div><div><p className="text-body-sm font-bold">{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p><div className="mt-2 flex items-center gap-2"><div className="flex gap-1" aria-label={`Racha: ${stats.racha.join(', ')||'sin resultados'}`}>{Array.from({length:5},(_,i)=><span key={i} title={stats.racha[i]==='V'?'Victoria':stats.racha[i]==='E'?'Empate':stats.racha[i]==='D'?'Derrota':'Sin resultado'} className={`league-dot ${stats.racha[i]?`result-${stats.racha[i]}`:''}`}/>)}</div><span className="league-caption">Últimos 5</span></div></div><Button asChild variant="link" className="league-link"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Clasificación ↗</a></Button></div>
-    {ultimo&&<UltimoResultado partido={ultimo}/>}
+    <UltimoResultado partidos={db.partidos}/>
   </section>;
 }
