@@ -4,7 +4,8 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {defaultSettings,settingsSchema,canManageTeam,clubWhatsapp} from "./club-settings";
-import {membershipSchema,initialRole,type EmailRole} from "./email-access";
+import {initialRole,type EmailRole} from "./email-access";
+import {pagoSchema,type PagoInput,type Pago,type Persona,type PersonaRol} from './socios-management';
 import { getDriveGallery } from './drive.functions';
 import { folderIdFromUrl } from './drive-gallery';
 import type { Rango, Visita } from "./visitas";
@@ -145,12 +146,13 @@ export const dataService = {
   clasificacion:()=>clasificacion,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
   async cargarAjustes(){
-    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual,url_clasificacion_futgal").maybeSingle();
+    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual,url_clasificacion_futgal,cuota_socio").maybeSingle();
     check(r.error);settings={
       whatsapp_club:r.data?.whatsapp_club??defaultSettings.whatsapp_club,
       nombre_club:r.data?.nombre_club??defaultSettings.nombre_club,
       temporada_actual:r.data?.temporada_actual??defaultSettings.temporada_actual,
       email_club:'',
+      cuota_socio:r.data?.cuota_socio==null?null:Number(r.data.cuota_socio),
       url_clasificacion_futgal:r.data?.url_clasificacion_futgal??defaultSettings.url_clasificacion_futgal,
     };
     if(this.esSuper()){
@@ -163,11 +165,14 @@ export const dataService = {
   async estadoPassword(email:string){const r=await supabase.rpc('acceso_password_club',{p_email:email});check(r.error);return !!(r.data as {activo?:boolean}|null)?.activo;},
   async enviarPassword(email:string){return sendPasswordInvitation({data:{email,origin:window.location.origin}});},
   async equipo(){const [r,h]=await Promise.all([supabase.from('usuario_roles').select('*').in('rol',['directiva','super_admin']).eq('activo',true),supabase.from('registro_permisos').select('*').order('fecha',{ascending:false})]);check(r.error);check(h.error);return {personas:(r.data??[]).map(x=>({id:x.id,email:x.email,nombre:x.nombre,role:x.rol,estado:x.user_id?'Activo':'Disponible',fecha_alta:x.creado_at})),invitaciones:[],historial:h.data??[]};},
-  async invitarDirectiva(nombre:string,email:string,_socioId:string|null=null){const r=await supabase.rpc('asignar_directiva_email',{p_nombre:nombre,p_email:email});check(r.error);await this.enviarPassword(email);},
+  async invitarDirectiva(nombre:string,email:string,_socioId:string|null=null){const r=await supabase.rpc('asignar_directiva_email',{p_nombre:nombre,p_email:email});check(r.error);await this.refresh();if(!await this.estadoPassword(email))try{await this.enviarPassword(email);}catch(e){toast.warning(e instanceof Error?e.message:'Acceso guardado; email pendiente de envío.');}},
   async quitarDirectiva(id:string,motivo:string){const r=await supabase.rpc('retirar_directiva_email',{p_id:id,p_motivo:motivo});check(r.error);},
-  async solicitarAlta(input:unknown){const f=membershipSchema.parse(input);const r=await supabase.rpc('solicitar_alta',{p_nombre:f.nombre,p_email:f.email,p_telefono:f.telefono,p_mayor:f.mayor,p_consentimiento:f.consentimiento});check(r.error);return r.data;},
-  async solicitudes(){const r=await supabase.from('solicitudes_socios').select('*').eq('estado','pendiente_pago').order('creado_at');check(r.error);return r.data??[];},
-  async pagarSolicitud(s:{id:string;nombre:string;email:string;telefono:string}){const r=await supabase.rpc('alta_socio_email',{p_nombre:s.nombre,p_email:s.email,p_telefono:s.telefono,p_solicitud:s.id});check(r.error);await this.refresh();await this.enviarPassword(s.email);},
+  async gestionSocios(){const r=await supabase.rpc('gestion_socios');check(r.error);return r.data as unknown as {pagos:Pago[];roles:PersonaRol[];passwords:Record<string,boolean>};},
+  async personasClub(){const r=await supabase.rpc('personas_club');check(r.error);return (r.data??[]) as unknown as Persona[];},
+  async gestionarRol(email:string,rol:'directiva'|'negocio',activo:boolean,patrocinador:string|null=null,motivo=''){const r=await supabase.rpc('gestionar_rol_persona',{p_email:email,p_rol:rol,p_activo:activo,...(patrocinador?{p_patrocinador:patrocinador}:{}),p_motivo:motivo});check(r.error);await this.refresh();},
+  async registrarPago(id:string,pago:PagoInput){const r=await supabase.rpc('registrar_pago_socio',{p_socio:id,p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();},
+  async editarSocio(id:string,input:{nombre:string;email:string;telefono:string}){const r=await supabase.rpc('editar_socio_datos',{p_id:id,p_nombre:input.nombre,p_email:input.email,p_telefono:input.telefono.replace(/\D/g,'')});check(r.error);await this.refresh();},
+  async reactivar(id:string){const r=await supabase.from('socios').update({estado:'activa',fecha_baja:null,motivo_baja:null}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('No autorizado');await this.refresh();},
   async emailNegocio(id:string,email:string){const r=await supabase.rpc('asignar_negocio_email',{p_id:id,p_email:email});check(r.error);await this.refresh();await this.enviarPassword(email);},
   async elegirRol(id:string){const chosen=roles.find(r=>r.id===id);if(!chosen)throw new Error('Rol no autorizado');const r=await supabase.rpc('elegir_vista',{p_role:id});check(r.error);selectedRole=id;role=chosen.rol;linkedSocio=chosen.socio_id;sessionState=role==='socia'?'ok':null;window.localStorage.setItem('rul-last-email-role',id);await this.refresh();},
   async albumes(){return (await getDriveGallery()).albumes;},
@@ -221,7 +226,7 @@ export const dataService = {
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}
     reads = leidos.map(l=>l.aviso_id); notify();
   },
-  async crearSocio(nombre:string,telefono:string,email:string){const r=await supabase.rpc('alta_socio_email',{p_nombre:nombre,p_email:email,p_telefono:telefono.replace(/\D/g,'')});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la socia/o');await this.enviarPassword(email);return s;},
+  async crearSocio(nombre:string,telefono:string,email:string,pago:PagoInput){const r=await supabase.rpc('alta_socio_con_pago',{p_datos:{nombre,email,telefono:telefono.replace(/\D/g,'')},p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la socia/o');if(!await this.estadoPassword(email))try{await this.enviarPassword(email);}catch(e){toast.warning(e instanceof Error?e.message:'Alta y pago guardados; email pendiente de envío.');}return s;},
   async desactivar(id: string, fecha: string, motivo: string) { const r=await supabase.from('socios').update({estado:'desactivada',fecha_baja:fecha,motivo_baja:motivo}).eq('id',id);check(r.error);await this.refresh(); },
   async bajaPatrocinador(id:string,fecha:string,motivo:string,detalle:string) { const r=await supabase.from('patrocinadores').update({activo:false,fecha_baja:fecha,motivo_baja:motivo,detalle_baja:detalle}).eq('id',id);check(r.error);await this.refresh(); },
   dispositivoId() { let d=window.localStorage.getItem('rul-device-id'); if(!d){d=crypto.randomUUID();window.localStorage.setItem('rul-device-id',d);} return d; },

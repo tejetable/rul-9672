@@ -45,5 +45,6 @@ use the editor.
 - Public settings reads use the explicitly projected ajustes_club_publicos view; the underlying settings and club email are readable only by Super admin so public contact links never expose administrative fields.
 - Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.
 
-- Public membership applications call a validated RPC that returns only a request ID; payment approval is role-checked and transactional, with payment reference fields reserved for future verified payment callbacks.
+- Paid membership creation uses transactional PostgreSQL RPCs and a deferred payment trigger; the future Stripe entry point is service-role-only and idempotent by payment reference so browser callers cannot claim a verified payment.
+- Member management metadata and club-person searches use role-checked RPCs; pure helpers own debounced filtering and 20-row pagination so list rules are independently testable.
 - Welcome, email entry and role selection share AccesoVisual and semantic access tokens; password forms share validation and visibility controls; recovery and invitation links use public dedicated routes and Auth session verification.

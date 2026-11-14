@@ -127,6 +127,20 @@
       "when": 1794648768911,
       "tag": "0017_paid_membership_management",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794648835548,
+      "tag": "0018_protect_paid_member_creation_and_edits",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794649071032,
+      "tag": "0019_club_team_confirmed_access_status",
+      "breakpoints": true
     }
   ]
 }

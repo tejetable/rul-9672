@@ -1,140 +1,21 @@
-import {PasswordAccessStatus} from './PasswordAccessStatus';
-import {accessMessage} from "@/lib/email-access";
-import {InviteForm} from "./ClubAdmin";
-
-import { BajaForm } from "@/components/BajaForm";
-import { Button } from "@/components/ui/button";
-
-import { useEffect, useMemo, useState } from "react";
-import { MessageCircle, Plus, Search, Smartphone } from "lucide-react";
-import { dataService, type Socio, useClubData, runAction } from "@/lib/dataService";
-import { waLink } from "@/lib/whatsapp";
-
-function enviar(s:Socio){if(s.telefono)window.open(waLink(accessMessage(s.email??'',window.location.origin),s.telefono),'_blank');else void navigator.clipboard.writeText(accessMessage(s.email??'',window.location.origin));}
-
-const ESTADO: Record<Socio["estado"], { label: string; cls: string }> = {
-  invitada: { label: "Invitada", cls: "bg-suave text-muted-foreground border border-border" },
-  activa: { label: "Activa", cls: "bg-accent text-accent-foreground" },
-  desactivada: { label: "Desactivada", cls: "border border-primary text-primary" },
-};
-
-export function SociasPanel() {
-  const db = useClubData();
-  const [promote,setPromote]=useState<string|null>(null);
-  const [baja, setBaja] = useState<string | null>(null);
-  const [socios, setSocios] = useState<Socio[]>([]);
-  const [q, setQ] = useState("");
-  const [form, setForm] = useState(false);
-  const [nombre, setNombre] = useState("");
-  const [tel, setTel] = useState("");
-  const [email,setEmail]=useState("");
-  const [pending,setPending]=useState<Awaited<ReturnType<typeof dataService.solicitudes>>>([]);
-  useEffect(()=>{runAction(async()=>setPending(await dataService.solicitudes()));},[db]);
-  const [creada, setCreada] = useState<Socio | null>(null);
-
-  const refresh = () => setSocios([...dataService.get().socios].sort((a, b) => b.numeroSocio - a.numeroSocio));
-  useEffect(refresh, [db]);
-
-  const lista = useMemo(
-    () => socios.filter((s) => s.nombre.toLowerCase().includes(q.toLowerCase()) || String(s.numeroSocio).includes(q)),
-    [socios, q],
-  );
-  const activas = socios.filter((s) => s.estado === "activa").length;
-
-  const guardar = async () => {
-    if (!nombre.trim() || !email.includes("@")) return;
-    const s = await dataService.crearSocio(nombre, tel,email);
-    setCreada(s);
-    setNombre("");
-    setTel("");setEmail("");
-    setForm(false);
-    refresh();
-  };
-
-  return (
-    <section className="flex flex-1 flex-col px-5 pb-28 pt-6">
-      <p className="club-chip">Directiva</p>
-      <h1 className="title-club mt-2 text-heading">Socias/os</h1>
-            <p className="mt-4 font-bold">
-        {activas} activas de {socios.length} socias/os
-      </p>
-
-      {pending.length>0&&<div className="mt-5 space-y-3"><h2 className="club-section-title">Solicitudes pendientes</h2>{pending.map(s=><article key={s.id} className="rounded-panel bg-surface p-4"><p className="font-bold">{s.nombre}</p><p className="break-all text-body-sm">{s.email}</p><p className="label-club mt-2">Pendiente de pago · {s.temporada}</p><Button className="mt-3 whitespace-normal" onClick={()=>runAction(()=>dataService.pagarSolicitud(s))}>Marcar como pagada (efectivo)</Button></article>)}</div>}
-      {creada && (
-        <div className="animate-rise mt-5 rounded-panel border-2 border-accent bg-suave p-4">
-          <p className="label-club text-accent">Nueva socia/o</p>
-          <p className="mt-1 text-item font-black">
-            {creada.nombre} · nº {creada.numeroSocio}
-          </p>
-          <div className="mt-3 flex flex-col gap-2">
-            <Button variant="ghost" onClick={() => enviar(creada)} className="flex h-auto min-h-11 items-center justify-center gap-2 rounded-control bg-primary font-bold text-primary-foreground">
-              <MessageCircle size={18} strokeWidth={1.75} /> Enviar / copiar acceso
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {form ? (
-        <div className="mt-5 border-y border-border py-4">
-          <label htmlFor="alta-nombre" className="label-club">Nombre</label>
-          <input id="alta-nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
-          <label htmlFor="alta-email" className="label-club mt-3 block">Email</label><input id="alta-email" type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="club-input mt-1 min-h-11 w-full px-3"/><label htmlFor="alta-telefono" className="label-club mt-3 block">Teléfono (opcional)</label>
-          <input id="alta-telefono" value={tel} onChange={(e) => setTel(e.target.value)} inputMode="tel" placeholder="600 000 000" className="mt-1 h-auto min-h-11 w-full rounded-control club-input border-input px-3" />
-          <div className="mt-4 flex gap-2">
-            <Button variant="ghost" onClick={() => runAction(guardar)} className="h-auto min-h-11 flex-1 rounded-control bg-primary font-bold text-primary-foreground">Guardar</Button>
-            <Button variant="ghost" onClick={() => setForm(false)} className="h-auto min-h-11 rounded-control px-4 font-bold">Cancelar</Button>
-          </div>
-        </div>
-      ) : (
-        <Button variant="ghost" onClick={() => setForm(true)} className="mt-5 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
-          <Plus size={20} strokeWidth={1.75} /> Nueva socia/o
-        </Button>
-      )}
-
-      <div className="mt-5 flex items-center gap-2 rounded-control border border-input px-3">
-        <Search size={18} strokeWidth={1.75} />
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o número" className="h-auto min-h-11 min-w-0 flex-1 bg-transparent outline-none" />
-      </div>
-
-      {baja && <BajaForm onCancel={() => setBaja(null)} onSave={async (fecha, motivo) => { await dataService.desactivar(baja, fecha, motivo); setBaja(null); }} />}
-      <ul className="mt-4 flex flex-col gap-3">
-        {lista.map((s) => (
-          <li key={s.id} className="rounded-panel bg-surface p-4">
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <p className="font-bold">{s.nombre}</p>
-                <p className="text-body-sm text-muted-foreground">Nº {s.numeroSocio}</p>
-              </div>
-              <span className={`label-club rounded-full px-3 py-1 ${ESTADO[s.estado].cls}`}>{ESTADO[s.estado].label}</span>
-            </div>
-            <PasswordAccessStatus email={s.email??''}/>{s.cambioDispositivo && (
-              <p className="mt-2 flex items-center gap-2 text-body-sm font-bold">
-                <Smartphone size={16} strokeWidth={1.75} /> Cambio de dispositivo
-              </p>
-            )}
-            <div className="mt-3 flex gap-2">
-              <Button variant="ghost"
-                onClick={()=>enviar(s)}
-                className="h-auto min-h-11 flex-1 rounded-control border border-primary text-body-sm font-bold"
-              >
-                Enviar / copiar acceso
-              </Button>
-              {s.estado !== "desactivada" && (
-                <Button variant="ghost"
-                  onClick={() => {
-                    setBaja(s.id);
-                  }}
-                  className="h-auto min-h-11 rounded-control px-3 text-body-sm font-bold text-muted-foreground"
-                >
-                  Desactivar
-                </Button>
-              )}
-            </div>
-            {dataService.esSuper()&&<Button variant="ghost" onClick={()=>setPromote(s.id)}>Hacer directiva</Button>}
-            {promote===s.id&&<InviteForm nombreInicial={s.nombre} socioId={s.id} onDone={()=>setPromote(null)}/>}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+import {useEffect,useMemo,useState} from 'react';
+import {Plus,Search,ChevronLeft,ChevronRight} from 'lucide-react';
+import {toast} from 'sonner';
+import {Button} from './ui/button';
+import {BajaForm} from './BajaForm';
+import {GestionSheet,PagoFields,RolesPersona} from './GestionPersonas';
+import {dataService,useClubData,type Socio} from '@/lib/dataService';
+import {hoyMadrid,listaSocios,paginaSocios,SEARCH_DELAY,type Filtro,type Orden,type PagoInput} from '@/lib/socios-management';
+const empty=()=>({pagos:[],roles:[],passwords:{}} as Awaited<ReturnType<typeof dataService.gestionSocios>>);
+const filtros:[Filtro,string][]=[['todas','Todas'],['activas','Activas'],['password','Pendientes de contraseña'],['desactivadas','Desactivadas'],['sin_pago','Sin pago esta temporada']];
+export function SociasPanel(){
+ const db=useClubData();const [meta,setMeta]=useState(empty),[q,setQ]=useState(''),[search,setSearch]=useState(''),[filter,setFilter]=useState<Filtro>('todas'),[order,setOrder]=useState<Orden>('numero'),[page,setPage]=useState(1),[selected,setSelected]=useState<string|null>(null),[add,setAdd]=useState(false);
+ const refresh=async()=>setMeta(await dataService.gestionSocios());
+ useEffect(()=>{let alive=true;void dataService.gestionSocios().then(v=>{if(alive)setMeta(v);}).catch(e=>toast.error(e.message));return()=>{alive=false;};},[db]);
+ useEffect(()=>{const t=setTimeout(()=>{setSearch(q);setPage(1);},SEARCH_DELAY);return()=>clearTimeout(t);},[q]);
+ const rows=useMemo(()=>listaSocios(db.socios,search,filter,order,meta.passwords,meta.pagos,dataService.ajustes().temporada_actual),[db,search,filter,order,meta]);const paged=paginaSocios(rows,page);const socio=db.socios.find(s=>s.id===selected);
+ const setFiltro=(f:Filtro)=>{setFilter(f);setPage(1);};
+ return <section className="px-5 pb-28 pt-5"><h1 className="club-section-title">Socias/os</h1><div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">{(['activas','password','desactivadas'] as const).map(f=><Button key={f} variant="link" className="h-auto p-0 text-body-sm" onClick={()=>setFiltro(f)}>{f==='activas'?'Activas':f==='password'?'Pendientes de contraseña':'Desactivadas'}: {listaSocios(db.socios,'',f,'numero',meta.passwords,meta.pagos,dataService.ajustes().temporada_actual).length}</Button>)}</div><div className="member-list-tools sticky top-14 z-20 mt-4 space-y-3 bg-background py-3"><label className="flex items-center gap-2"><Search size={18}/><input aria-label="Buscar socios" placeholder="Nombre, email, teléfono o nº" value={q} onChange={e=>setQ(e.target.value)} className="club-input min-w-0 flex-1 p-3"/></label><div className="flex flex-wrap gap-1">{filtros.map(([f,l])=><Button key={f} variant="ghost" aria-pressed={filter===f} className={`h-auto min-h-8 whitespace-normal rounded-full px-2 py-1 text-[length:var(--text-label)] ${filter===f?'bg-primary text-primary-foreground':'bg-surface'}`} onClick={()=>setFiltro(f)}>{l}</Button>)}</div><div className="flex flex-wrap items-center justify-between gap-2"><label className="text-body-sm">Ordenar <select aria-label="Ordenar socios" value={order} onChange={e=>{setOrder(e.target.value as Orden);setPage(1);}} className="club-input p-2"><option value="numero">Nº de socio</option><option value="nombre">Nombre</option><option value="fecha">Fecha de alta</option></select></label><Button className="text-[length:var(--text-label)]" onClick={()=>setAdd(true)}><Plus size={16}/>NUEVA SOCIA/O</Button></div></div><ul className="mt-2 divide-y divide-border">{paged.rows.map(s=><li key={s.id}><Button variant="ghost" className="member-row" onClick={()=>setSelected(s.id)}><span className="member-number">{s.numeroSocio}</span><span className="min-w-0 flex-1 text-left"><strong className="block truncate">{s.nombre}</strong><span className="member-email">{s.email}</span></span><span className="flex shrink-0 flex-col gap-1">{meta.roles.filter(r=>r.email===s.email&&(r.rol==='directiva'||r.rol==='negocio'||r.rol==='super_admin')).map(r=><span key={r.id} className="member-role">{r.rol==='negocio'?'NEGOCIO':'DIRECTIVA'}</span>)}</span><span aria-label={s.estado==='desactivada'?'Desactivada':meta.passwords[s.email??'']?'Activa':'Pendiente de contraseña'} className={`member-status ${s.estado==='desactivada'?'status-off':meta.passwords[s.email??'']?'status-active':'status-pending'}`}/></Button></li>)}</ul>{!rows.length&&<p className="py-8 text-center text-body-sm">{filter==='desactivadas'?'No hay socios desactivados':filter==='password'?'No hay socios pendientes de contraseña':filter==='sin_pago'?'No hay socios sin pago esta temporada':'No hay socios con estos criterios'}</p>}<div className="mt-4 flex items-center justify-between gap-1 text-body-sm"><Button aria-label="Anterior" variant="ghost" size="icon" disabled={paged.current===1} onClick={()=>setPage(paged.current-1)}><ChevronLeft/></Button><span>Página {paged.current} de {paged.pages}</span><Button aria-label="Siguiente" variant="ghost" size="icon" disabled={paged.current===paged.pages} onClick={()=>setPage(paged.current+1)}><ChevronRight/></Button></div><GestionSheet title="Nueva socia/o" open={add} onClose={()=>setAdd(false)}>{add&&<SocioForm onDone={async()=>{await refresh();setAdd(false);}}/>}</GestionSheet><GestionSheet title={socio?`${socio.nombre} · nº ${socio.numeroSocio}`:'Ficha del socio'} open={!!socio} onClose={()=>setSelected(null)}>{socio&&<FichaSocio key={socio.id} socio={socio} meta={meta} refresh={refresh}/>}</GestionSheet></section>;
 }
+function SocioForm({socio,onDone}:{socio?:Socio;onDone:()=>Promise<void>}){const [nombre,setNombre]=useState(socio?.nombre??''),[email,setEmail]=useState(socio?.email??''),[tel,setTel]=useState(socio?.telefono??''),[pago,setPago]=useState<PagoInput>({metodo:'efectivo',importe:dataService.ajustes().cuota_socio??0,fecha:hoyMadrid()}),[busy,setBusy]=useState(false),[error,setError]=useState('');return <form className="space-y-3" onSubmit={e=>{e.preventDefault();setBusy(true);setError('');const existed=dataService.get().socios.some(s=>s.email?.toLowerCase()===email.trim().toLowerCase());void (socio?dataService.editarSocio(socio.id,{nombre,email,telefono:tel}):dataService.crearSocio(nombre,tel,email,pago)).then(async()=>{toast.success(existed&&!socio?'La persona ya existe: rol socia y pago guardados.':'Datos guardados.');await onDone();}).catch(e=>setError(e.message)).finally(()=>setBusy(false));}}>{([['Nombre',nombre,setNombre],['Email',email,setEmail],['Teléfono (opcional)',tel,setTel]] as const).map(([l,v,set])=><label key={l} className="block text-body-sm">{l}<input required={l!=='Teléfono (opcional)'} type={l==='Email'?'email':l.startsWith('Teléfono')?'tel':'text'} value={v} onChange={e=>set(e.target.value)} className="club-input mt-1 w-full p-3"/></label>)}{!socio&&<PagoFields value={pago} onChange={setPago}/>} {error&&<p role="alert">{error}</p>}<Button type="submit" disabled={busy}>{busy?'Guardando…':socio?'Guardar datos':'Guardar alta y pago'}</Button></form>;}
+function FichaSocio({socio:s,meta,refresh}:{socio:Socio;meta:Awaited<ReturnType<typeof dataService.gestionSocios>>;refresh:()=>Promise<void>}){const [mode,setMode]=useState<'datos'|'pago'|'baja'|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState(''),[pago,setPago]=useState<PagoInput>({metodo:'efectivo',importe:dataService.ajustes().cuota_socio??0,fecha:hoyMadrid()});const activo=meta.passwords[s.email??''];const perform=(fn:()=>Promise<unknown>)=>{setBusy(true);setError('');void fn().then(refresh).catch(e=>setError(e.message)).finally(()=>setBusy(false));};return <><dl className="space-y-2 text-body-sm"><div><dt className="label-club">Email</dt><dd className="break-all">{s.email}</dd></div><div><dt className="label-club">Teléfono</dt><dd>{s.telefono||'—'}</dd></div><div><dt className="label-club">Fecha de alta</dt><dd>{new Date(s.fechaAlta).toLocaleDateString('es-ES')}</dd></div><div><dt className="label-club">Estado</dt><dd>{s.estado==='desactivada'?'Desactivada':'Activa'}</dd></div><div><dt className="label-club">Acceso</dt><dd>{activo?'Activo':'Pendiente de crear contraseña'}</dd></div></dl><section className="border-t border-border pt-4"><h2 className="font-bold">Pagos · {dataService.ajustes().temporada_actual}</h2>{meta.pagos.filter(p=>p.socio_id===s.id&&p.temporada===dataService.ajustes().temporada_actual).map(p=><p key={p.id} className="mt-2 text-body-sm">{p.metodo} · {Number(p.importe).toFixed(2)} € · {new Date(`${p.fecha_pago}T12:00:00`).toLocaleDateString('es-ES')}</p>)}{!meta.pagos.some(p=>p.socio_id===s.id&&p.temporada===dataService.ajustes().temporada_actual)&&<p className="mt-2 text-body-sm">Sin pago esta temporada</p>}</section><div className="flex flex-wrap gap-2"><Button variant="outline" onClick={()=>setMode('datos')}>Editar datos</Button><Button onClick={()=>setMode('pago')}>Registrar pago</Button>{!activo&&<Button disabled={busy} variant="outline" className="h-auto whitespace-normal" onClick={()=>perform(async()=>{await dataService.enviarPassword(s.email??'');toast.success('Email enviado.');})}>Reenviar email para crear contraseña</Button>}<Button disabled={busy} variant="ghost" onClick={()=>s.estado==='desactivada'?perform(()=>dataService.reactivar(s.id)):setMode('baja')}>{s.estado==='desactivada'?'Reactivar':'Desactivar'}</Button></div>{error&&<p role="alert">{error}</p>}{mode==='datos'&&<SocioForm socio={s} onDone={async()=>{await refresh();setMode(null);}}/>}{mode==='pago'&&<form className="space-y-3" onSubmit={e=>{e.preventDefault();perform(async()=>{await dataService.registrarPago(s.id,pago);setMode(null);});}}><PagoFields value={pago} onChange={setPago}/><Button disabled={busy} type="submit">Guardar pago</Button></form>}{mode==='baja'&&<BajaForm onCancel={()=>setMode(null)} onSave={async(f,m)=>{await dataService.desactivar(s.id,f,m);await refresh();setMode(null);}}/>}<RolesPersona nombre={s.nombre} email={s.email??''} roles={meta.roles.filter(r=>r.email===s.email)} onDone={refresh}/></>;}

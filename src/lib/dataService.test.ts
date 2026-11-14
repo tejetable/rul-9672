@@ -5,6 +5,7 @@ vi.mock('./drive.functions',()=>({getDriveGallery:vi.fn().mockResolvedValue({alb
 import {dataService} from './dataService';
 beforeEach(()=>{vi.clearAllMocks();mocks.from.mockImplementation(()=>({select:()=>({maybeSingle:async()=>({data:null,error:null})})}));});
 describe('Cloud data boundary',()=>{
+ it('rejects an unpaid manual creation before calling Cloud',async()=>{await expect(dataService.crearSocio('Persona','600000001','demo@example.test',{metodo:'efectivo',importe:0,fecha:'2026-11-14'})).rejects.toThrow();expect(mocks.rpc).not.toHaveBeenCalled();});
  it('signed-out settings read only the public projection and clear the private email',async()=>{
    dataService.ajustes().email_club='private@example.test';
    mocks.from.mockImplementation(()=>({select:()=>({maybeSingle:async()=>({data:{whatsapp_club:'34600000000',nombre_club:'Club',temporada_actual:'2026/27'},error:null})})}));

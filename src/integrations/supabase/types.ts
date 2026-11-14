@@ -837,6 +837,15 @@ export type Database = {
         Args: { datos: Json; pago: Json }
         Returns: string
       }
+      editar_socio_datos: {
+        Args: {
+          p_email: string
+          p_id: string
+          p_nombre: string
+          p_telefono: string
+        }
+        Returns: undefined
+      }
       elegir_vista: { Args: { p_role: string }; Returns: undefined }
       enlazar_roles_email: { Args: never; Returns: Json }
       enlazar_socio: {
