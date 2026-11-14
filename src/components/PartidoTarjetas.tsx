@@ -61,7 +61,7 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
 function EquipoPartido({rival}:{rival?:string}) {
   return <div className="fixture-team">{rival ? <span className="fixture-opponent">{rival.split(' ').slice(0,3).map(w=>w[0]).join('').toUpperCase()}</span> : <img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-14 object-contain"/>}<p>{rival??'R.U. LUCENSE'}</p></div>;
 }
-function Escudo36({rival}:{rival?:string}){return rival?<span className="result-opponent">{rival.replace(/["'.]/g,'').split(' ').filter(Boolean).slice(0,3).map(w=>w[0]).join('').toUpperCase()}</span>:<img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-9 object-contain"/>;}
+function Escudo36({rival}:{rival?:string|undefined}){return rival?<span className="result-opponent">{rival.replace(/["'.]/g,'').split(' ').filter(Boolean).slice(0,3).map(w=>w[0]).join('').toUpperCase()}</span>:<img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-9 object-contain"/>;}
 export function UltimoResultado({partidos}:{partidos:Partido[]}) {
   const {data}=useDriveGallery();
   const jugados=[...partidos].filter(p=>p.jugado).sort((a,b)=>(inicioPartido(a)?.getTime()??0)-(inicioPartido(b)?.getTime()??0));
@@ -74,7 +74,7 @@ export function UltimoResultado({partidos}:{partidos:Partido[]}) {
   const f=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';
   const fecha=f.charAt(0).toUpperCase()+f.slice(1);
   const folder=album?.id??partido.driveFolderId;
-  return <><article className="result-card" aria-label="Resultado del partido" onTouchStart={e=>setX0(e.touches[0].clientX)} onTouchEnd={e=>{if(x0===null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)ir(d<0?i+1:i-1);setX0(null);}}>
+  return <><article className="result-card" aria-label="Resultado del partido" onTouchStart={e=>setX0(e.touches[0]?.clientX??null)} onTouchEnd={e=>{if(x0===null)return;const d=(e.changedTouches[0]?.clientX??x0)-x0;if(Math.abs(d)>40)ir(d<0?i+1:i-1);setX0(null);}}>
     <div className="result-nav">
       <button type="button" className="result-arrow" aria-label="Partido anterior" disabled={i===0} onClick={()=>ir(i-1)}>‹</button>
       <div className="flex min-w-0 flex-1 items-center justify-center gap-2"><h2 className="result-kicker">{i===last?'ÚLTIMO PARTIDO':`JORNADA ${partido.jornada??'—'}`}</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
