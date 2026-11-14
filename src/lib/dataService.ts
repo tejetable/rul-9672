@@ -114,6 +114,7 @@ let userId: string | null = null;
 let linkedSocio: string | null = null;
 let sessionState: 'ok'|'movido'|'desactivada'|null=null;
 let visitNames:Record<string,{nombre:string;numero:number}>={};
+let negocioPrueba:string|null=null;
 const listeners = new Set<() => void>();
 let channel: ReturnType<typeof supabase.channel> | null = null;
 const notify = () => { version++; listeners.forEach((fn) => fn()); };
@@ -138,6 +139,10 @@ export const dataService = {
   estadoSocia:()=>sessionState,
   nombreVisita:(id:string)=>visitNames[id]?.nombre ?? 'Sin carnet',
   rol: () => role,
+  negocioPrueba:()=>negocioPrueba,
+  async accederComoNegocio(id:string){const r=await supabase.rpc('acceder_como_negocio',{p_id:id});check(r.error);negocioPrueba=id;notify();},
+  async salirNegocioPrueba(){const r=await supabase.rpc('salir_negocio_prueba');check(r.error);negocioPrueba=null;await this.refresh();},
+  async borrarVisitasPrueba(id:string){const r=await supabase.rpc('borrar_visitas_prueba',{p_negocio:id});check(r.error);await this.refresh();},
   roles:()=>roles,
   autenticado:()=>!!userId,
   esSuper:()=>roles.some(r=>r.rol==='super_admin')||canManageTeam(role),
@@ -186,6 +191,7 @@ export const dataService = {
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {
     role=null;
+    negocioPrueba=null;
     await this.cargarAjustes();
     const { data } = await supabase.auth.getUser(); userId = data.user?.id ?? null;
     if (!userId) { db = emptyDB(); role = null;roles=[];selectedRole=null; linkedSocio = null; reads = []; sessionState=null;visitNames={};notify(); return; }
@@ -194,7 +200,7 @@ export const dataService = {
     selectedRole=selected?.id??null;role=selected?.rol??null;linkedSocio=selected?.socio_id??null;
     if(selected){const r=await supabase.rpc('elegir_vista',{p_role:selected.id});check(r.error);}
     sessionState=role==='socia'?'ok':null;
-    if(this.esSuper())await this.cargarAjustes();
+    if(this.esSuper()){const exit=await supabase.rpc('salir_negocio_prueba');check(exit.error);await this.cargarAjustes();}
     await this.refresh();
     if (!channel) {
       channel = supabase.channel(`club-${crypto.randomUUID()}`).on('postgres_changes', { event: '*', schema: 'public' }, () => { void this.refresh().catch(() => toast.error('No se pudieron actualizar los datos.')); }).subscribe();
@@ -220,7 +226,7 @@ export const dataService = {
     liga={pj:stats.data?.pj??0,g:stats.data?.g??0,e:stats.data?.e??0,p:stats.data?.p??0,puntos:stats.data?.puntos??0,goles_favor:stats.data?.goles_favor??0,goles_contra:stats.data?.goles_contra??0,racha:stats.data?.racha??[]};clasificacion=tabla.data;
     db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:v.titulo,descripcion:v.descripcion,condiciones:v.condiciones,activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
-      visitas: visitas.map(v => ({id:v.id,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
+      visitas: visitas.map(v => ({id:v.id,esPrueba:v.es_prueba,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
       partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
       avisos:avisos.map(a=>({id:a.id,titulo:a.titulo,texto:a.texto,fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
     if(role==='socia'){const status=await supabase.rpc('estado_sesion_socia');sessionState=status.data as typeof sessionState;}
@@ -235,18 +241,20 @@ export const dataService = {
   async cerrarSesion(){ if(channel){await supabase.removeChannel(channel);channel=null;} db=emptyDB();reads=[];roles=[];selectedRole=null;settings={...defaultSettings,email_club:''};role=null;userId=null;linkedSocio=null;sessionState=null;visitNames={};notify();const r=await supabase.auth.signOut();check(r.error); },
   async marcarApertura(_id:string){const r=await supabase.rpc('marcar_apertura');check(r.error);},
   async crearPatrocinador(p:Omit<Patrocinador,'id'|'activo'>,v:{titulo:string;descripcion:string;condiciones:string}):Promise<Patrocinador|'pin_usado'> {const r=await supabase.rpc('crear_negocio_email',{p_nombre:p.nombre,p_categoria:p.categoria,p_direccion:p.direccion,p_logo:p.logoUrl,p_email:p.emailAcceso??'',p_titulo:v.titulo,p_descripcion:v.descripcion,p_condiciones:v.condiciones,p_importe:p.importePatrocinio??0});check(r.error);await this.refresh();const pat=db.patrocinadores.find(x=>x.id===r.data);if(!pat)throw new Error('No se pudo leer el patrocinador.');await this.enviarPassword(p.emailAcceso??'');return pat;},
-  negocioSesion(){const id=roles.find(r=>r.id===selectedRole)?.patrocinador_id;return role==='negocio'?db.patrocinadores.find(p=>p.id===id)??null:null;},
+  negocioSesion(){const id=negocioPrueba??roles.find(r=>r.id===selectedRole)?.patrocinador_id;return role==='negocio'||negocioPrueba?db.patrocinadores.find(p=>p.id===id)??null:null;},
   abrirNegocio(_id:string){},
   cerrarNegocio(){return this.cerrarSesion();},
   async socioPorNumero(n:number){const r=await supabase.rpc('identificar_socio',{p_numero:n});check(r.error);if(!r.data)return null;const s=r.data as unknown as {id:string;nombre:string;numeroSocio:number;repite:boolean;yaHoy:boolean};return {...s,telefono:'',temporada:'2026/27',estado:'activa' as const,fechaAlta:'',consentimientoRGPD:{aceptado:false,fecha:null},mayorDeEdad:true,tokenInvitacion:'',fechaActivacion:null,dispositivoId:null,cambioDispositivo:false};},
-  async registrarVisita(input:{patrocinadorId:string;socio:Socio|null;origen:Visita['origen'];tipoCliente:Visita['tipoCliente']}):Promise<Visita|'duplicada'>{const r=await supabase.from('visitas').insert({patrocinador_id:input.patrocinadorId,socio_id:input.socio?.id ?? null,origen:input.origen==='sin_carne'?'sin_carnet':input.origen,tipo_cliente:input.tipoCliente}).select().single();if(r.error?.code==='23505')return 'duplicada';check(r.error);await this.refresh();const v=db.visitas.find(v=>v.id===r.data?.id);if(!v)throw new Error('No se pudo leer la visita.');return v;},
-  async anularVisita(id:string){const r=await supabase.from('visitas').update({anulada:true}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('Solo puedes anular visitas de los últimos 10 minutos.');await this.refresh();},
+  async registrarVisita(input:{patrocinadorId:string;socio:Socio|null;origen:Visita['origen'];tipoCliente:Visita['tipoCliente'];gasto?:string}):Promise<Visita|'duplicada'>{
+    if(negocioPrueba){const r=await supabase.rpc('guardar_visita_prueba',{p_negocio:input.patrocinadorId,...(input.socio?{p_socio:input.socio.id}:{}),p_origen:input.origen==='sin_carne'?'sin_carnet':input.origen,p_tipo:input.tipoCliente,...(input.gasto?{p_gasto:input.gasto}:{})});if(r.error?.code==='23505')return 'duplicada';check(r.error);await this.refresh();const v=db.visitas.find(v=>v.id===r.data);if(!v)throw new Error('No se pudo leer la visita.');return v;}
+    const r=await supabase.from('visitas').insert({patrocinador_id:input.patrocinadorId,socio_id:input.socio?.id ?? null,origen:input.origen==='sin_carne'?'sin_carnet':input.origen,tipo_cliente:input.tipoCliente,tramo_gasto:input.gasto||null}).select().single();if(r.error?.code==='23505')return 'duplicada';check(r.error);await this.refresh();const v=db.visitas.find(v=>v.id===r.data?.id);if(!v)throw new Error('No se pudo leer la visita.');return v;},
+  async anularVisita(id:string){if(negocioPrueba){const r=await supabase.rpc('anular_visita_prueba',{p_id:id});check(r.error);await this.refresh();return;}const r=await supabase.from('visitas').update({anulada:true}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('Solo puedes anular visitas de los últimos 10 minutos.');await this.refresh();},
   async crearAviso(a:{titulo:string;texto:string;tipo:Aviso['tipo'];para:NonNullable<Aviso['para']>}){const r=await supabase.from('avisos').insert({titulo:a.titulo,texto:a.texto,tipo:a.tipo,destinatarios:a.para});check(r.error);await this.refresh();},
   async borrarAviso(id:string){const r=await supabase.from('avisos').delete().eq('id',id);check(r.error);await this.refresh();},
   avisosLeidos:()=>reads,
   avisosPara(quien:'socias'|'negocios'){return db.avisos.filter(a=>!a.para||a.para==='todos'||a.para===quien);},
   async marcarAvisosLeidos(quien:'socias'|'negocios'){if(!userId)return;const rows=this.avisosPara(quien).filter(a=>!reads.includes(a.id)).map(a=>({aviso_id:a.id,user_id:userId ?? '',socio_id:linkedSocio}));if(!rows.length)return;const r=await supabase.from('avisos_leidos').insert(rows);if(r.error?.code!=='23505')check(r.error);await this.refresh();},
-  async statsPatrocinador(id:string,rango:Rango){const r=await supabase.rpc('stats_patrocinador',{p_patrocinador_id:id,p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubStats;},
+  async statsPatrocinador(id:string,rango:Rango,incluirPrueba=false){const r=await supabase.rpc(incluirPrueba?'stats_negocio_prueba':'stats_patrocinador',{p_patrocinador_id:id,p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubStats;},
   async statsClub(rango:Rango){const r=await supabase.rpc('stats_club',{p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubSummary;},
 };
 export function useClubData(){useSyncExternalStore(dataService.subscribe,dataService.snapshot,()=>0);return db;}

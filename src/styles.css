@@ -74,7 +74,7 @@
   --spacing-club-6: 24px;
   --spacing-club-8: 32px;
   --radius-control: 12px;
-  --radius-tile: 14px;
+  --radius-tile: 16px;
   --radius-panel: 20px;
   --radius-xl: 12px;
   --radius-2xl: 20px;
@@ -473,3 +473,39 @@ label > .club-input, label > .access-input { margin-top:8px; }
 .access-form > label + .access-input { margin-top:-4px; }
 .member-row { min-height:56px; height:auto; }
 @media(max-width:430px) { .club-form-panel form > .flex { flex-wrap:wrap; } .club-form-panel form > .flex > button { width:100%; } }
+
+/* Shared interactive states, independent of each screen. */
+:root { --control-primary-hover:#0A3A28; --control-row-hover:color-mix(in srgb,var(--primary-foreground) 70%,transparent); --control-secondary-hover:color-mix(in srgb,var(--primary) 6%,transparent); --control-filter-hover:color-mix(in srgb,var(--primary) 8%,transparent); --control-switch-off:color-mix(in srgb,var(--primary) 20%,transparent); }
+:where(button,a,input,select,textarea,[role="menuitem"],[role="switch"]) { transition-duration:150ms; }
+:where(button,a,input,select,textarea,[role="menuitem"],[role="switch"]):focus-visible { outline:2px solid var(--ring)!important; outline-offset:2px!important; box-shadow:none; }
+input.access-input:focus-visible,input.club-input:focus-visible,select.club-input:focus-visible,.club-interactive:focus-visible { outline-offset:2px!important; }
+.club-interactive:not(:disabled):active { transform:scale(.99); }
+.club-interactive[data-club-variant="default"]:not(:disabled):active,.club-interactive.bg-primary:not(:disabled):active { transform:scale(.98); }
+.club-interactive:not(:disabled):hover { background:var(--control-row-hover); color:inherit; }
+.club-interactive[data-club-variant="default"]:not(:disabled):hover,.club-interactive.bg-primary:not(:disabled):hover { background:var(--control-primary-hover); color:var(--primary-foreground); }
+.club-interactive[data-club-variant="outline"]:not(:disabled):hover,.club-interactive.btn-suave:not(:disabled):hover,.access-button-secondary:not(:disabled):hover { background:var(--control-secondary-hover); color:var(--primary); }
+.club-interactive[data-club-variant="link"]:hover { background:transparent; color:inherit; text-decoration:underline; }
+a:hover { text-decoration:underline; }
+.member-filter:hover,.gallery-filter:hover { background:var(--control-filter-hover); color:var(--primary); }
+.club-tabs > .bg-primary:hover,.member-filter[aria-pressed="true"]:hover,.gallery-filter-active:hover { background:var(--primary); color:var(--primary-foreground); }
+[role="menuitem"]:focus,[role="menuitem"]:hover,[role="menuitem"][data-highlighted] { background:var(--control-row-hover); color:var(--foreground); cursor:pointer; }
+.club-input:not(textarea),.access-input { height:44px; min-height:44px; }
+.club-button,.access-button { height:44px; min-height:44px; }
+.member-filter { height:44px; min-height:44px; }
+.member-status { margin-right:8px; }
+.member-row { height:56px; min-height:56px; }
+.member-control-row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; }
+.member-control-row > select,.member-control-row > button { height:44px; min-height:44px; margin:0; border-radius:12px; }
+.member-control-row > button { padding:0 12px; }
+.state-role-row { display:flex; min-height:56px; align-items:center; justify-content:space-between; gap:12px; }
+.club-switch[data-state="unchecked"] { background:var(--control-switch-off); }
+.business-test-banner { position:fixed; top:0; left:50%; transform:translateX(-50%); width:min(100%,430px); height:28px; z-index:55; display:flex; align-items:center; gap:4px; padding:0 16px; background:var(--gold); color:var(--primary); font-size:12px; font-weight:700; }
+.business-test-banner > span:first-child { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.business-test-banner > button { flex-shrink:0; height:28px; min-height:28px; padding:0 4px; font-size:12px; font-weight:700; }
+.business-test-view { padding-top:28px; }
+.business-test-view > .club-header { top:28px; }
+main > div:has(.business-test-view) > .club-header,main > div:has(.business-test-view) > .club-tabs,main > div:has(.business-test-view) > p { display:none; }
+@media(prefers-reduced-motion:reduce) { .club-interactive,[role="switch"] { transition:none; } }
+
+main .club-interactive:not(.gallery-tile):not(.gallery-album-card):not(.member-row):not(.access-role):not(.member-tab):not([data-club-variant="link"]):not(.business-test-banner > button) { min-height:44px; }
+.club-form-panel .club-interactive { min-height:44px; }

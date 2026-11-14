@@ -51,3 +51,6 @@ use the editor.
 
 - Member number proposals use the lowest positive unused number; PostgreSQL serializes allocations and rejects conflicts by owner name without resetting the sequence.
 - Match played state is derived by a PostgreSQL trigger from both scores; unconfirmed kickoff times never generate calendar events or live-match states.
+
+- Business test access keeps the administrator identity and stores session-scoped targets in usuario_vista; guarded RPCs force test visits and real statistics exclude them, so previewing cannot affect production metrics.
+- Shared Button and Switch states and control dimensions are defined centrally, so screen-level hover rules cannot change text contrast or alignment.

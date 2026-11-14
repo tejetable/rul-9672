@@ -401,6 +401,7 @@ export type Database = {
           fecha: string
           id: string
           motivo: string
+          patrocinador_id: string | null
         }
         Insert: {
           accion: string
@@ -409,6 +410,7 @@ export type Database = {
           fecha?: string
           id?: string
           motivo?: string
+          patrocinador_id?: string | null
         }
         Update: {
           accion?: string
@@ -417,8 +419,17 @@ export type Database = {
           fecha?: string
           id?: string
           motivo?: string
+          patrocinador_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "registro_permisos_patrocinador_id_fkey"
+            columns: ["patrocinador_id"]
+            isOneToOne: false
+            referencedRelation: "patrocinadores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       socios: {
         Row: {
@@ -604,21 +615,31 @@ export type Database = {
       }
       usuario_vista: {
         Row: {
+          patrocinador_prueba: string | null
           role_id: string
           session_id: string
           user_id: string
         }
         Insert: {
+          patrocinador_prueba?: string | null
           role_id: string
           session_id: string
           user_id: string
         }
         Update: {
+          patrocinador_prueba?: string | null
           role_id?: string
           session_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "usuario_vista_patrocinador_prueba_fkey"
+            columns: ["patrocinador_prueba"]
+            isOneToOne: false
+            referencedRelation: "patrocinadores"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "usuario_vista_role_id_fkey"
             columns: ["role_id"]
@@ -678,6 +699,7 @@ export type Database = {
       visitas: {
         Row: {
           anulada: boolean
+          es_prueba: boolean
           fecha: string | null
           fecha_hora: string
           id: string
@@ -692,6 +714,7 @@ export type Database = {
         }
         Insert: {
           anulada?: boolean
+          es_prueba?: boolean
           fecha?: string | null
           fecha_hora?: string
           id?: string
@@ -706,6 +729,7 @@ export type Database = {
         }
         Update: {
           anulada?: boolean
+          es_prueba?: boolean
           fecha?: string | null
           fecha_hora?: string
           id?: string
@@ -786,6 +810,7 @@ export type Database = {
       }
     }
     Functions: {
+      acceder_como_negocio: { Args: { p_id: string }; Returns: undefined }
       acceso_password_club: { Args: { p_email: string }; Returns: Json }
       alta_socio_con_pago: {
         Args: { p_datos: Json; p_pago: Json }
@@ -800,6 +825,7 @@ export type Database = {
         }
         Returns: string
       }
+      anular_visita_prueba: { Args: { p_id: string }; Returns: undefined }
       asignar_directiva_email: {
         Args: { p_email: string; p_nombre: string }
         Returns: string
@@ -808,6 +834,7 @@ export type Database = {
         Args: { p_email: string; p_id: string }
         Returns: undefined
       }
+      borrar_visitas_prueba: { Args: { p_negocio: string }; Returns: undefined }
       crear_negocio_email: {
         Args: {
           p_categoria: string
@@ -877,6 +904,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      guardar_visita_prueba: {
+        Args: {
+          p_gasto?: string
+          p_negocio: string
+          p_origen?: string
+          p_socio?: string
+          p_tipo?: string
+        }
+        Returns: string
+      }
       has_club_role: {
         Args: { r: Database["public"]["Enums"]["club_role"] }
         Returns: boolean
@@ -891,6 +928,7 @@ export type Database = {
       marcar_apertura: { Args: never; Returns: undefined }
       mi_patrocinador: { Args: never; Returns: string }
       mi_socio: { Args: never; Returns: string }
+      negocio_prueba_actual: { Args: never; Returns: string }
       personas_club: { Args: never; Returns: Json }
       quitar_directiva: {
         Args: { p_motivo: string; p_user: string }
@@ -908,6 +946,7 @@ export type Database = {
         Args: { p_id: string; p_motivo: string }
         Returns: undefined
       }
+      salir_negocio_prueba: { Args: never; Returns: undefined }
       solicitar_alta: {
         Args: {
           p_consentimiento: boolean
@@ -919,6 +958,18 @@ export type Database = {
         Returns: string
       }
       stats_club: { Args: { p_periodo: string }; Returns: Json }
+      stats_negocio_datos: {
+        Args: {
+          p_incluir_prueba: boolean
+          p_patrocinador_id: string
+          p_periodo: string
+        }
+        Returns: Json
+      }
+      stats_negocio_prueba: {
+        Args: { p_patrocinador_id: string; p_periodo: string }
+        Returns: Json
+      }
       stats_patrocinador: {
         Args: { p_patrocinador_id: string; p_periodo: string }
         Returns: Json

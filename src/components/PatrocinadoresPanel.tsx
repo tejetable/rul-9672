@@ -3,14 +3,16 @@ import { BajaForm } from "@/components/BajaForm";
 import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Download, Plus } from "lucide-react";
+import { Download, Plus, LogIn } from "lucide-react";
+import {GestionSheet} from './GestionPersonas';
+import {NegocioApp} from './NegocioApp';
 import { dataService, useClubData, runAction } from "@/lib/dataService";
 import { type Rango } from "@/lib/visitas";
 
 function exportarCSV() {
   const db = dataService.get();
   const head = ["fechaHora", "patrocinador", "numeroSocio", "nombre", "origen", "tipoCliente", "repiteViaClub", "verificada", "anulada"];
-  const rows = db.visitas.map((v) => [
+  const rows = db.visitas.filter(v=>!v.esPrueba).map((v) => [
     v.fechaHora,
     db.patrocinadores.find((p) => p.id === v.patrocinadorId)?.nombre ?? "",
     v.numeroSocio ?? "",
@@ -37,6 +39,10 @@ export function PatrocinadoresPanel() {
   const [rango, setRango] = useState<Rango>("mes");
   const [form, setForm] = useState(false);
   const db = useClubData();
+  const [selected,setSelected]=useState<string|null>(null);
+  const [preview,setPreview]=useState(false);
+  const pat=db.patrocinadores.find(p=>p.id===selected);
+  const enter=(id:string)=>runAction(async()=>{await dataService.accederComoNegocio(id);setSelected(id);setPreview(true);});
   const [baja, setBaja] = useState<string | null>(null);
   const [summary, setSummary] = useState<ClubSummary>({socios_activos:0,activos_semana:0,visitas:0,nuevas_verificadas:0,patrocinadores:{},bajas:{}});
   useEffect(() => { runAction(async () => setSummary(await dataService.statsClub(rango))); }, [db, rango]);
@@ -45,6 +51,7 @@ export function PatrocinadoresPanel() {
     ["Activos esta semana", summary.activos_semana],
     ["Visitas del mes", summary.visitas],
   ] as const;
+  if(preview)return <NegocioApp onExit={()=>runAction(async()=>{await dataService.salirNegocioPrueba();setPreview(false);})}/>;
   return (
     <section className="px-4 pb-28 pt-6">
       <p className="club-chip">Directiva</p>
@@ -80,7 +87,7 @@ export function PatrocinadoresPanel() {
           const prog = { nuevas:raw.objetivo_nuevas_90d,pct:Math.min(100,raw.objetivo_nuevas_90d*20) };
           return (
             <li key={p.id} className="rounded-panel bg-surface p-4">
-              <p className="font-black">{p.nombre}</p>
+              <div className="flex items-center justify-between gap-2"><Button variant="ghost" className="flex-1 justify-start whitespace-normal text-left font-black" onClick={()=>setSelected(p.id)}>{p.nombre}</Button>{dataService.esSuper()&&p.activo&&<Button variant="ghost" size="icon" title={`Acceder como ${p.nombre}`} aria-label={`Acceder como ${p.nombre}`} onClick={()=>enter(p.id)}><LogIn/></Button>}</div>
               <div className="mt-3 grid grid-cols-3 gap-2 text-left">
                 {[["Visitas", s.visitas], ["Nuevas verif.", s.nuevasVerificadas], ["Nuevas decl.", s.nuevasDeclaradas], ["Repiten", s.repiten], ["% nuevas", `${s.pctNuevas}%`], ["90 días", `${prog.nuevas}/5`]].map(([l, n]) => (
                   <div key={l} className="py-2">
@@ -97,6 +104,7 @@ export function PatrocinadoresPanel() {
           );
         })}
       </ul>
+      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><PasswordAccessStatus email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
       <Button variant="ghost" onClick={exportarCSV} className="mt-6 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
         <Download size={18} strokeWidth={1.75} /> Exportar CSV
       </Button>

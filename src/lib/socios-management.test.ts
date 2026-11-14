@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {primerNumeroLibre,conflictoNumero,alCorriente,listaSocios,paginaSocios,pagoSchema,PAGE_SIZE,SEARCH_DELAY,UNETE_MENSAJE} from './socios-management';
+import {rolPrincipal,primerNumeroLibre,conflictoNumero,alCorriente,listaSocios,paginaSocios,pagoSchema,PAGE_SIZE,SEARCH_DELAY,UNETE_MENSAJE} from './socios-management';
 import type {Socio} from './dataService';
 const socios=Array.from({length:60},(_,i)=>({id:String(i+1),nombre:`Persona demo ${i+1}`,numeroSocio:i+1,email:`demo${i+1}@example.test`,telefono:`600000${String(i+1).padStart(3,'0')}`,estado:i===59?'desactivada':'activa',fechaAlta:'2026-11-14'} as Socio));
 describe('Gestión de socios',()=>{
@@ -14,3 +14,5 @@ describe('Gestión de socios',()=>{
  it('membership contact uses the requested message',()=>expect(UNETE_MENSAJE).toBe('¡Hola! Quiero hacerme socio/a del R.U. Lucense.'));
 });
 describe("Numeración manual",()=>{it("con solo Diego nº 11 propone el 1",()=>expect(primerNumeroLibre([{numeroSocio:11}])).toBe(1));it("rellena el hueco mínimo sin reiniciar secuencia",()=>expect(primerNumeroLibre([{numeroSocio:1},{numeroSocio:3},{numeroSocio:11}])).toBe(2));it("impide usar el 11 de otra persona",()=>expect(conflictoNumero([{numeroSocio:11,nombre:"Tejetable",email:"diegoteje11@gmail.com"}],11,"otro@example.test")).toBe("El nº 11 ya es de Tejetable"));});
+
+describe('Rol principal',()=>{it('Super admin precede a Directiva y Negocio',()=>expect(rolPrincipal([{rol:'negocio',activo:true},{rol:'directiva',activo:true},{rol:'super_admin',activo:true}])).toBe('super_admin'));it('Directiva precede a Negocio',()=>expect(rolPrincipal([{rol:'negocio',activo:true},{rol:'directiva',activo:true}])).toBe('directiva'));it('ignora roles retirados',()=>expect(rolPrincipal([{rol:'super_admin',activo:false},{rol:'negocio',activo:true}])).toBe('negocio'));});

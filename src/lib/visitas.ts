@@ -12,6 +12,7 @@ export interface Visita {
   verificada: boolean;
   ventajaId?: string | undefined;
   anulada: boolean;
+  esPrueba?: boolean;
 }
 
 export const OBJETIVO_NUEVAS = 5;

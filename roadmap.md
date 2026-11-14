@@ -48,4 +48,8 @@
 - [x] Cargar ocho jornadas reales, automatizar jugado y verificar LIGA y último resultado.
 - [x] Compactar filtros en una fila desplazable.
 - [x] Unificar márgenes y revisar pantallas en 360, 390 y 430 px; Negocio revisado visualmente con cuenta directiva sin alterar permisos.
-- [ ] Verificar acceso real de Negocio (no existe ninguna cuenta con ese rol asignado).
+- [x] Verificar la vista real de Negocio mediante acceso protegido de Super admin, sin asignar cuentas ficticias.
+- [x] Acceder como negocio solo Super admin, auditoría y visitas de prueba separadas.
+- [x] Interruptores de estado y roles en ficha de socio y chip de mayor rol.
+- [x] Unificar estados interactivos y foco de teclado.
+- [x] Alinear controles a 44 px y revisar los tres roles en 360/390/430.

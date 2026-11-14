@@ -5,13 +5,14 @@ import { Check, LogOut, MessageCircle, QrCode } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { QrScanner } from "@/components/QrScanner";
 import { dataService, type Patrocinador, type Socio, type Visita, useClubData, runAction } from "@/lib/dataService";
 import { fraseMes } from "@/lib/visitas";
 import { adaptarStats, emptyStats, type ClubStats } from "@/lib/club-stats";
 import { waLink } from "@/lib/whatsapp";
 
-export function NegocioApp() {
+export function NegocioApp({onExit}:{onExit?:()=>void}={}) {
   useClubData();
   const [neg, setNeg] = useState<Patrocinador | null | undefined>(undefined);
   const [tab, setTab] = useState<"registrar" | "mes">("registrar");
@@ -20,15 +21,16 @@ export function NegocioApp() {
   if (!neg) return <p className="p-6">El club debe asociar tu email a un negocio.</p>;
 
   return (
-    <div className="flex flex-1 flex-col pb-16">
+    <div className={`flex flex-1 flex-col pb-16 ${onExit?'business-test-view':''}`}>
+      {onExit&&<div className="business-test-banner"><span>Accediendo como {neg.nombre}</span><span>·</span><Button variant="link" onClick={onExit}>Salir</Button></div>}
       <ClubCabecera titulo={neg.nombre} etiqueta="Negocio amigo">
-        <VerComo/><AvisosCampana quien="negocios" />
-        <Button variant="ghost" size="icon" onClick={() => { runAction(async () => { await dataService.cerrarNegocio(); setNeg(null); }); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>
+        {!onExit&&<VerComo/>}<AvisosCampana quien="negocios" />
+        {!onExit&&<Button variant="ghost" size="icon" onClick={() => { runAction(async () => { await dataService.cerrarNegocio(); setNeg(null); }); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>}
       </ClubCabecera>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
       <div className="club-tabs mx-4 mt-4 grid-cols-2">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"]] as const).map(([id, l]) => (
-          <Button variant="ghost" key={id} onClick={() => setTab(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
+          <Button variant="ghost" key={id} onClick={() => setTab(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold transition-colors duration-150 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
             {l}
           </Button>
         ))}
@@ -52,10 +54,11 @@ function Registrar({ neg }: { neg: Patrocinador }) {
   const [scan, setScan] = useState(false);
   const [hoy, setHoy] = useState<Visita[]>([]);
   const [reciente, setReciente] = useState<string | null>(null);
+  const [gasto,setGasto]=useState('');
 
   const refrescar = useCallback(() => {
-    const d = new Date().toDateString();
-    setHoy(dataService.get().visitas.filter((v) => v.patrocinadorId === neg.id && new Date(v.fechaHora).toDateString() === d).reverse());
+    const dia=(value:Date)=>value.toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});
+    setHoy(dataService.get().visitas.filter((v) => v.patrocinadorId === neg.id && !!v.esPrueba===!!dataService.negocioPrueba() && dia(new Date(v.fechaHora)) === dia(new Date())).reverse());
   }, [neg.id]);
   useEffect(refrescar, [refrescar, db]);
 
@@ -87,14 +90,14 @@ function Registrar({ neg }: { neg: Patrocinador }) {
     const s = sinCarnet ? null : socio;
     setGuardando(true);
     try {
-    const r = await dataService.registrarVisita({ patrocinadorId: neg.id, socio: s, origen: s ? origen : "sin_carne", tipoCliente: tipo });
+    const r = await dataService.registrarVisita({ patrocinadorId: neg.id, socio: s, origen: s ? origen : "sin_carne", tipoCliente: tipo,gasto });
     if (r === "duplicada") return setAviso("Esta visita ya está registrada hoy.");
     refrescar();
     setReciente(r.id);
     } finally { setGuardando(false); }
   };
 
-  const big = "flex h-auto min-h-14 w-full items-center justify-center gap-2 rounded-control text-item font-black uppercase transition-transform duration-200 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
+  const big = "flex h-auto min-h-11 w-full items-center justify-center gap-2 rounded-control text-item font-black uppercase transition-transform duration-150 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
 
   return (
     <section className="flex flex-1 flex-col px-4 pt-6">
@@ -110,7 +113,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
         <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
       </Button>
       <label htmlFor="num-socio" className="label-club mt-6 block">Nº de socio</label>
-      <input id="num-socio" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-14 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
+      <input id="num-socio" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-11 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
       {socio && !aviso && (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black text-accent">
           <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}
@@ -125,6 +128,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
         <Button variant="ghost" onClick={() => { limpiar(); setSinCarnet(true); setReciente(null); }} className="mt-3 h-auto min-h-11 self-start whitespace-normal px-0 text-left text-body-sm text-muted-foreground underline">Viene de parte del club pero no tiene carnet</Button>
       )}
 
+      <label className="mt-3 block text-body-sm">Gasto (opcional)<select className="club-input mt-2" value={gasto} onChange={e=>setGasto(e.target.value)}><option value="">Sin indicar</option><option value="lt20">Menos de 20 €</option><option value="20_50">20–50 €</option><option value="50_100">50–100 €</option><option value="gt100">Más de 100 €</option></select></label>
       <h2 className="label-club mt-8 text-muted-foreground">Últimas visitas de hoy</h2>
       {hoy.length === 0 ? (
         <p className="mt-2 text-body-sm text-muted-foreground">Todavía ninguna hoy.</p>
@@ -162,10 +166,11 @@ function Registrar({ neg }: { neg: Patrocinador }) {
 }
 
 function TuMes({ neg }: { neg: Patrocinador }) {
+  const [incluir,setIncluir]=useState(false);
   const [rango, setRango] = useState<"mes" | "90" | "temporada">("mes");
   const db = useClubData();
   const [stats, setStats] = useState<ClubStats>(emptyStats);
-  useEffect(() => { runAction(async () => setStats(await dataService.statsPatrocinador(neg.id, rango))); }, [neg.id, rango, db]);
+  useEffect(() => {if(incluir&&!dataService.negocioPrueba())return;let alive=true;runAction(async () => {const result=await dataService.statsPatrocinador(neg.id, rango,incluir);if(alive)setStats(result);});return()=>{alive=false;};}, [neg.id, rango, db,incluir]);
   const s = adaptarStats(stats);
   const prog = { nuevas: stats.objetivo_nuevas_90d, objetivo: 5, pct: Math.min(100, stats.objetivo_nuevas_90d * 20) };
   const sem = stats.serie;
@@ -176,7 +181,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
   return (
     <section className="px-4 pt-6">
       <h1 className="club-section-title mb-3">Tu mes con el club</h1>
-      <span className="label-club inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
+      {dataService.negocioPrueba()&&<label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label>}
       <div className="mt-4 club-tabs grid-cols-3">
         {([["mes", "Este mes"], ["90", "90 días"], ["temporada", "Temporada"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setRango(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold ${rango === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
@@ -236,7 +241,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       </div>
 
       <p className="mt-6 text-item font-bold">{frase}</p>
-      <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-14 items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
+      <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-11 items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
         <MessageCircle size={20} strokeWidth={1.75} /> Compartir por WhatsApp
       </a>
     </section>
