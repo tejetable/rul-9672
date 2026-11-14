@@ -174,7 +174,7 @@ export const dataService = {
   acceso:()=>acceso,
   passwordEntrada:()=>loginPassword,
   recordarPasswordEntrada:(value:string)=>{loginPassword=value;},
-  async cargarAcceso(){const r=await supabase.rpc('estado_acceso_personal');check(r.error);acceso=r.data as unknown as typeof acceso;notify();},
+  async cargarAcceso(){const r=await supabase.rpc('estado_acceso_personal');check(r.error);acceso=r.data as unknown as typeof acceso;if((r.data as {google?:boolean}|null)?.google)loginPassword='';notify();},
   async completarPassword(){const r=await supabase.rpc('completar_cambio_password');check(r.error);loginPassword='';await this.cargarAcceso();},
   async equipo(){const [r,h]=await Promise.all([supabase.from('usuario_roles').select('*').in('rol',['directiva','super_admin']).eq('activo',true),supabase.from('registro_permisos').select('*').order('fecha',{ascending:false})]);check(r.error);check(h.error);return {personas:(r.data??[]).map(x=>({id:x.id,email:x.email,nombre:x.nombre,role:x.rol,estado:x.user_id?'Activo':'Disponible',fecha_alta:x.creado_at})),invitaciones:[],historial:h.data??[]};},
   async invitarDirectiva(nombre:string,email:string,_socioId:string|null=null){const r=await supabase.rpc('asignar_directiva_email',{p_nombre:nombre,p_email:normalizarEmail(email)});check(r.error);await this.refresh();},

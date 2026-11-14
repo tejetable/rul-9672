@@ -29,12 +29,12 @@
 - [x] Añadir roles por email y formularios de Directiva, socias y negocios.
 - [x] Añadir solicitudes públicas pendientes de pago y confirmación en efectivo.
 - [x] Verificar acceso, permisos, solicitudes y cambio de rol en escritorio y móvil.
-- [ ] Verificar recepción de invitaciones y recuperación por email (requiere acceso al buzón del destinatario).
+- [ ] Verificar recuperación por email (requiere acceso al buzón del destinatario; invitaciones retiradas).
 - [x] Rediseñar bienvenida, email, código y selección de rol con escudo transparente; comprobar 360×740, 390×844 y 430×932.
 - [ ] Configurar WhatsApp real del club y comprobar chat final (falta número con prefijo de país).
 - [x] Sustituir OTP por Google y email/contraseña; alta pública con contraseña y recuperación.
 - [x] Conectar emails seguros a altas manuales; mostrar estado real y reenviar desde fichas.
-- [ ] Personalizar invitación y recuperación (requiere dominio de envío).
+- [ ] Personalizar recuperación (requiere dominio de envío; invitaciones retiradas).
 - [x] Verificar ficha de Super admin autenticado, permisos, formularios y diseño móvil; 47 pruebas pasan.
 - [ ] Verificar alta → confirmación → contraseña → reentrada y Google con misma cuenta (requiere buzón y autorización de Google).
 - [x] Separar Club en Partidos y Avisos y añadir edición y resultados.
@@ -63,3 +63,6 @@
 - [x] Validación común de emails, importes españoles y limpieza de títulos repetidos.
 - [x] Verificar alta pagada con contraseña → cambio obligatorio → entrada privada; reinicio y cambio personal, email de Manuel y rechazo de Directiva. Datos temporales retirados.
 - [ ] Verificar Google con un Gmail nuevo sin contraseña (requiere autorización interactiva de la cuenta Google).
+- [x] Aplicar acceso definitivo: método de sesión verificado, alta Auth opcional, acceso y eliminación de contraseña protegidos.
+- [x] Eliminar socios con nombre completo, conservar visitas y estadísticas, proteger otros roles y autoeliminación.
+- [x] Verificar alta Hotmail → cambio → entrada, bloqueo de eliminación de contraseña, eliminación Gmail, rechazo Directiva, otros roles y visitas anónimas con estadísticas intactas; 109 pruebas y móviles 360/390/430. Cuentas temporales retiradas; Google interactivo sigue pendiente.

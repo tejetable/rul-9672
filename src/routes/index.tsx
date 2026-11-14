@@ -93,7 +93,7 @@ function Directiva() {
   if(page&&dataService.esSuper())return <ClubAdmin page={page} onClose={()=>setPage(null)}/>;
   return (
     <div className="flex flex-1 flex-col">
-      <ClubCabecera etiqueta={dataService.rol()==='super_admin'?'Super admin':'Directiva'}><VerComo/><ClubAdminMenu onOpen={setPage}/></ClubCabecera>
+      <ClubCabecera><VerComo/><ClubAdminMenu onOpen={setPage}/></ClubCabecera>
       {!dataService.ajustes().whatsapp_club&&<p className="mx-4 mt-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
 
       <div className="club-tabs mx-4 mt-4 grid-cols-3">

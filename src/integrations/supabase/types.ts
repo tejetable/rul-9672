@@ -379,6 +379,7 @@ export type Database = {
           nombre: string
           patrocinador_id: string | null
           socio_id: string | null
+          tiene_password: boolean
         }
         Insert: {
           debe_cambiar_password?: boolean
@@ -390,6 +391,7 @@ export type Database = {
           nombre?: string
           patrocinador_id?: string | null
           socio_id?: string | null
+          tiene_password?: boolean
         }
         Update: {
           debe_cambiar_password?: boolean
@@ -401,6 +403,7 @@ export type Database = {
           nombre?: string
           patrocinador_id?: string | null
           socio_id?: string | null
+          tiene_password?: boolean
         }
         Relationships: [
           {
@@ -732,6 +735,7 @@ export type Database = {
           origen: string
           patrocinador_id: string
           repite_via_club: boolean
+          socio_eliminado: boolean
           socio_id: string | null
           tipo_cliente: string
           tramo_gasto: string | null
@@ -747,6 +751,7 @@ export type Database = {
           origen: string
           patrocinador_id: string
           repite_via_club?: boolean
+          socio_eliminado?: boolean
           socio_id?: string | null
           tipo_cliente: string
           tramo_gasto?: string | null
@@ -762,6 +767,7 @@ export type Database = {
           origen?: string
           patrocinador_id?: string
           repite_via_club?: boolean
+          socio_eliminado?: boolean
           socio_id?: string | null
           tipo_cliente?: string
           tramo_gasto?: string | null
@@ -838,6 +844,7 @@ export type Database = {
     Functions: {
       acceder_como_negocio: { Args: { p_id: string }; Returns: undefined }
       acceso_password_club: { Args: { p_email: string }; Returns: Json }
+      acceso_usuario_admin: { Args: { p_email: string }; Returns: Json }
       alta_socio_con_pago: {
         Args: { p_datos: Json; p_pago: Json }
         Returns: string
@@ -904,6 +911,10 @@ export type Database = {
         Returns: undefined
       }
       elegir_vista: { Args: { p_role: string }; Returns: undefined }
+      eliminar_socio_admin: {
+        Args: { p_actor: string; p_nombre: string; p_socio: string }
+        Returns: Json
+      }
       enlazar_roles_email: { Args: never; Returns: Json }
       enlazar_socio: {
         Args: { p_dispositivo: string; p_token: string }
@@ -958,6 +969,10 @@ export type Database = {
       mi_socio: { Args: never; Returns: string }
       negocio_prueba_actual: { Args: never; Returns: string }
       personas_club: { Args: never; Returns: Json }
+      preparar_eliminar_socio: {
+        Args: { p_nombre: string; p_socio: string }
+        Returns: Json
+      }
       preparar_password_usuario: { Args: { p_email: string }; Returns: string }
       quitar_directiva: {
         Args: { p_motivo: string; p_user: string }
@@ -985,6 +1000,7 @@ export type Database = {
         Returns: undefined
       }
       salir_negocio_prueba: { Args: never; Returns: undefined }
+      sesion_google: { Args: never; Returns: boolean }
       solicitar_alta: {
         Args: {
           p_consentimiento: boolean

@@ -60,7 +60,7 @@ export function PatrocinadoresPanel() {
   if(preview)return <NegocioApp onExit={()=>runAction(async()=>{await dataService.salirNegocioPrueba();setPreview(false);})}/>;
   return (
     <section className="px-4 pb-28 pt-4">
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
         {club.map(([l, n]) => (
           <div key={l} className="rounded-panel bg-surface p-4">
             <p className="text-heading font-black leading-none">{n}</p>
@@ -113,7 +113,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       { titulo: f.titulo.trim(), descripcion: f.descripcion.trim(), condiciones: f.condiciones.trim() },
     );
     if (r === "pin_usado") return setErr("No se pudo guardar.");
-    if(initial&&dataService.esSuper())await savePassword({data:{email:checked.data,password:initial,mode:'initial'}});
+    if(dataService.esSuper())await savePassword({data:{email:checked.data,password:initial,mode:'initial'}});
     onDone();
   };
   const inp = "mt-1 h-auto min-h-12 w-full rounded-control club-input border-input px-3";
@@ -129,7 +129,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       {f.logoUrl && <img src={f.logoUrl} alt="Logo del patrocinador" className="mt-2 h-14 w-auto object-contain" />}
       {campo("direccion", "Dirección")}
       {campo("emailAcceso", "Email de acceso del negocio", {type:"email",required:true})}
-      <InitialPassword value={initial} onChange={setInitial}/>{campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
+      <InitialPassword email={f.emailAcceso} value={initial} onChange={setInitial}/>{campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
       <p className="label-club mt-6 text-accent">Ventaja</p>
       {campo("titulo", "Título")}
       {campo("descripcion", "Descripción")}

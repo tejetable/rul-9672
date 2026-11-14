@@ -58,6 +58,8 @@ use the editor.
 - Member access metadata comes from the guarded gestion_socios RPC using Auth last_sign_in_at, independently of password readiness, so Google users count as having accessed.
 - Directiva creation actions use the shared DirectivaFab and modal forms, preserving a consistent safe-area-aware action without losing list position.
 - Repeated club lists use ListRow inside ListCard; secondary editing and full details live in sheets so rows keep a stable two-line grid without nested controls.
-- Mandatory password changes use protected profile state and guarded completion that verifies the Auth password hash changed; hashes never leave the database and plaintext is only transient form memory.
+- Mandatory changes are derived from protected password-change state and verified JWT AMR: Google OAuth clears the visible flag without consuming the pending password change; password sessions must change the Auth hash. Hashes never leave the database.
+- Account administration uses authenticated server functions and role-checked RPCs; member deletion atomically anonymizes visits before removal, then deletes Auth only if no other roles remain. Logical password availability lives in protected profiles, not Auth hash presence.
 - All email inputs share email-validation.ts normalization and Zod validation; password management never logs credential values.
 - Optional access sharing keeps the entered password only in the success form and builds a validated WhatsApp recipient link; closing the form discards it.
+- Optional personal password creation uses an authenticated self-only server function checking protected password availability before admin Auth mutation; existing passwords always require current-password verification.
