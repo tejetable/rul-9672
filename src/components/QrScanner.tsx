@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 
-/** Lector de QR con la cámara (BarcodeDetector del navegador). Devuelve el número de socio. */
+/** Lector de QR con la cámara (BarcodeDetector del navegador). Devuelve el número de soci@. */
 export function QrScanner({ onResult, onClose }: { onResult: (n: number) => void; onClose: () => void }) {
   const video = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -12,7 +12,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (n: number) => void
     let stop = false;
     const BD = (window as unknown as { BarcodeDetector?: new (o: object) => { detect: (v: HTMLVideoElement) => Promise<{ rawValue: string }[]> } }).BarcodeDetector;
     if (!BD) {
-      setError("Este móvil no puede escanear desde aquí. Escribe el número de socio.");
+      setError("Este móvil no puede escanear desde aquí. Escribe el número de soci@.");
       return;
     }
     const det = new BD({ formats: ["qr_code"] });
@@ -39,7 +39,7 @@ export function QrScanner({ onResult, onClose }: { onResult: (n: number) => void
         };
         tick();
       })
-      .catch(() => setError("No podemos abrir la cámara. Escribe el número de socio."));
+      .catch(() => setError("No podemos abrir la cámara. Escribe el número de soci@."));
     return () => {
       stop = true;
       cancelAnimationFrame(raf);

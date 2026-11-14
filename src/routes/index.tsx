@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "R.U. Lucense · Carnet de la afición" },
-      { name: "description", content: "Tu carnet de socia/o del Real Unión Lucense F.S. y lo que te da ser de los nuestros en Guntín." },
+      { name: "description", content: "Tu carnet de soci@ del Real Unión Lucense F.S. y lo que te da ser de los nuestros en Guntín." },
       { property: "og:title", content: "R.U. Lucense · Carnet de la afición" },
       { property: "og:description", content: "Más que un club, un grupo de amigos. Tu carnet y tus ventajas en el móvil." },
       { property: "og:type", content: "website" },
@@ -67,7 +67,7 @@ export function AppFrame({ children, crema = false }: { children: React.ReactNod
   );
 }
 
-function UneteFamilia(){const href=UNETE_DESTINO==='whatsapp'?dataService.whatsapp(UNETE_MENSAJE):null;return <div className="text-center text-body-sm">¿Aún no eres socio/a? <Button asChild variant="link" className="h-auto p-0 text-body-sm underline"><a href={href??undefined} aria-disabled={!href} onClick={e=>{if(!href){e.preventDefault();runAction(async()=>{throw new Error('El WhatsApp del club está pendiente de configurar.');});}}} target="_blank" rel="noreferrer">¡Únete a la familia!</a></Button></div>;}
+function UneteFamilia(){const href=UNETE_DESTINO==='whatsapp'?dataService.whatsapp(UNETE_MENSAJE):null;return <div className="text-center text-body-sm">¿Aún no eres soci@? <Button asChild variant="link" className="h-auto p-0 text-body-sm underline"><a href={href??undefined} aria-disabled={!href} onClick={e=>{if(!href){e.preventDefault();runAction(async()=>{throw new Error('El WhatsApp del club está pendiente de configurar.');});}}} target="_blank" rel="noreferrer">¡Únete a la familia!</a></Button></div>;}
 function Bienvenida({onEnter}:{onEnter:()=>void}) {
  return <AccesoVisual><GoogleAcceso/><Button variant="outline" onClick={onEnter} className="access-button access-button-secondary">ENTRAR CON EMAIL</Button><UneteFamilia/><p className="access-season">Temporada {dataService.ajustes().temporada_actual}</p></AccesoVisual>;
 }
@@ -97,8 +97,8 @@ function Directiva() {
       {!dataService.ajustes().whatsapp_club&&<p className="mx-4 mt-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
 
       <div className="club-tabs mx-4 mt-4 grid-cols-3">
-        {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["club", "Club"]] as const).map(([id, l]) => (
-          <Button variant="ghost" key={id} onClick={() => setT(id)} className={`h-auto min-h-11 rounded-control text-label font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
+        {([["socias", "Soci@s"], ["patro", "Patrocinadores"], ["club", "Club"]] as const).map(([id, l]) => (
+          <Button variant="ghost" aria-label={id === "socias" ? "Socios o socias" : l} key={id} onClick={() => setT(id)} className={`h-auto min-h-11 rounded-control text-label font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}
       </div>
       {t === "socias" ? <SociasPanel /> : t === "patro" ? <PatrocinadoresPanel /> : <ClubPanel />}

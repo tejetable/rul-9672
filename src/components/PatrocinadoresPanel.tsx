@@ -53,8 +53,8 @@ export function PatrocinadoresPanel() {
   const [summary, setSummary] = useState<ClubSummary>({socios_activos:0,activos_semana:0,visitas:0,nuevas_verificadas:0,patrocinadores:{},bajas:{}});
   useEffect(() => { runAction(async () => setSummary(await dataService.statsClub(rango))); }, [db, rango]);
   const club = [
-    ["Socias/os activos", summary.socios_activos],
-    ["Activos esta semana", summary.activos_semana],
+    ["Soci@s en activo", summary.socios_activos],
+    ["Con actividad esta semana", summary.activos_semana],
     ["Visitas del mes", summary.visitas],
   ] as const;
   if(preview)return <NegocioApp onExit={()=>runAction(async()=>{await dataService.salirNegocioPrueba();setPreview(false);})}/>;

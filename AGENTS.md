@@ -49,7 +49,7 @@ use the editor.
 - Member management metadata and club-person searches use role-checked RPCs; pure helpers own debounced filtering and 20-row pagination so list rules are independently testable.
 - Welcome, email entry and role selection share AccesoVisual and semantic access tokens; password forms share validation and visibility controls; recovery and invitation links use public dedicated routes and Auth session verification.
 
-- Member number proposals use the lowest positive unused number; PostgreSQL serializes allocations and rejects conflicts by owner name without resetting the sequence.
+- Member number proposals use the lowest positive unused number; PostgreSQL serializes allocations and edits, rejects conflicts by owner name and audits number changes without resetting the sequence. Relations stay id-bound; QR refreshes with the number.
 - Match played state is derived by a PostgreSQL trigger from both scores; unconfirmed kickoff times never generate calendar events or live-match states.
 
 - Business test access keeps the administrator identity and stores session-scoped targets in usuario_vista; guarded RPCs force test visits and real statistics exclude them, so previewing cannot affect production metrics.
@@ -63,4 +63,5 @@ use the editor.
 - All email inputs share email-validation.ts normalization and Zod validation; password management never logs credential values.
 - Optional access sharing keeps the entered password only in the success form and builds a validated WhatsApp recipient link; closing the form discards it.
 - Optional personal password creation uses an authenticated self-only server function checking protected password availability before admin Auth mutation; existing passwords always require current-password verification.
+- Member copy normalization is presentation-only; never transform identifiers or stored values.
 - Bottom sheets share an 85dvh scroll viewport, sticky heading and safe-area padding; root visualViewport handling keeps focused fields visible. Floating creation controls use portals with frame-relative horizontal insets to escape clipping.

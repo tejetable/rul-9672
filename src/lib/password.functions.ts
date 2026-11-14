@@ -28,7 +28,7 @@ export const deleteClubMember=createServerFn({method:'POST'}).middleware([requir
  const result=await supabaseAdmin.rpc('eliminar_socio_admin',{p_actor:context.userId,p_socio:data.id,p_nombre:data.name});
  if(result.error)throw new Error(result.error.message);
  const target=result.data as {usuario:string|null;borrar_auth:boolean};
- if(target.borrar_auth&&target.usuario){const removed=await supabaseAdmin.auth.admin.deleteUser(target.usuario);if(removed.error)throw new Error('El socio se eliminó, pero su acceso no pudo retirarse. Contacta con el club para completar la retirada.');}
+ if(target.borrar_auth&&target.usuario){const removed=await supabaseAdmin.auth.admin.deleteUser(target.usuario);if(removed.error)throw new Error('La ficha se eliminó, pero el acceso no pudo retirarse. Contacta con el club para completar la retirada.');}
  return {deleted:true};
 });
 export const createPersonalPassword=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator((v:unknown)=>z.object({password:passwordSchema}).parse(v)).handler(async({data,context})=>{

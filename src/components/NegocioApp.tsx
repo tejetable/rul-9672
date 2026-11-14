@@ -114,11 +114,11 @@ function Registrar({ neg }: { neg: Patrocinador }) {
       <Button variant="ghost" onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
         <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
       </Button>
-      <label htmlFor="num-socio" className="label-club mt-6 block">Nº de socio</label>
-      <input id="num-socio" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-11 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
+      <label htmlFor="num-socio" className="label-club mt-6 block">Nº de soci@</label>
+      <input id="num-socio" aria-label="Número de socio o socia" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-11 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
       {socio && !aviso && (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black text-accent">
-          <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Socia nº {socio.numeroSocio}
+          <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Soci@ nº {socio.numeroSocio}
           {repite && <span className="label-club rounded-full bg-accent px-3 py-1 text-accent-foreground">Repite por el club</span>}
         </p>
       )}
@@ -135,7 +135,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
       {hoy.length === 0 ? (
         <p className="mt-2 text-body-sm text-muted-foreground">Todavía ninguna hoy.</p>
       ) : (
-        <ListCard label="Últimas visitas de hoy" className="mt-2">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTA'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
+        <ListCard label="Últimas visitas de hoy" className="mt-2">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTE'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
       )}
 
       <div className="business-confirmation sticky bottom-0 -mx-4 mt-auto bg-background px-4 pb-5 pt-4">
@@ -143,10 +143,10 @@ function Registrar({ neg }: { neg: Patrocinador }) {
           <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
         ) : (
           <>
-            <p className="label-club mb-2 text-left text-accent">{listo ? "¿Ya era clienta tuya antes? Pulsa y queda registrada" : "Escanea el carnet o escribe el número"}</p>
+            <p className="label-club mb-2 text-left text-accent">{listo ? "¿Ya venía antes? Pulsa para registrar la visita" : "Escanea el carnet o escribe el número"}</p>
             <div className="grid grid-cols-2 gap-3">
-              <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Nueva</Button>
-              <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} btn-suave text-item`}>Ya era clienta</Button>
+              <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Primera visita</Button>
+              <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} btn-suave text-item`}>Ya venía</Button>
             </div>
           </>
         )}
@@ -166,7 +166,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
   const sem = stats.serie;
   const max = Math.max(1, ...sem.map((w) => w.total));
   const frase = fraseMes(s, rango);
-  const share = `${frase}\n\nVisitas por el club: ${s.visitas} · Clientas nuevas: ${s.nuevas} · Repiten: ${s.repiten}\n— Real Unión Lucense F.S.`;
+  const share = `${frase}\n\nVisitas por el club: ${s.visitas} · Personas nuevas: ${s.nuevas} · Repiten: ${s.repiten}\n— Real Unión Lucense F.S.`;
 
   return (
     <section className="px-4 pt-6">
@@ -178,7 +178,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       </div>
 
       <div className="mt-6 rounded-panel bg-primary p-4 text-primary-foreground">
-        <p className="label-club opacity-80">Clientas nuevas</p>
+        <p className="label-club opacity-80">Personas nuevas</p>
         <p className="text-heading font-black leading-none text-gold">{s.nuevas}</p>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
@@ -192,7 +192,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
 
       <div className="mt-6">
         <div className="flex justify-between text-body-sm font-bold">
-          <span>5 clientas nuevas en 90 días</span>
+          <span>5 personas nuevas en 90 días</span>
           <span>{prog.nuevas}/{prog.objetivo}</span>
         </div>
         <div className="mt-2 h-3 overflow-hidden rounded-full bg-suave">

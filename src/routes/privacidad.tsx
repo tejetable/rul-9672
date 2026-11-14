@@ -22,7 +22,7 @@ function Privacidad() {
         <Button variant="ghost" onClick={() => history.back()} className="label-club h-auto min-h-11">← Volver</Button>
         <h1 className="title-club mt-4 text-heading">Política de privacidad</h1>
                 <div className="mt-6 space-y-6">
-          <p><b>Qué guardamos:</b> tu nombre, tu teléfono y tu número de socia/o.</p>
+          <p><b>Qué guardamos:</b> tu nombre, tu teléfono y tu número de soci@.</p>
           <p><b>Para qué:</b> para darte el carnet y contar cuántas veces usas tus ventajas en los negocios que nos apoyan.</p>
           <p><b>Quién lo ve:</b> el club. Los negocios solo ven tu nombre al validar tu carnet.</p>
           <p><b>Lo que no hacemos:</b> no vendemos tus datos a nadie.</p>

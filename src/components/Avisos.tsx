@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Trash2, Bell } from "lucide-react";
 import { dataService, type Aviso, useClubData, runAction } from "@/lib/dataService";
 
-const PARA: Record<NonNullable<Aviso["para"]>, string> = { todos: "Todos", socias: "Socias/os", negocios: "Negocios" };
+const PARA: Record<NonNullable<Aviso["para"]>, string> = { todos: "Todos", socias: "Soci@s", negocios: "Negocios" };
 const TIPO: Record<Aviso["tipo"], string> = { club: "Club", ventaja: "Ventaja", otro: "Otro" };
 
 export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
@@ -56,7 +56,7 @@ export function AvisosPanel() {
       </div>
       <p className="label-club mt-4">Lo ven</p>
       <div className="mt-2 flex flex-wrap gap-2">
-        {(Object.keys(PARA) as NonNullable<Aviso["para"]>[]).map((k) => <Button variant="ghost" key={k} onClick={() => setPara(k)} className={chip(para === k)}>{PARA[k]}</Button>)}
+        {(Object.keys(PARA) as NonNullable<Aviso["para"]>[]).map((k) => <Button variant="ghost" key={k} aria-label={k === "socias" ? "Socios o socias" : PARA[k]} onClick={() => setPara(k)} className={chip(para === k)}>{PARA[k]}</Button>)}
       </div>
       <Button variant="ghost" onClick={() => runAction(publicar)} disabled={!titulo.trim() || !texto.trim()} className="mt-6 h-auto min-h-14 w-full rounded-panel bg-primary font-black uppercase text-primary-foreground disabled:opacity-40">
         Publicar aviso

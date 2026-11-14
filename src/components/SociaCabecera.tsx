@@ -10,7 +10,7 @@ import { dataService, runAction } from "@/lib/dataService";
 
 export function SociaCabecera() {
   const member=dataService.sesion()?.socio;
-  const contact=dataService.whatsapp(`¡Hola! Soy ${member?.nombre??""}, socia/o nº ${member?.numeroSocio??""}.`);
+  const contact=dataService.whatsapp(`¡Hola! Soy ${member?.nombre??""}, soci@ nº ${member?.numeroSocio??""}.`);
   return <header className="sticky top-0 z-30 flex h-14 w-full shrink-0 items-center gap-2 border-b border-border bg-background px-4">
     <img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-7 shrink-0 object-contain" />
     <span className="min-w-0 flex-1 truncate text-sm font-black">R.U. LUCENSE</span>

@@ -916,6 +916,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      editar_socio_ficha: {
+        Args: {
+          p_email: string
+          p_id: string
+          p_nombre: string
+          p_numero: number
+          p_telefono: string
+        }
+        Returns: undefined
+      }
       elegir_vista: { Args: { p_role: string }; Returns: undefined }
       eliminar_socio_admin: {
         Args: { p_actor: string; p_nombre: string; p_socio: string }

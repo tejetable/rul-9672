@@ -1,3 +1,4 @@
+import {textoMiembros} from './member-language';
 import {normalizarEmail} from './email-validation';
 import { useSyncExternalStore } from "react";
 import { z } from "zod";
@@ -120,7 +121,7 @@ let loginPassword='';
 const listeners = new Set<() => void>();
 let channel: ReturnType<typeof supabase.channel> | null = null;
 const notify = () => { version++; listeners.forEach((fn) => fn()); };
-const check = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
+const check = (error: { message: string } | null) => { if (error) throw new Error(textoMiembros(error.message)); };
 const socioFrom = (s: Record<string, unknown>): Socio => ({
   email:String(s['email']??''),id: String(s['id']), nombre: String(s['nombre']), telefono: String(s['telefono'] ?? ''), numeroSocio: Number(s['numero_socio']),
   temporada: String(s['temporada'] ?? '2026/27'), fechaAlta: String(s['fecha_alta'] ?? ''),
@@ -184,7 +185,7 @@ export const dataService = {
   async personasClub(){const r=await supabase.rpc('personas_club');check(r.error);return (r.data??[]) as unknown as Persona[];},
   async gestionarRol(email:string,rol:'directiva'|'negocio',activo:boolean,patrocinador:string|null=null,motivo=''){const r=await supabase.rpc('gestionar_rol_persona',{p_email:normalizarEmail(email),p_rol:rol,p_activo:activo,...(patrocinador?{p_patrocinador:patrocinador}:{}),p_motivo:motivo});check(r.error);await this.refresh();},
   async registrarPago(id:string,pago:PagoInput){const r=await supabase.rpc('registrar_pago_socio',{p_socio:id,p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();},
-  async editarSocio(id:string,input:{nombre:string;email:string;telefono:string}){const r=await supabase.rpc('editar_socio_datos',{p_id:id,p_nombre:input.nombre,p_email:normalizarEmail(input.email),p_telefono:input.telefono.replace(/\D/g,'')});check(r.error);await this.refresh();},
+  async editarSocio(id:string,input:{nombre:string;email:string;telefono:string;numeroSocio:number}){const r=await supabase.rpc('editar_socio_ficha',{p_id:id,p_nombre:input.nombre,p_email:normalizarEmail(input.email),p_telefono:input.telefono.replace(/\D/g,''),p_numero:input.numeroSocio});check(r.error);await this.refresh();},
   async reactivar(id:string){const r=await supabase.from('socios').update({estado:'activa',fecha_baja:null,motivo_baja:null}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('No autorizado');await this.refresh();},
   async emailNegocio(id:string,email:string){const r=await supabase.rpc('asignar_negocio_email',{p_id:id,p_email:normalizarEmail(email)});check(r.error);await this.refresh();},
   async elegirRol(id:string){const chosen=roles.find(r=>r.id===id);if(!chosen)throw new Error('Rol no autorizado');const r=await supabase.rpc('elegir_vista',{p_role:id});check(r.error);selectedRole=id;role=chosen.rol;linkedSocio=chosen.socio_id;sessionState=role==='socia'?'ok':null;window.localStorage.setItem('rul-last-email-role',id);await this.refresh();},
@@ -234,15 +235,16 @@ export const dataService = {
     check(stats.error);check(tabla.error);
     liga={pj:stats.data?.pj??0,g:stats.data?.g??0,e:stats.data?.e??0,p:stats.data?.p??0,puntos:stats.data?.puntos??0,goles_favor:stats.data?.goles_favor??0,goles_contra:stats.data?.goles_contra??0,racha:stats.data?.racha??[]};clasificacion=tabla.data;
     db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
-      ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:v.titulo,descripcion:v.descripcion,condiciones:v.condiciones,activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
+      ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:textoMiembros(v.titulo),descripcion:textoMiembros(v.descripcion),condiciones:textoMiembros(v.condiciones),activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,esPrueba:v.es_prueba,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
       partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
-      avisos:avisos.map(a=>({id:a.id,titulo:a.titulo,texto:a.texto,fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
+      avisos:avisos.map(a=>({id:a.id,titulo:textoMiembros(a.titulo),texto:textoMiembros(a.texto),fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
     if(role==='socia'){const status=await supabase.rpc('estado_sesion_socia');sessionState=status.data as typeof sessionState;}
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}
+    roles=roles.map(r=>({...r,numero_socio:db.socios.find(s=>s.id===r.socio_id)?.numeroSocio??r.numero_socio}));
     reads = leidos.map(l=>l.aviso_id); notify();
   },
-  async crearSocio(nombre:string,telefono:string,email:string,pago:PagoInput,numeroSocio?:number){const r=await supabase.rpc('alta_socio_con_pago',{p_datos:{nombre,email:normalizarEmail(email),...(numeroSocio===undefined?{}:{numero_socio:numeroSocio}),telefono:telefono.replace(/\D/g,'')},p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la socia/o');return s;},
+  async crearSocio(nombre:string,telefono:string,email:string,pago:PagoInput,numeroSocio?:number){const r=await supabase.rpc('alta_socio_con_pago',{p_datos:{nombre,email:normalizarEmail(email),...(numeroSocio===undefined?{}:{numero_socio:numeroSocio}),telefono:telefono.replace(/\D/g,'')},p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la ficha');return s;},
   async desactivar(id: string, fecha: string, motivo: string) { const r=await supabase.from('socios').update({estado:'desactivada',fecha_baja:fecha,motivo_baja:motivo}).eq('id',id);check(r.error);await this.refresh(); },
   async bajaPatrocinador(id:string,fecha:string,motivo:string,detalle:string) { const r=await supabase.from('patrocinadores').update({activo:false,fecha_baja:fecha,motivo_baja:motivo,detalle_baja:detalle}).eq('id',id);check(r.error);await this.refresh(); },
   dispositivoId() { let d=window.localStorage.getItem('rul-device-id'); if(!d){d=crypto.randomUUID();window.localStorage.setItem('rul-device-id',d);} return d; },

@@ -37,7 +37,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
         {tab === "equipo" && <Equipo db={db} />}
         {tab === "ventajas" && <Ventajas db={db} />}
       </div>
-      <nav aria-label="Secciones de socio" className="member-navigation fixed inset-x-0 mx-auto w-full max-w-[430px] bottom-0 z-20 grid grid-cols-3 border-t border-border bg-background pt-1">
+      <nav aria-label="Secciones de socio o socia" className="member-navigation fixed inset-x-0 mx-auto w-full max-w-[430px] bottom-0 z-20 grid grid-cols-3 border-t border-border bg-background pt-1">
         <Button variant="ghost" onClick={() => setTab("equipo")} aria-current={tab === "equipo" ? "page" : undefined} className={tabCls(tab === "equipo")}>
           {indicador(tab === "equipo")}
           <span className="relative">
@@ -124,7 +124,7 @@ function Ventajas({ db }: { db: DB }) {
                     <tr className="label-club text-muted-foreground">
                       <th className="py-2 text-left">Servicio</th>
                       <th className="py-2 text-right">Normal</th>
-                      <th className="py-2 text-right">Socia/o</th>
+                      <th className="py-2 text-right" aria-label="Socio o socia">Soci@</th>
                     </tr>
                   </thead>
                   <tbody>

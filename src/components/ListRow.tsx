@@ -24,7 +24,7 @@ export function ListRow({ leading, name, subtitle, chip, date, dateTime, status,
       <span className="list-row-name-line"><strong className="list-row-name" title={name}>{name}</strong>{chip && <span className="list-row-chip">{chip}</span>}</span>
       <span className="list-row-subtitle" title={subtitle}>{subtitle || '\u00a0'}</span>
     </span>
-    <span className="list-row-meta">{date && <time dateTime={dateTime}>{date}</time>}{status && <span role="img" aria-label={statusLabel || (status === 'active' ? 'Activa' : status === 'pending' ? 'Sin acceder' : 'Baja')} className={`list-row-status list-row-status-${status}`} />}</span>
+    <span className="list-row-meta">{date && <time dateTime={dateTime}>{date}</time>}{status && <span role="img" aria-label={statusLabel || (status === 'active' ? 'En activo' : status === 'pending' ? 'Sin acceder' : 'Baja')} className={`list-row-status list-row-status-${status}`} />}</span>
   </>;
   return <li className="club-list-item">{onClick ? <Button variant="ghost" className="club-list-row" onClick={onClick}>{content}</Button> : <div className="club-list-row">{content}</div>}</li>;
 }

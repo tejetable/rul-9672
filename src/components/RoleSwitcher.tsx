@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export type Role = "socia" | "negocio" | "directiva";
 
 const ROLES: { id: Role; label: string }[] = [
-  { id: "socia", label: "Socia" },
+  { id: "socia", label: "Soci@" },
   { id: "negocio", label: "Negocio" },
   { id: "directiva", label: "Directiva" },
 ];
@@ -20,6 +20,7 @@ export function RoleSwitcher({ role, onChange }: { role: Role; onChange: (r: Rol
           {ROLES.map((r) => (
             <Button variant="ghost"
               key={r.id}
+              aria-label={r.id === "socia" ? "Socio o socia" : r.label}
               onClick={() => {
                 onChange(r.id);
                 setOpen(false);

@@ -12,16 +12,16 @@ export function Carne({ nombre, numero, temporada = "2026/27" }: { nombre: strin
     <div className="mx-auto w-full max-w-[390px]">
       <div className="flex flex-col items-start">
         <div className="qr-blanco self-center w-full max-w-[280px] rounded-tile p-4">
-          <QRCodeSVG value={`RUL:${numero}`} size={240} marginSize={2} bgColor="#FFFFFF" fgColor="#0D4631" className="aspect-square h-auto w-full" aria-label={`Identificación de socio ${numero}`} />
+          <QRCodeSVG value={`RUL:${numero}`} size={240} marginSize={2} bgColor="#FFFFFF" fgColor="#0D4631" className="aspect-square h-auto w-full" aria-label={`Identificación de socio o socia ${numero}`} />
         </div>
         <p className="mt-3 text-body-sm font-bold text-primary">Enséñaselo en el mostrador</p>
         <p className="card-member-name mt-3 text-left uppercase">{nombre}</p>
         <p className="mt-1 text-section font-black text-gold">Nº {String(numero).padStart(4, "0")}</p>
-        <p className="card-kicker mt-1 text-muted-foreground">Temporada {temporada}</p>
+        <p aria-label={`Socio o socia de la temporada ${temporada}`} className="card-kicker mt-1 text-muted-foreground">Soci@ de la temporada {temporada}</p>
       </div>
       <div className="mx-auto mt-6 w-full max-w-[240px]">
         <article className="digital-card relative isolate overflow-hidden rounded-tile text-primary" aria-label={reverso ? "Reverso del carnet: ventajas" : `Carnet de ${nombre}, nº ${String(numero).padStart(4, "0")}`}>
-          <img key={reverso ? "reverso" : "frente"} src={reverso ? dorso.url : frente.url} alt={reverso ? "Ventajas del socio. Primer año, primera historia. Patrocinadores del Real Unión Lucense F.S." : "Carnet de socio. Real Unión Lucense F.S. Temporada 2026/27. Ayúdanos a que esta historia siga. Primera temporada."} className="h-full w-full object-contain" />
+          <img key={reverso ? "reverso" : "frente"} src={reverso ? dorso.url : frente.url} alt={reverso ? "Ventajas del socio o socia. Primer año, primera historia. Patrocinadores del Real Unión Lucense F.S." : "Carnet de socio o socia. Real Unión Lucense F.S. Temporada 2026/27. Ayúdanos a que esta historia siga. Primera temporada."} className="h-full w-full object-contain" />
           {!reverso && <span className="physical-card-number">{String(numero).padStart(4, "0")}</span>}
           {reverso && <a href={folleto.url} target="_blank" rel="noreferrer" className="physical-card-benefits-qr rounded-md focus-visible:outline-2 focus-visible:outline-ring" aria-label="Abrir el folleto de ventajas"><QRCodeSVG value={folleto.url} size={160} className="card-qr-code h-full w-full" /></a>}
         </article>

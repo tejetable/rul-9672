@@ -5,5 +5,5 @@ export function waLink(texto: string, telefono = "") {
 }
 
 export function textoInvitacion(nombre: string, enlace: string) {
-  return `¡Ya eres de los nuestros, ${nombre}! Activa tu carnet de socia del R.U. Lucense aquí: ${enlace}. Te esperamos en Guntín.`;
+  return `¡Ya eres de los nuestros, ${nombre}! Activa tu carnet de soci@ del R.U. Lucense aquí: ${enlace}. Te esperamos en Guntín.`;
 }

@@ -1,3 +1,5 @@
+- [x] Unificar lenguaje visible y accesible de miembros en los tres roles, WhatsApp y mensajes; conservar artwork físico y PDF originales.
+- [x] Editar número único con auditoría, preservar relaciones por id y QR actualizado; verificar ficha real 11 → 12 → 11, conflicto en Cloud y bloqueo anónimo. Prueba temporal retirada.
 - [x] Rediseñar el carné digital siguiendo el carné físico y darle protagonismo en la pantalla de socios.
 - [x] Verificar activación, carné, ventajas y salida en móvil y escritorio.
 - [x] Reproducir ambas caras del carné físico con los originales y quitar «Mis ventajas».
