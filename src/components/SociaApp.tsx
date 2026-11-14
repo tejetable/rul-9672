@@ -33,11 +33,11 @@ export function SociaApp({ socio }: { socio: Socio }) {
   return (
     <div className="flex flex-1 flex-col">
       <SociaCabecera />
-      <div className="flex-1 pb-12">
+      <div className="flex-1 pb-24">
         {tab === "equipo" && <Equipo db={db} />}
         {tab === "ventajas" && <Ventajas db={db} />}
       </div>
-      <nav aria-label="Secciones de socio" className="member-navigation sticky bottom-0 z-20 grid grid-cols-3 border-t border-[rgba(13,70,49,.12)] bg-background pt-1">
+      <nav aria-label="Secciones de socio" className="member-navigation fixed inset-x-0 mx-auto w-full max-w-[430px] bottom-0 z-20 grid grid-cols-3 border-t border-border bg-background pt-1">
         <Button variant="ghost" onClick={() => setTab("equipo")} aria-current={tab === "equipo" ? "page" : undefined} className={tabCls(tab === "equipo")}>
           {indicador(tab === "equipo")}
           <span className="relative">
@@ -66,7 +66,7 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
   return (
     <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}><Dialog.Portal>
     <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60" />
-    <Dialog.Content aria-describedby={undefined} className="animate-sheet fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-8"
+    <Dialog.Content aria-describedby={undefined} className="animate-sheet fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8"
       style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
       onTouchStart={(e) => setY0((e.touches[0]?.clientY ?? 0))}
       onTouchMove={(e) => y0 !== null && setDy(Math.max(0, (e.touches[0]?.clientY ?? 0) - y0))}
@@ -89,7 +89,7 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
 
 function Equipo({ db }: { db: DB }) {
   return (
-    <section className="px-5 pt-5">
+    <section className="px-4 pt-6">
       <Liga />
       <div id="fotos-equipo" className="scroll-mt-20">
         <Galeria />
@@ -106,15 +106,15 @@ function Ventajas({ db }: { db: DB }) {
   if (p) {
     const vs = db.ventajas.filter((v) => v.patrocinadorId === p.id && v.activa);
     return (
-      <section className="px-5 pt-4">
+      <section className="px-4 pt-4">
         <Button variant="ghost" onClick={() => setSel(null)} className="label-club flex h-auto min-h-11 items-center gap-1">
           <ChevronLeft size={18} strokeWidth={1.75} /> Ventajas
         </Button>
         <p className="club-chip mt-2">{p.categoria}</p>
-        <h1 className="title-club mt-2 text-heading">{p.nombre}</h1>
-                <div className="mt-5 space-y-4">
+        <h1 className="club-section-title mt-3">{p.nombre}</h1>
+                <div className="mt-6 space-y-3">
           {vs.map((v) => (
-            <div key={v.id} className="rounded-panel bg-surface p-5">
+            <div key={v.id} className="rounded-panel bg-surface p-4">
               <p className="title-club text-heading text-accent">{v.destacado}</p>
               <p className="mt-2 text-item font-bold">{v.titulo}</p>
               <p className="mt-1">{v.descripcion}</p>
@@ -148,9 +148,9 @@ function Ventajas({ db }: { db: DB }) {
   }
 
   return (
-    <section className="px-5 pt-6">
+    <section className="px-4 pt-6">
       <p className="club-chip">Ventajas 2026/27</p>
-      <h1 className="club-title mt-3">Ventajas</h1>
+      <h1 className="club-section-title mt-3">Ventajas</h1>
             <p className="mt-4 text-muted-foreground">Negocios de nuestra tierra que empujan con nosotros.</p>
       <ul className="mt-6 space-y-3">
         {pats.map((pt) => {
@@ -175,7 +175,7 @@ function Ventajas({ db }: { db: DB }) {
       <a href={folleto.url} target="_blank" rel="noreferrer" className="mt-6 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel btn-suave font-bold">
         <FileText size={18} strokeWidth={1.75} /> Ver el folleto completo (PDF)
       </a>
-      <p className="mt-4 text-center text-body-sm text-muted-foreground">Enseña tu carnet en el mostrador. Así el negocio sabe que vienes por el club.</p>
+      <p className="mt-4 text-left text-body-sm text-muted-foreground">Enseña tu carnet en el mostrador. Así el negocio sabe que vienes por el club.</p>
     </section>
   );
 }

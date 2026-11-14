@@ -18,10 +18,10 @@ export const Route = createFileRoute("/privacidad")({
 function Privacidad() {
   return (
     <div className="min-h-screen bg-primary sm:py-6">
-      <main className="mx-auto min-h-screen w-full max-w-[430px] bg-background px-6 py-10 sm:min-h-[calc(100vh-3rem)] sm:rounded-[2rem]">
+      <main className="mx-auto min-h-screen w-full max-w-[430px] bg-background px-4 py-8 sm:min-h-[calc(100vh-3rem)] sm:rounded-[2rem]">
         <Button variant="ghost" onClick={() => history.back()} className="label-club h-auto min-h-11">← Volver</Button>
         <h1 className="title-club mt-4 text-heading">Política de privacidad</h1>
-                <div className="mt-6 space-y-4">
+                <div className="mt-6 space-y-6">
           <p><b>Qué guardamos:</b> tu nombre, tu teléfono y tu número de socia/o.</p>
           <p><b>Para qué:</b> para darte el carnet y contar cuántas veces usas tus ventajas en los negocios que nos apoyan.</p>
           <p><b>Quién lo ve:</b> el club. Los negocios solo ven tu nombre al validar tu carnet.</p>

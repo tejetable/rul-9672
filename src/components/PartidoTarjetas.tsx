@@ -24,7 +24,7 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
   }, []);
   const inicio = inicioPartido(partido);
   const cuenta = inicio && ahora ? cuentaPartido(inicio, ahora) : null;
-  const hora = inicio?.toLocaleTimeString("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }) || "[pendiente]";
+  const hora = partido.horaConfirmada === false ? "Hora por confirmar" : inicio?.toLocaleTimeString("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }) || "[pendiente]";
   const dia = inicio?.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", weekday: "short", day: "2-digit", month: "short" }).replace(/[.,]/g, "").toUpperCase() || "[pendiente]";
   const descargar = () => {
     const ics = calendarioPartido(partido);
@@ -38,26 +38,26 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
   return <article className="fixture-card" aria-label="Próximo partido">
     <LugoSilueta />
     <div className="relative z-10">
-      <div className="flex items-center justify-between gap-2">
+      <div className="fixture-heading">
         <h1 className="fixture-chip">PRÓXIMO PARTIDO</h1>
         <div className="flex flex-wrap justify-end gap-1">{partido.jornada && <span className="fixture-chip">JORNADA {partido.jornada}</span>}<span className="fixture-chip">{partido.esLocal ? "EN CASA" : "FUERA"}</span></div>
       </div>
       <p className="fixture-subtitle">Concello de Guntín - R.U. Lucense · {partido.competicion}</p>
       <div className="fixture-matchup">
         {partido.esLocal ? <EquipoPartido /> : <EquipoPartido rival={partido.rival} />}
-        <div className="text-center"><p className="fixture-time">{hora}</p><p className="fixture-date">{dia}</p></div>
+        <div className="text-center"><p className={partido.horaConfirmada === false ? "fixture-unconfirmed" : "fixture-time"}>{hora}</p><p className="fixture-date">{dia}</p></div>
         {partido.esLocal ? <EquipoPartido rival={partido.rival} /> : <EquipoPartido />}
       </div>
       <span className="fixture-gold" />
       <div className="fixture-countdown" aria-live="polite">
-        {cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : cuenta?.estado === "en_juego" ? <span className="fixture-chip"><span className="fixture-live-dot" />EN JUEGO</span> : cuenta?.estado === "hoy" ? <p className="font-black text-xl">HOY · {hora}</p> : <div className="grid w-full grid-cols-3 gap-2">
+        {partido.horaConfirmada === false ? <p className="font-bold">Hora por confirmar</p> : cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : cuenta?.estado === "en_juego" ? <span className="fixture-chip"><span className="fixture-live-dot" />EN JUEGO</span> : cuenta?.estado === "hoy" ? <p className="font-black text-xl">HOY · {hora}</p> : <div className="grid w-full grid-cols-3 gap-2">
           {[[cuenta?.dias, "DÍAS"], [cuenta?.horas, "HORAS"], [cuenta?.minutos, "MIN"]].map(([numero, label]) => <div key={label} className="fixture-counter"><p>{numero ?? "—"}</p><span>{label}</span></div>)}
         </div>}
       </div>
       <p className="fixture-location"><MapPin size={16} strokeWidth={1.75} />{partido.lugar}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <Button asChild variant="ghost" className="fixture-directions"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partido.lugar)}`} target="_blank" rel="noopener noreferrer"><Navigation strokeWidth={1.75} />Cómo llegar</a></Button>
-        <Button variant="ghost" className="fixture-calendar" disabled={!inicio} onClick={descargar}><CalendarPlus strokeWidth={1.75} />Al calendario</Button>
+        <Button variant="ghost" className="fixture-calendar" disabled={!inicio || partido.horaConfirmada === false} onClick={descargar}><CalendarPlus strokeWidth={1.75} />Al calendario</Button>
       </div>
     </div>
   </article>;
@@ -69,15 +69,16 @@ function EquipoPartido({rival}:{rival?:string}) {
 export function UltimoResultado({partido}:{partido:Partido}) {
   const {data}=useDriveGallery();const album=data?.albumes.find(a=>a.partidoId===partido.id);
   const resultado=resultadoPartido(partido);
-  const fecha=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'short'});
+  const fecha=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'');
   return <article className="result-card" aria-label="Último partido">
-    <div className="flex items-center justify-between gap-2"><h2 className="result-kicker">ÚLTIMO PARTIDO · {fecha}</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
+    <div className="flex items-center justify-between gap-2"><h2 className="result-kicker">ÚLTIMO PARTIDO</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
     <div className="result-matchup">
       <div className="result-team">{partido.esLocal&&<img src={escudo.url} alt="R.U. Lucense" className="size-9 object-contain"/>}<p>{partido.esLocal?'R.U. Lucense':partido.rival}</p></div>
       <p className="result-score">{partido.golesLocal} <span className="result-separator">–</span> {partido.golesVisitante}</p>
       <div className="result-team">{!partido.esLocal&&<img src={escudo.url} alt="R.U. Lucense" className="size-9 object-contain"/>}<p>{partido.esLocal?partido.rival:'R.U. Lucense'}</p></div>
     </div>
-    {album&&<Button asChild variant="link" className="h-9 p-0 text-accent text-body-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:album.id}} search={{foto:''}}>Ver fotos del partido <ArrowRight/></Link></Button>}
+    <p className="mt-3 text-body-sm">{fecha} · Jornada {partido.jornada} · {partido.lugar}</p>
+    {(album||partido.driveFolderId)&&<Button asChild variant="link" className="h-9 p-0 text-accent text-body-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:album?.id??partido.driveFolderId??''}} search={{foto:''}}>Ver fotos del partido <ArrowRight/></Link></Button>}
   </article>;
 }
 export function Liga() {

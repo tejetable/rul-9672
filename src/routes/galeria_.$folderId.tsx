@@ -24,7 +24,7 @@ function AlbumPage(){
       <div className="gallery-filters">{albums.map(a=><Button key={a.id} variant="ghost" className={`gallery-filter ${a.id===folderId?'gallery-filter-active':''}`} onClick={()=>go(a.id)}>{a.titulo} · {new Date(`${a.fecha}T12:00:00`).toLocaleDateString('es-ES',{day:'2-digit',month:'short'})}</Button>)}</div>
     </header>
     {isPending&&<div className="gallery-image is-loading aspect-square"/>}
-    {!isPending&&!album&&<p className="px-5 py-8 text-muted-foreground">No hay fotos disponibles en este álbum.</p>}
+    {!isPending&&!album&&<p className="px-4 py-8 text-muted-foreground">No hay fotos disponibles en este álbum.</p>}
     <div className="gallery-complete-grid">{album?.fotos.map((f,i)=><Button key={f.id} variant="ghost" className="gallery-tile gallery-square" aria-label={`Ver foto ${i+1}`} onClick={()=>setVisor(i)}><GaleriaFoto foto={f} alt={album.titulo}/></Button>)}</div>
     {album&&visor!==null&&<GaleriaVisor album={album} inicial={visor} siguiente={next} onClose={()=>{setVisor(null);void navigate({to:'/galeria/$folderId',params:{folderId},search:{foto:''},replace:true});}}/>}
   </main></div>;

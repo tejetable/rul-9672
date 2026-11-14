@@ -43,13 +43,13 @@ function Index() {
  useEffect(()=>{void dataService.init().catch(e=>runAction(async()=>{throw e;})).finally(()=>setReady(true));const saved=window.localStorage.getItem(ROLE_KEY) as Role|null;if(saved)setDemoRole(saved);const t=setTimeout(()=>setWait(false),1500);return()=>clearTimeout(t);},[]);
  const role=dataService.rol(),sesion=dataService.sesion(),roles=dataService.roles();
  const unknown=dataService.autenticado()&&roles.length===0;
- const content=!ready||wait?<Cargando/>:dataService.autenticado()?unknown?<section className="space-y-5 px-6 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><UneteFamilia/><Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<EleccionRol/>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')}/>;
+ const content=!ready||wait?<Cargando/>:dataService.autenticado()?unknown?<section className="space-y-5 px-4 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><UneteFamilia/><Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<EleccionRol/>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')}/>;
  return <AppFrame>{page==='login'&&!dataService.autenticado()?<EmailAcceso onBack={()=>setPage('welcome')} onDone={()=>setPage('welcome')}/>:content}{ready&&!wait&&DEMO_MODE&&<RoleSwitcher role={demoRole} onChange={r=>{window.localStorage.setItem(ROLE_KEY,r);setDemoRole(r);}}/>}</AppFrame>;
 }
 
 function Cargando() {
   return (
-    <section className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+    <section className="flex flex-1 flex-col items-center justify-center px-4 text-center">
       <img src={escudo.url} alt="Escudo del Real Unión Lucense F.S." width={450} height={676} className="crest crest-blend animate-rise w-36" />
       <p className="label-club animate-rise mt-6" style={{ animationDelay: "200ms" }}>R.U. Lucense</p>
     </section>
@@ -73,7 +73,7 @@ function Bienvenida({onEnter}:{onEnter:()=>void}) {
 
 function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
   return (
-    <section className="flex flex-1 flex-col justify-center px-6 pb-24">
+    <section className="flex flex-1 flex-col justify-center px-4 pb-24">
       <Smartphone size={32} strokeWidth={1.75} />
       <h1 className="title-club mt-4 text-heading">{estado === "movido" ? "Tu carnet está en otro móvil" : "Tu carnet está desactivado"}</h1>
             <p className="mt-4">
@@ -93,9 +93,9 @@ function Directiva() {
   return (
     <div className="flex flex-1 flex-col">
       <ClubCabecera etiqueta={dataService.rol()==='super_admin'?'Super admin':'Directiva'}><VerComo/><ClubAdminMenu onOpen={setPage}/></ClubCabecera>
-      {!dataService.ajustes().whatsapp_club&&<p className="mx-5 mt-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
+      {!dataService.ajustes().whatsapp_club&&<p className="mx-4 mt-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
 
-      <div className="club-tabs mx-5 mt-4 grid-cols-3">
+      <div className="club-tabs mx-4 mt-4 grid-cols-3">
         {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["club", "Club"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setT(id)} className={`h-auto min-h-11 rounded-control text-label font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}

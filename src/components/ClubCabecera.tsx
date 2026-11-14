@@ -5,8 +5,8 @@ export function ClubCabecera({ titulo = "R.U. LUCENSE", etiqueta, children }: { 
   return <header className="club-header">
     <img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-7 shrink-0 object-contain" />
     <div className="min-w-0 flex-1">
-      {etiqueta && <p className="text-label uppercase text-muted-foreground">{etiqueta}</p>}
-      <p className="truncate text-body-sm font-black">{titulo}</p>
+      {etiqueta && <p className="truncate text-label uppercase text-muted-foreground">{etiqueta}</p>}
+      <p className="line-clamp-2 text-body-sm font-black">{titulo}</p>
     </div>
     {children}
   </header>;

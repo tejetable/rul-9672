@@ -10,12 +10,12 @@ export function Carne({ nombre, numero, temporada = "2026/27" }: { nombre: strin
   const [reverso, setReverso] = useState(false);
   return (
     <div className="mx-auto w-full max-w-[390px]">
-      <div className="flex flex-col items-center">
-        <div className="qr-blanco w-full max-w-[280px] rounded-tile p-4">
+      <div className="flex flex-col items-start">
+        <div className="qr-blanco self-center w-full max-w-[280px] rounded-tile p-4">
           <QRCodeSVG value={`RUL:${numero}`} size={240} marginSize={2} bgColor="#FFFFFF" fgColor="#0D4631" className="aspect-square h-auto w-full" aria-label={`Identificación de socio ${numero}`} />
         </div>
         <p className="mt-3 text-body-sm font-bold text-primary">Enséñaselo en el mostrador</p>
-        <p className="card-member-name mt-3 text-center uppercase">{nombre}</p>
+        <p className="card-member-name mt-3 text-left uppercase">{nombre}</p>
         <p className="mt-1 text-section font-black text-gold">Nº {String(numero).padStart(4, "0")}</p>
         <p className="card-kicker mt-1 text-muted-foreground">Temporada {temporada}</p>
       </div>

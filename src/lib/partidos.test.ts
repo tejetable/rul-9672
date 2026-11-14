@@ -44,3 +44,9 @@ describe('Calendario automático de LIGA',()=>{
   it('convierte las 18:30 del 14 de noviembre en Madrid',()=>expect(fechaMadridISO('2026-11-14','18:30')).toBe('2026-11-14T17:30:00.000Z'));
   it('respeta la hora de verano al añadir partidos',()=>expect(fechaMadridISO('2027-04-14','18:30')).toBe('2027-04-14T16:30:00.000Z'));
 });
+describe('Resultados reales y hora pendiente',()=>{
+ it('Friol visitante muestra local 6 y club 10 como victoria',()=>{const friol={...partido,id:'j6',rival:'P.M. Friol FS "B"',fechaHora:'2026-11-08T11:00:00Z',jornada:6,esLocal:false,jugado:true,golesLocal:6,golesVisitante:10};expect(resultadoPartido(friol)).toBe('V');expect(ultimoPartido([friol,partido])?.golesLocal).toBe(6);expect(ultimoPartido([friol,partido])?.golesVisitante).toBe(10);});
+ it('un pasado sin resultado no es próximo ni en curso fuera de las dos horas',()=>{const pasado={...partido,fechaHora:'2026-11-08T11:00:00Z'};expect(proximoPartido([pasado],new Date('2026-11-14T09:50:00Z'))).toBeUndefined();expect(partidoEnCurso([pasado],new Date('2026-11-14T09:50:00Z'))).toBeUndefined();});
+ it('Cubelas sigue anunciado durante todo el día mientras no se confirme hora',()=>expect(proximoPartido([{...partido,id:'cubelas',fechaHora:'2026-11-22T11:00:00Z',horaConfirmada:false}],new Date('2026-11-22T18:00:00Z'))?.id).toBe('cubelas'));
+ it('Cubelas sin hora confirmada no exporta una hora inventada',()=>expect(calendarioPartido({...partido,rival:'CD Cubelas FS',horaConfirmada:false})).toBeNull());
+});

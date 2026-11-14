@@ -26,7 +26,7 @@ export function NegocioApp() {
         <Button variant="ghost" size="icon" onClick={() => { runAction(async () => { await dataService.cerrarNegocio(); setNeg(null); }); }} aria-label="Cerrar sesión" className="size-11"><LogOut size={20} strokeWidth={1.75} /></Button>
       </ClubCabecera>
       <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
-      <div className="club-tabs mx-5 mt-4 grid-cols-2">
+      <div className="club-tabs mx-4 mt-4 grid-cols-2">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setTab(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold transition-colors duration-200 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
             {l}
@@ -97,7 +97,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
   const big = "flex h-auto min-h-14 w-full items-center justify-center gap-2 rounded-control text-item font-black uppercase transition-transform duration-200 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
 
   return (
-    <section className="flex flex-1 flex-col px-5 pt-6">
+    <section className="flex flex-1 flex-col px-4 pt-6">
       {scan && <QrScanner onResult={onScan} onClose={() => setScan(false)} />}
       {reciente && (
         <div className="animate-rise mb-4 flex items-center gap-3 rounded-panel bg-surface p-4">
@@ -109,7 +109,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
       <Button variant="ghost" onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
         <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
       </Button>
-      <label htmlFor="num-socio" className="label-club mt-5 block">Nº de socio</label>
+      <label htmlFor="num-socio" className="label-club mt-6 block">Nº de socio</label>
       <input id="num-socio" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-14 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
       {socio && !aviso && (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black text-accent">
@@ -144,12 +144,12 @@ function Registrar({ neg }: { neg: Patrocinador }) {
         </ul>
       )}
 
-      <div className="sticky bottom-0 -mx-5 mt-auto bg-background px-5 pb-5 pt-4">
+      <div className="sticky bottom-0 -mx-4 mt-auto bg-background px-4 pb-5 pt-4">
         {repite && !sinCarnet ? (
           <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
         ) : (
           <>
-            <p className="label-club mb-2 text-center text-accent">{listo ? "¿Ya era clienta tuya antes? Pulsa y queda registrada" : "Escanea el carnet o escribe el número"}</p>
+            <p className="label-club mb-2 text-left text-accent">{listo ? "¿Ya era clienta tuya antes? Pulsa y queda registrada" : "Escanea el carnet o escribe el número"}</p>
             <div className="grid grid-cols-2 gap-3">
               <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Nueva</Button>
               <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} btn-suave text-item`}>Ya era clienta</Button>
@@ -174,7 +174,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
   const share = `${frase}\n\nVisitas por el club: ${s.visitas} · Clientas nuevas: ${s.nuevas} · Repiten: ${s.repiten}\n— Real Unión Lucense F.S.`;
 
   return (
-    <section className="px-5 pt-6">
+    <section className="px-4 pt-6">
       <h1 className="club-section-title mb-3">Tu mes con el club</h1>
       <span className="label-club inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
       <div className="mt-4 club-tabs grid-cols-3">
@@ -183,13 +183,13 @@ function TuMes({ neg }: { neg: Patrocinador }) {
         ))}
       </div>
 
-      <div className="mt-5 rounded-panel bg-primary p-5 text-primary-foreground">
+      <div className="mt-6 rounded-panel bg-primary p-4 text-primary-foreground">
         <p className="label-club opacity-80">Clientas nuevas</p>
         <p className="text-heading font-black leading-none text-gold">{s.nuevas}</p>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-3 gap-2">
         {[["Visitas por el club", s.visitas], ["Repiten por el club", s.repiten], ["% nuevas", `${s.pctNuevas}%`]].map(([l, n]) => (
-          <div key={l} className="rounded-panel bg-surface p-3">
+          <div key={l} className="rounded-panel bg-surface p-4">
             <p className="text-heading font-black">{n}</p>
             <p className="label-club mt-1 text-[11px] text-muted-foreground">{l}</p>
           </div>

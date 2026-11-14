@@ -11,8 +11,8 @@ export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
   const [avisos, setAvisos] = useState<Aviso[]>([]);
   useEffect(() => setAvisos(dataService.avisosPara(quien)), [quien, db]);
   return (
-    <section className="px-5 pt-6">
-      <h1 className="title-club text-heading">Avisos</h1>
+    <section className="px-4 pt-6">
+      <h1 className="club-section-title">Avisos</h1>
             {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
       <ul className="mt-6 space-y-3">
         {avisos.map((a) => (
@@ -46,11 +46,11 @@ export function AvisosPanel() {
   const chip = (on: boolean) => `club-button h-auto min-h-11 rounded-control px-3 text-body-sm font-bold ${on ? "bg-primary text-primary-foreground" : "btn-suave"}`;
 
   return (
-    <section className="px-5 pb-32 pt-6">
+    <section className="px-4 pb-32 pt-6">
       <span className="club-chip">Directiva</span>
-      <h1 className="club-title mt-2">Nuevo aviso</h1>
-            <input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Título" className="mt-5 h-auto min-h-12 w-full rounded-panel club-input border-input px-4 font-bold" />
-      <textarea value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Qué queremos contar" rows={3} className="mt-3 w-full rounded-panel club-input border-input p-4" />
+      <h1 className="club-section-title mt-3">Nuevo aviso</h1>
+            <label className="mt-3 block text-body-sm">Título<input aria-label="Título del aviso" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Título" className="mt-6 h-auto min-h-12 w-full rounded-panel club-input border-input px-4 font-bold" /></label>
+      <label className="mt-3 block text-body-sm">Texto<textarea aria-label="Texto del aviso" value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Qué queremos contar" rows={3} className="mt-3 w-full rounded-panel club-input border-input p-4" /></label>
       <p className="label-club mt-4">Tipo</p>
       <div className="mt-2 flex flex-wrap gap-2">
         {(Object.keys(TIPO) as Aviso["tipo"][]).map((k) => <Button variant="ghost" key={k} onClick={() => setTipo(k)} className={chip(tipo === k)}>{TIPO[k]}</Button>)}
@@ -59,7 +59,7 @@ export function AvisosPanel() {
       <div className="mt-2 flex flex-wrap gap-2">
         {(Object.keys(PARA) as NonNullable<Aviso["para"]>[]).map((k) => <Button variant="ghost" key={k} onClick={() => setPara(k)} className={chip(para === k)}>{PARA[k]}</Button>)}
       </div>
-      <Button variant="ghost" onClick={() => runAction(publicar)} disabled={!titulo.trim() || !texto.trim()} className="mt-5 h-auto min-h-14 w-full rounded-panel bg-primary font-black uppercase text-primary-foreground disabled:opacity-40">
+      <Button variant="ghost" onClick={() => runAction(publicar)} disabled={!titulo.trim() || !texto.trim()} className="mt-6 h-auto min-h-14 w-full rounded-panel bg-primary font-black uppercase text-primary-foreground disabled:opacity-40">
         Publicar aviso
       </Button>
 

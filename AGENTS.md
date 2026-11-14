@@ -48,3 +48,6 @@ use the editor.
 - Paid membership creation uses transactional PostgreSQL RPCs and a deferred payment trigger; the future Stripe entry point is service-role-only and idempotent by payment reference so browser callers cannot claim a verified payment.
 - Member management metadata and club-person searches use role-checked RPCs; pure helpers own debounced filtering and 20-row pagination so list rules are independently testable.
 - Welcome, email entry and role selection share AccesoVisual and semantic access tokens; password forms share validation and visibility controls; recovery and invitation links use public dedicated routes and Auth session verification.
+
+- Member number proposals use the lowest positive unused number; PostgreSQL serializes allocations and rejects conflicts by owner name without resetting the sequence.
+- Match played state is derived by a PostgreSQL trigger from both scores; unconfirmed kickoff times never generate calendar events or live-match states.
