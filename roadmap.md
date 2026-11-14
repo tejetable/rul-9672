@@ -44,3 +44,7 @@
 - [x] Listas paginadas, fichas de socios, pagos y cuota editable; probar 60 registros sin introducir personas ficticias en Cloud.
 - [x] Equipo directivo compacto, búsqueda de personas y roles protegidos; verificar alta con pago y chip Directiva con Super admin y rechazos sin autorización.
 - [ ] Configurar cuota real del club (falta importe).
+- [ ] Limpiar socios de prueba, conservar Diego nº 11 y permitir numeración manual única desde el primer hueco.
+- [ ] Cargar ocho jornadas reales, automatizar jugado y verificar LIGA y último resultado.
+- [ ] Compactar filtros en una fila desplazable.
+- [ ] Unificar márgenes y revisar pantallas de los tres roles en 360, 390 y 430 px.

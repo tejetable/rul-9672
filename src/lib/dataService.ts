@@ -76,6 +76,7 @@ export interface Partido {
   golesLocal: number | null;
   golesVisitante: number | null;
   jugado: boolean;
+  horaConfirmada?: boolean;
   driveFolderId?: string | null;
 }
 export interface Aviso {
@@ -176,9 +177,9 @@ export const dataService = {
   async emailNegocio(id:string,email:string){const r=await supabase.rpc('asignar_negocio_email',{p_id:id,p_email:email});check(r.error);await this.refresh();await this.enviarPassword(email);},
   async elegirRol(id:string){const chosen=roles.find(r=>r.id===id);if(!chosen)throw new Error('Rol no autorizado');const r=await supabase.rpc('elegir_vista',{p_role:id});check(r.error);selectedRole=id;role=chosen.rol;linkedSocio=chosen.socio_id;sessionState=role==='socia'?'ok':null;window.localStorage.setItem('rul-last-email-role',id);await this.refresh();},
   async albumes(){return (await getDriveGallery()).albumes;},
-  async guardarPartido(input:{id?:string;jornada:number;rival:string;fechaHora:string;esLocal:boolean;lugar:string;competicion:string;driveUrl:string}){
+  async guardarPartido(input:{id?:string;jornada:number;rival:string;fechaHora:string;esLocal:boolean;lugar:string;competicion:string;driveUrl:string;horaConfirmada?:boolean}){
     const folder=folderIdFromUrl(input.driveUrl);if(input.driveUrl.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');
-    const row={jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder};
+    const row={hora_confirmada:input.horaConfirmada??true,jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder};
     const r=input.id?await supabase.from('partidos').update(row).eq('id',input.id).select('id').single():await supabase.from('partidos').insert(row).select('id').single();check(r.error);await this.refresh();
   },
   async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);await this.refresh();},
@@ -220,13 +221,13 @@ export const dataService = {
     db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:v.titulo,descripcion:v.descripcion,condiciones:v.condiciones,activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
-      partidos: partidos.map(p=>({id:p.id,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
+      partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
       avisos:avisos.map(a=>({id:a.id,titulo:a.titulo,texto:a.texto,fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
     if(role==='socia'){const status=await supabase.rpc('estado_sesion_socia');sessionState=status.data as typeof sessionState;}
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}
     reads = leidos.map(l=>l.aviso_id); notify();
   },
-  async crearSocio(nombre:string,telefono:string,email:string,pago:PagoInput){const r=await supabase.rpc('alta_socio_con_pago',{p_datos:{nombre,email,telefono:telefono.replace(/\D/g,'')},p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la socia/o');if(!await this.estadoPassword(email))try{await this.enviarPassword(email);}catch(e){toast.warning(e instanceof Error?e.message:'Alta y pago guardados; email pendiente de envío.');}return s;},
+  async crearSocio(nombre:string,telefono:string,email:string,pago:PagoInput,numeroSocio?:number){const r=await supabase.rpc('alta_socio_con_pago',{p_datos:{nombre,email,...(numeroSocio===undefined?{}:{numero_socio:numeroSocio}),telefono:telefono.replace(/\D/g,'')},p_pago:pagoSchema.parse(pago)});check(r.error);await this.refresh();const s=db.socios.find(s=>s.id===r.data);if(!s)throw new Error('No se pudo leer la socia/o');if(!await this.estadoPassword(email))try{await this.enviarPassword(email);}catch(e){toast.warning(e instanceof Error?e.message:'Alta y pago guardados; email pendiente de envío.');}return s;},
   async desactivar(id: string, fecha: string, motivo: string) { const r=await supabase.from('socios').update({estado:'desactivada',fecha_baja:fecha,motivo_baja:motivo}).eq('id',id);check(r.error);await this.refresh(); },
   async bajaPatrocinador(id:string,fecha:string,motivo:string,detalle:string) { const r=await supabase.from('patrocinadores').update({activo:false,fecha_baja:fecha,motivo_baja:motivo,detalle_baja:detalle}).eq('id',id);check(r.error);await this.refresh(); },
   dispositivoId() { let d=window.localStorage.getItem('rul-device-id'); if(!d){d=crypto.randomUUID();window.localStorage.setItem('rul-device-id',d);} return d; },

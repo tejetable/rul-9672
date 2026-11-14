@@ -236,6 +236,7 @@ export type Database = {
           fecha_hora: string | null
           goles_contra: number | null
           goles_favor: number | null
+          hora_confirmada: boolean
           id: string
           jornada: number | null
           jugado: boolean
@@ -251,6 +252,7 @@ export type Database = {
           fecha_hora?: string | null
           goles_contra?: number | null
           goles_favor?: number | null
+          hora_confirmada?: boolean
           id?: string
           jornada?: number | null
           jugado?: boolean
@@ -266,6 +268,7 @@ export type Database = {
           fecha_hora?: string | null
           goles_contra?: number | null
           goles_favor?: number | null
+          hora_confirmada?: boolean
           id?: string
           jornada?: number | null
           jugado?: boolean

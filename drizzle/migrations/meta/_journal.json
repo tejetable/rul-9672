@@ -141,6 +141,13 @@
       "when": 1794649071032,
       "tag": "0019_club_team_confirmed_access_status",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794649925883,
+      "tag": "0020_manual_member_numbers_and_confirmed_match_times",
+      "breakpoints": true
     }
   ]
 }

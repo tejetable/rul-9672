@@ -20,3 +20,5 @@ export function listaSocios(socios:Socio[],q:string,filtro:Filtro,orden:Orden,st
 }
 export function paginaSocios<T>(rows:T[],page:number){const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));const current=Math.min(Math.max(page,1),pages);return {rows:rows.slice((current-1)*PAGE_SIZE,current*PAGE_SIZE),pages,current};}
 export function hoyMadrid(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+export function primerNumeroLibre(socios:Pick<Socio, "numeroSocio">[]) { const ocupados=new Set(socios.map(s=>s.numeroSocio)); let numero=1; while(ocupados.has(numero))numero++; return numero; }
+export function conflictoNumero(socios:Pick<Socio,"numeroSocio"|"nombre"|"email">[],numero:number,email:string) { const socio=socios.find(s=>s.numeroSocio===numero&&s.email?.toLowerCase()!==email.trim().toLowerCase()); return socio ? `El nº ${numero} ya es de ${socio.nombre}` : null; }
