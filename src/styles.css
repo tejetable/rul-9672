@@ -509,3 +509,24 @@ main > div:has(.business-test-view) > .club-header,main > div:has(.business-test
 
 main .club-interactive:not(.gallery-tile):not(.gallery-album-card):not(.member-row):not(.access-role):not(.member-tab):not([data-club-variant="link"]):not(.business-test-banner > button) { min-height:44px; }
 .club-form-panel .club-interactive { min-height:44px; }
+
+/* Shared Directiva creation action, inset within the app frame. */
+:root { --shadow-directiva-fab:0 6px 16px color-mix(in srgb,var(--primary) 30%,transparent); --member-column-muted:color-mix(in srgb,var(--primary) 40%,transparent); }
+main .directiva-fab { position:fixed; z-index:35; right:max(calc(16px + env(safe-area-inset-right)),calc((100vw - 430px)/2 + 16px)); bottom:calc(16px + env(safe-area-inset-bottom)); width:56px; height:56px; min-height:56px; padding:0; border-radius:50%; background:var(--primary); color:var(--primary-foreground); box-shadow:var(--shadow-directiva-fab); transition:transform 150ms,background-color 150ms; }
+main .directiva-fab svg { width:24px; height:24px; }
+main .directiva-fab:hover { background:var(--control-primary-hover); color:var(--primary-foreground); }
+main .directiva-fab.is-reduced { transform:scale(.88); }
+main .directiva-fab:active { transform:scale(.94); }
+.member-columns,.member-data-row { display:grid; grid-template-columns:32px minmax(0,1fr) 62px 16px; gap:8px; align-items:center; }
+.member-columns { height:24px; margin:10px 0; }
+.member-columns .member-column { height:44px; min-height:44px; padding:0; justify-content:flex-start; gap:3px; font-size:11px; font-weight:700; text-transform:uppercase; color:var(--member-column-muted); background:transparent; border:0; box-shadow:none; }
+.member-columns .member-column:hover { background:transparent; color:var(--member-column-muted); }
+.member-columns .member-column.is-sorted,.member-columns .member-column.is-sorted:hover { color:var(--primary); }
+.member-columns .member-column svg { width:10px; height:10px; }
+.member-columns .member-column:nth-child(3) { justify-content:flex-end; }
+.member-columns .member-column:first-child { position:relative; }
+.member-columns .member-column:first-child::before { content:""; position:absolute; inset:0 -6px; }
+.member-date { font-size:11px; text-align:right; white-space:nowrap; }
+.member-data-row .member-status { margin-right:8px; }
+.member-data-row .member-role { display:inline-block; padding:1px 3px; font-size:8px; }
+@media(prefers-reduced-motion:reduce) { main .directiva-fab { transition:none; } }

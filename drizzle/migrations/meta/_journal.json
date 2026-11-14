@@ -162,6 +162,13 @@
       "when": 1794651014440,
       "tag": "0022_optional_member_in_test_visit",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794651693487,
+      "tag": "0023_member_first_access_status",
+      "breakpoints": true
     }
   ]
 }

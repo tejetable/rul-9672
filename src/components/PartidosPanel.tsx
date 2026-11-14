@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Plus, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
+import {DirectivaFab} from './DirectivaFab';
+import {GestionSheet} from './GestionPersonas';
 import { Button } from '@/components/ui/button';
 import { dataService, useClubData, runAction, type Partido } from '@/lib/dataService';
 import { fechaMadridCampos, fechaMadridISO, inicioPartido, proximoPartido } from '@/lib/partidos';
@@ -11,9 +13,9 @@ export function PartidosPanel() {
   const lista=[...db.partidos].sort((a,b)=>Number(a.jugado)-Number(b.jugado)||(a.jugado ? -1:1)*((inicioPartido(a)?.getTime()??Infinity)-(inicioPartido(b)?.getTime()??Infinity)));
   return <section className="px-4 pt-6 pb-32">
     <h1 className="club-section-title">Partidos</h1>
-    <article className="mt-4 rounded-panel bg-surface p-4"><p className="label-club">Próximo partido</p><p className="mt-2 font-black">{proximo?`vs. ${proximo.rival}`:'Por confirmar'}</p>{proximo&&<><p className="text-body-sm">Jornada {proximo.jornada} · {fechaMadridCampos(proximo).fecha} · {fechaMadridCampos(proximo).hora}</p><Button variant="ghost" onClick={()=>setEdit(proximo)}><Pencil size={16}/>Editar</Button></>}</article>
-    <Button className="mt-4 w-full club-button" onClick={()=>setEdit('nuevo')}><Plus/>AÑADIR PARTIDO</Button>
-    {edit&&<PartidoForm key={edit==='nuevo'?'nuevo':edit.id} partido={edit==='nuevo'?undefined:edit} onClose={()=>setEdit(null)}/>}
+    <article className="mt-4 rounded-panel bg-surface p-4"><p className="label-club">Próximo partido</p><p className="mt-2 font-black">{proximo?`vs. ${proximo.rival}`:'Por confirmar'}</p>{proximo&&<><p className="text-body-sm">Jornada {proximo.jornada} · {fechaMadridCampos(proximo).fecha} · {fechaMadridCampos(proximo).hora}</p></>}</article>
+    <DirectivaFab label="Editar próximo partido" onClick={()=>setEdit(proximo??'nuevo')}/>
+    <GestionSheet title={edit==='nuevo'?'Añadir partido':'Editar próximo partido'} open={!!edit} onClose={()=>setEdit(null)}>{edit&&<PartidoForm key={edit==='nuevo'?'nuevo':edit.id} partido={edit==='nuevo'?undefined:edit} onClose={()=>setEdit(null)}/>}</GestionSheet>
     <div className="mt-6 space-y-3">{lista.map(p=>{
       const pasado=(inicioPartido(p)?.getTime()??Infinity)<=ahora.getTime();const campos=fechaMadridCampos(p);
       const favor=p.esLocal?p.golesLocal:p.golesVisitante,contra=p.esLocal?p.golesVisitante:p.golesLocal;

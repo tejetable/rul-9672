@@ -53,3 +53,6 @@
 - [x] Interruptores de estado y roles en ficha de socio y chip de mayor rol.
 - [x] Unificar estados interactivos y foco de teclado.
 - [x] Alinear controles a 44 px y revisar los tres roles en 360/390/430.
+- [x] Socias/os sin subtítulos y estado de acceso según último inicio de sesión.
+- [x] Orden ascendente/descendente por columnas Nº, Nombre y Alta.
+- [x] Botón flotante compartido en cinco vistas de Directiva; verificar móvil y formularios.

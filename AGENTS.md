@@ -54,3 +54,6 @@ use the editor.
 
 - Business test access keeps the administrator identity and stores session-scoped targets in usuario_vista; guarded RPCs force test visits and real statistics exclude them, so previewing cannot affect production metrics.
 - Shared Button and Switch states and control dimensions are defined centrally, so screen-level hover rules cannot change text contrast or alignment.
+
+- Member access metadata comes from the guarded gestion_socios RPC using Auth last_sign_in_at, independently of password readiness, so Google users count as having accessed.
+- Directiva creation actions use the shared DirectivaFab and modal forms, preserving a consistent safe-area-aware action without losing list position.

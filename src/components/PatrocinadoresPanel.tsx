@@ -3,7 +3,8 @@ import { BajaForm } from "@/components/BajaForm";
 import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { Download, Plus, LogIn } from "lucide-react";
+import { Download, LogIn } from "lucide-react";
+import {DirectivaFab} from './DirectivaFab';
 import {GestionSheet} from './GestionPersonas';
 import {NegocioApp} from './NegocioApp';
 import { dataService, useClubData, runAction } from "@/lib/dataService";
@@ -75,9 +76,8 @@ export function PatrocinadoresPanel() {
       </div>
       <h2 className="club-section-title mt-8">Patrocinadores</h2>
       <span className="label-club mt-3 inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
-      {form ? <NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }} /> : (
-        <Button variant="ghost" onClick={() => setForm(true)} className="mt-4 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel btn-suave font-black uppercase"><Plus size={18} strokeWidth={1.75} /> Nuevo patrocinador</Button>
-      )}
+      <GestionSheet title="Nuevo patrocinador" open={form} onClose={()=>setForm(false)}>{form&&<NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }}/>}</GestionSheet>
+      {!form&&!selected&&!baja&&<DirectivaFab label="Nuevo patrocinador" onClick={()=>setForm(true)}/>}
       {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
       <h2 className="club-section-title mt-6">Bajas</h2><div className="mt-2 grid grid-cols-2 gap-2">{["no ve retorno","precio","cierre del negocio","otro"].map(m => <div key={m} className="rounded-panel bg-surface p-4"><p className="font-black">{summary.bajas[m] ?? 0}</p><p className="text-body-sm">{m}</p></div>)}</div>
       <ul className="mt-6 space-y-3">
