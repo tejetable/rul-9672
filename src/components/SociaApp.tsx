@@ -66,7 +66,7 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
   return (
     <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}><Dialog.Portal>
     <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60" />
-    <Dialog.Content aria-describedby={undefined} className="animate-sheet fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8"
+    <Dialog.Content aria-describedby={undefined} className="animate-sheet carnet-overlay fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8"
       style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
       onTouchStart={(e) => setY0((e.touches[0]?.clientY ?? 0))}
       onTouchMove={(e) => y0 !== null && setDy(Math.max(0, (e.touches[0]?.clientY ?? 0) - y0))}

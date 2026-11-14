@@ -66,3 +66,7 @@
 - [x] Aplicar acceso definitivo: método de sesión verificado, alta Auth opcional, acceso y eliminación de contraseña protegidos.
 - [x] Eliminar socios con nombre completo, conservar visitas y estadísticas, proteger otros roles y autoeliminación.
 - [x] Verificar alta Hotmail → cambio → entrada, bloqueo de eliminación de contraseña, eliminación Gmail, rechazo Directiva, otros roles y visitas anónimas con estadísticas intactas; 109 pruebas y móviles 360/390/430. Cuentas temporales retiradas; Google interactivo sigue pendiente.
+- [x] Sustituir calendario por Twitch editable y centrar partido, chips, escudo transparente y cuenta atrás.
+- [x] Corregir alturas dinámicas, zonas seguras, hojas con cabecera fija, teclado, avisos y toasts.
+- [x] Verificar partido normal/directo, canal vacío, edición de Twitch, campana con diez avisos, campo enfocado y botones flotantes en 360/390/430 y escritorio con Chromium.
+- [ ] Verificar Safari iPhone y Chrome Android con barra real y teclado (requiere dispositivos físicos; tamaños variables y campos enfocados comprobados en Chromium).

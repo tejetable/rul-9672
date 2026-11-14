@@ -34,13 +34,16 @@ export function AvisosCampana({ quien }: { quien: "socias" | "negocios" }) {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
-        <Dialog.Content aria-describedby={undefined} className="fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[80dvh] w-full max-w-[430px] overflow-y-auto rounded-t-lg border-t border-border bg-background px-4 pb-8 pt-6 animate-sheet">
-          <div className="flex items-center justify-between gap-3">
+        <Dialog.Content aria-describedby={undefined} className="club-bottom-sheet fixed inset-x-0 z-50 mx-auto w-full max-w-[430px] rounded-t-panel border-t border-border bg-background animate-sheet">
+          <div className="club-sheet-scroll">
+          <div className="club-sheet-header grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
             <Dialog.Title className="club-section-title">Avisos</Dialog.Title>
             <Dialog.Close asChild><Button variant="ghost" size="icon" aria-label="Cerrar avisos"><X size={20} strokeWidth={1.75} /></Button></Dialog.Close>
           </div>
+          <div className="px-4 pb-4">
           {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
           {selected?<div className="mt-4 space-y-3"><Button variant="link" onClick={()=>setSelected(null)}>Volver a avisos</Button><h2 className="font-bold">{selected.titulo}</h2><p className="whitespace-pre-line">{selected.texto}</p></div>:<ListCard label="Avisos" className="mt-4">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={a.texto} date={new Date(a.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>}
+          </div></div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

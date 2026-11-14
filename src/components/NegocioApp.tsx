@@ -138,7 +138,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
         <ListCard label="Últimas visitas de hoy" className="mt-2">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTA'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
       )}
 
-      <div className="sticky bottom-0 -mx-4 mt-auto bg-background px-4 pb-5 pt-4">
+      <div className="business-confirmation sticky bottom-0 -mx-4 mt-auto bg-background px-4 pb-5 pt-4">
         {repite && !sinCarnet ? (
           <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
         ) : (

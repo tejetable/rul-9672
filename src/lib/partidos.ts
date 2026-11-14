@@ -23,6 +23,9 @@ export function cuentaPartido(inicio: Date, ahora: Date) {
   };
 }
 
+export function directoPartido(partido:Partido,ahora:Date){const inicio=inicioPartido(partido);return partido.horaConfirmada!==false&&!!inicio&&ahora.getTime()>=inicio.getTime()&&ahora.getTime()<inicio.getTime()+7200000;}
+export function minutosHastaPartido(inicio:Date,ahora:Date){return Math.max(0,Math.ceil((inicio.getTime()-ahora.getTime())/60000));}
+
 export function proximoPartido(partidos: Partido[], ahora: Date): Partido | undefined {
   return partidos.filter(p => !p.jugado && (p.horaConfirmada === false ? !!inicioPartido(p) && fechaMadridCampos(p).fecha >= ahora.toLocaleDateString("en-CA",{timeZone:"Europe/Madrid"}) : (inicioPartido(p)?.getTime() ?? 0) > ahora.getTime())).sort((a,b) => (inicioPartido(a)?.getTime() ?? 0) - (inicioPartido(b)?.getTime() ?? 0))[0];
 }

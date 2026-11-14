@@ -2,11 +2,11 @@ import {Link} from "@tanstack/react-router";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useState } from "react";
-import { ArrowRight, CalendarPlus, MapPin, Navigation } from "lucide-react";
-import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
+import { ArrowRight, Twitch, MapPin, Navigation } from "lucide-react";
+import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
-import { calendarioPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido } from "@/lib/partidos";
+import { directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido } from "@/lib/partidos";
 
 function LugoSilueta() {
   return <svg className="fixture-silhouette" viewBox="0 0 260 130" aria-hidden="true" fill="currentColor">
@@ -16,6 +16,7 @@ function LugoSilueta() {
 }
 
 export function ProximoPartido({ partido }: { partido: Partido }) {
+  useClubData();
   const [ahora, setAhora] = useState<Date | null>(null);
   useEffect(() => {
     setAhora(new Date());
@@ -26,38 +27,32 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
   const cuenta = inicio && ahora ? cuentaPartido(inicio, ahora) : null;
   const hora = partido.horaConfirmada === false ? "Hora por confirmar" : inicio?.toLocaleTimeString("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }) || "[pendiente]";
   const dia = inicio?.toLocaleDateString("es-ES", { timeZone: "Europe/Madrid", weekday: "short", day: "2-digit", month: "short" }).replace(/[.,]/g, "").toUpperCase() || "[pendiente]";
-  const descargar = () => {
-    const ics = calendarioPartido(partido);
-    if (!ics) return;
-    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
-    const enlace = document.createElement("a");
-    enlace.href = url; enlace.download = `rul-partido-${partido.id}.ics`;
-    enlace.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
+  const twitch=dataService.ajustes().url_twitch;
+  const live=!!ahora&&directoPartido(partido,ahora);
+  const minutes=inicio&&ahora?minutosHastaPartido(inicio,ahora):0;
   return <article className="fixture-card" aria-label="Próximo partido">
     <LugoSilueta />
     <div className="relative z-10">
       <div className="fixture-heading">
         <h1 className="fixture-chip">PRÓXIMO PARTIDO</h1>
-        <div className="flex flex-wrap justify-end gap-1">{partido.jornada && <span className="fixture-chip">JORNADA {partido.jornada}</span>}<span className="fixture-chip">{partido.esLocal ? "EN CASA" : "FUERA"}</span></div>
+        {partido.jornada && <span className="fixture-chip">JORNADA {partido.jornada}</span>}<span className="fixture-chip">{partido.esLocal ? "EN CASA" : "FUERA"}</span>
       </div>
       <p className="fixture-subtitle">Concello de Guntín - R.U. Lucense · {partido.competicion}</p>
       <div className="fixture-matchup">
         {partido.esLocal ? <EquipoPartido /> : <EquipoPartido rival={partido.rival} />}
-        <div className="text-center"><p className={partido.horaConfirmada === false ? "fixture-unconfirmed" : "fixture-time"}>{hora}</p><p className="fixture-date">{dia}</p></div>
+        <div className="min-w-0 text-center"><p className={partido.horaConfirmada === false ? "fixture-unconfirmed" : "fixture-time"}>{hora}</p>{live||cuenta?.estado==='hoy'?<span className="fixture-chip fixture-day-chip">{live?'EN JUEGO':'HOY'}</span>:<p className="fixture-date">{dia}</p>}</div>
         {partido.esLocal ? <EquipoPartido rival={partido.rival} /> : <EquipoPartido />}
       </div>
       <span className="fixture-gold" />
       <div className="fixture-countdown" aria-live="polite">
-        {partido.horaConfirmada === false ? <p className="font-bold">Hora por confirmar</p> : cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : cuenta?.estado === "en_juego" ? <span className="fixture-chip"><span className="fixture-live-dot" />EN JUEGO</span> : cuenta?.estado === "hoy" ? <p className="font-black text-xl">HOY · {hora}</p> : <div className="grid w-full grid-cols-3 gap-2">
+        {partido.horaConfirmada === false ? null : cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : live ? null : cuenta?.estado === "hoy" ? <p className="text-body-sm font-bold">Empieza en {Math.floor(minutes/60)>0?`${Math.floor(minutes/60)} h `:''}{minutes%60} min</p> : <div className="grid w-full grid-cols-3 gap-2">
           {[[cuenta?.dias, "DÍAS"], [cuenta?.horas, "HORAS"], [cuenta?.minutos, "MIN"]].map(([numero, label]) => <div key={label} className="fixture-counter"><p>{numero ?? "—"}</p><span>{label}</span></div>)}
         </div>}
       </div>
       <p className="fixture-location"><MapPin size={16} strokeWidth={1.75} />{partido.lugar}</p>
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className={`mt-4 grid ${twitch?'grid-cols-2':'grid-cols-1'} gap-2`}>
         <Button asChild variant="ghost" className="fixture-directions"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partido.lugar)}`} target="_blank" rel="noopener noreferrer"><Navigation strokeWidth={1.75} />Cómo llegar</a></Button>
-        <Button variant="ghost" className="fixture-calendar" disabled={!inicio || partido.horaConfirmada === false} onClick={descargar}><CalendarPlus strokeWidth={1.75} />Al calendario</Button>
+        {twitch&&<Button asChild variant="ghost" className="fixture-calendar"><a href={twitch} target="_blank" rel="noopener noreferrer"><Twitch strokeWidth={1.75}/>{live&&<span className="fixture-live-dot"/>}{live?'Ver en directo':'Ver en Twitch'}</a></Button>}
       </div>
     </div>
   </article>;

@@ -18,7 +18,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex club-full-height items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
@@ -46,7 +46,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex club-full-height items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load
@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0D4631" },
     ],
     links: [
@@ -118,6 +118,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  useEffect(()=>{
+    const viewport=window.visualViewport;
+    const update=()=>{const bottom=viewport?Math.max(0,window.innerHeight-viewport.height-viewport.offsetTop):0;document.documentElement.style.setProperty('--viewport-bottom',`${bottom}px`);document.documentElement.style.setProperty('--visible-height',`${viewport?.height??window.innerHeight}px`);};
+    const focus=(event:FocusEvent)=>{const target=event.target;if(target instanceof HTMLElement&&target.matches('input,textarea,select')&&target.closest('.club-bottom-sheet'))setTimeout(()=>target.scrollIntoView({block:'center',behavior:'smooth'}),250);};
+    update();viewport?.addEventListener('resize',update);viewport?.addEventListener('scroll',update);document.addEventListener('focusin',focus);
+    return()=>{viewport?.removeEventListener('resize',update);viewport?.removeEventListener('scroll',update);document.removeEventListener('focusin',focus);};
+  },[]);
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (!["SIGNED_IN","SIGNED_OUT","USER_UPDATED"].includes(event)) return;

@@ -63,3 +63,4 @@ use the editor.
 - All email inputs share email-validation.ts normalization and Zod validation; password management never logs credential values.
 - Optional access sharing keeps the entered password only in the success form and builds a validated WhatsApp recipient link; closing the form discards it.
 - Optional personal password creation uses an authenticated self-only server function checking protected password availability before admin Auth mutation; existing passwords always require current-password verification.
+- Bottom sheets share an 85dvh scroll viewport, sticky heading and safe-area padding; root visualViewport handling keeps focused fields visible. Floating creation controls use portals with frame-relative horizontal insets to escape clipping.

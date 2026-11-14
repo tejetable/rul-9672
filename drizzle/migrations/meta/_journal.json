@@ -197,6 +197,13 @@
       "when": 1794654083270,
       "tag": "0027_ignore_retired_roles_on_member_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794654415923,
+      "tag": "0028_club_twitch_setting",
+      "breakpoints": true
     }
   ]
 }

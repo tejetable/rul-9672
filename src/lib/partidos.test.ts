@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { calendarioPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido, fechaMadridISO } from "./partidos";
+import { directoPartido,minutosHastaPartido, calendarioPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido, fechaMadridISO } from "./partidos";
 import type { Partido } from "./dataService";
 
 const partido: Partido = { id: "m2", rival: "Abella F.C.", fechaHora: "sábado 14/11/2026 · 19:00", lugar: "Pabellón de Guntín", competicion: "Primera Futgal", esLocal: true, jugado: false, golesLocal: null, golesVisitante: null };
 const inicio = new Date("2026-11-14T18:00:00Z");
 describe("Fecha y cuenta atrás del partido", () => {
+  it('Twitch is live from kickoff until exactly two hours later',()=>{expect(directoPartido(partido,new Date('2026-11-14T17:59:59Z'))).toBe(false);expect(directoPartido(partido,inicio)).toBe(true);expect(directoPartido(partido,new Date('2026-11-14T19:59:59Z'))).toBe(true);expect(directoPartido(partido,new Date('2026-11-14T20:00:00Z'))).toBe(false);});
+  it('unknown kickoff cannot claim to be live',()=>expect(directoPartido({...partido,horaConfirmada:false},inicio)).toBe(false));
+  it('compact countdown keeps 3 hours 20 minutes and 45 minutes precise',()=>{expect(minutosHastaPartido(inicio,new Date('2026-11-14T14:40:00Z'))).toBe(200);expect(minutosHastaPartido(inicio,new Date('2026-11-14T17:15:00Z'))).toBe(45);});
   it("interpreta el inicio ISO recibido de Cloud",()=>expect(inicioPartido({...partido,fechaHora:"2026-11-14T18:00:00Z"})?.toISOString()).toBe("2026-11-14T18:00:00.000Z"));
   it("interpreta las 19:00 en Madrid, no en la zona horaria del móvil", () => {
     expect(inicioPartido(partido)?.toISOString()).toBe("2026-11-14T18:00:00.000Z");

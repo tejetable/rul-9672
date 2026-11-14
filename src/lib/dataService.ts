@@ -154,12 +154,13 @@ export const dataService = {
   clasificacion:()=>clasificacion,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
   async cargarAjustes(){
-    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual,url_clasificacion_futgal,cuota_socio").maybeSingle();
+    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual,url_clasificacion_futgal,cuota_socio,url_twitch").maybeSingle();
     check(r.error);settings={
       whatsapp_club:r.data?.whatsapp_club??defaultSettings.whatsapp_club,
       nombre_club:r.data?.nombre_club??defaultSettings.nombre_club,
       temporada_actual:r.data?.temporada_actual??defaultSettings.temporada_actual,
       email_club:'',
+      url_twitch:r.data?.url_twitch??defaultSettings.url_twitch,
       cuota_socio:r.data?.cuota_socio==null?null:Number(r.data.cuota_socio),
       url_clasificacion_futgal:r.data?.url_clasificacion_futgal??defaultSettings.url_clasificacion_futgal,
     };

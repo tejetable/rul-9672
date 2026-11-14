@@ -22,6 +22,7 @@ export type Database = {
           nombre_club: string
           temporada_actual: string
           url_clasificacion_futgal: string
+          url_twitch: string
           whatsapp_club: string
         }
         Insert: {
@@ -31,6 +32,7 @@ export type Database = {
           nombre_club?: string
           temporada_actual?: string
           url_clasificacion_futgal?: string
+          url_twitch?: string
           whatsapp_club?: string
         }
         Update: {
@@ -40,6 +42,7 @@ export type Database = {
           nombre_club?: string
           temporada_actual?: string
           url_clasificacion_futgal?: string
+          url_twitch?: string
           whatsapp_club?: string
         }
         Relationships: []
@@ -807,6 +810,7 @@ export type Database = {
           nombre_club: string | null
           temporada_actual: string | null
           url_clasificacion_futgal: string | null
+          url_twitch: string | null
           whatsapp_club: string | null
         }
         Insert: {
@@ -815,6 +819,7 @@ export type Database = {
           nombre_club?: string | null
           temporada_actual?: string | null
           url_clasificacion_futgal?: string | null
+          url_twitch?: string | null
           whatsapp_club?: string | null
         }
         Update: {
@@ -823,6 +828,7 @@ export type Database = {
           nombre_club?: string | null
           temporada_actual?: string | null
           url_clasificacion_futgal?: string | null
+          url_twitch?: string | null
           whatsapp_club?: string | null
         }
         Relationships: []

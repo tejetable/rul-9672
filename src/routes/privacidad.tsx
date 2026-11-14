@@ -17,8 +17,8 @@ export const Route = createFileRoute("/privacidad")({
 
 function Privacidad() {
   return (
-    <div className="min-h-screen bg-primary sm:py-6">
-      <main className="mx-auto min-h-screen w-full max-w-[430px] bg-background px-4 py-8 sm:min-h-[calc(100vh-3rem)] sm:rounded-[2rem]">
+    <div className="club-full-height bg-primary sm:py-6">
+      <main className="mx-auto club-full-height w-full max-w-[430px] bg-background px-4 py-8 sm:club-full-height sm:rounded-[2rem]">
         <Button variant="ghost" onClick={() => history.back()} className="label-club h-auto min-h-11">← Volver</Button>
         <h1 className="title-club mt-4 text-heading">Política de privacidad</h1>
                 <div className="mt-6 space-y-6">
