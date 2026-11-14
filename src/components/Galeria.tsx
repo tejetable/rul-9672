@@ -1,21 +1,64 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GaleriaFoto } from "@/components/GaleriaFoto";
-import { GaleriaVisor } from "@/components/GaleriaVisor";
 import { useDriveGallery } from '@/hooks/use-drive-gallery';
+import {randomHighlights,type HighlightPhoto} from '@/lib/drive-gallery';
+
+async function preloadPhotos(photos:HighlightPhoto[]):Promise<HighlightPhoto[]> {
+  const loaded=await Promise.all(photos.map(async item=>{
+    const image=new Image();image.src=item.foto.thumb;
+    try {await image.decode();return item;}catch{return null;}
+  }));
+  return loaded.filter((item):item is HighlightPhoto=>item!==null);
+}
 
 export function Galeria() {
   const {data,isPending}=useDriveGallery();
   const albumes=data?.albumes??[];
+  const [photos,setPhotos]=useState<HighlightPhoto[]>([]);
+  const [incoming,setIncoming]=useState<HighlightPhoto[]|null>(null);
+  const [busy,setBusy]=useState(false);
+  const [initialLoading,setInitialLoading]=useState(true);
+  const alive=useRef(true);
+  const lock=useRef(false);
+  const generation=useRef(0);
+  useEffect(()=>{alive.current=true;return()=>{alive.current=false;generation.current++;};},[]);
+  useEffect(()=>{
+    if(!data)return;
+    const token=++generation.current;
+    void preloadPhotos(randomHighlights(data.destacadas)).then(ready=>{
+      if(alive.current&&generation.current===token){setPhotos(ready);setInitialLoading(false);}
+    });
+  },[data]);
+  const refresh=async()=>{
+    if(!data||lock.current)return;
+    lock.current=true;setBusy(true);
+    const token=++generation.current;
+    try {
+      const ready=await preloadPhotos(randomHighlights(data.destacadas,photos));
+      if(!alive.current||token!==generation.current||ready.length!==Math.min(5,data.destacadas.length))return;
+      setIncoming(ready);
+      await new Promise(resolve=>setTimeout(resolve,250));
+      if(alive.current&&token===generation.current){setPhotos(ready);setIncoming(null);}
+    }finally{lock.current=false;if(alive.current)setBusy(false);}
+  };
+  const mosaic=(selection:HighlightPhoto[],outgoing=false)=><div className={`gallery-mosaic gallery-highlight-layer ${outgoing?'is-outgoing':''}`}>{selection.map(({foto,albumId},index)=>{
+    const album=albumes.find(a=>a.id===albumId);if(!album)return null;
+    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded/><span className="gallery-caption"><strong>{album.titulo}</strong><span>{album.detalle}</span></span></Link></Button>;
+  })}</div>;
   return <section className="mt-6" aria-label="Fotos del equipo">
     <div className="mb-3 flex items-center justify-between gap-3">
       <h2 className="club-section-title">Fotos</h2>
-      <Button asChild variant="link" className="h-11 px-0 text-accent font-bold"><Link to="/galeria" search={{ partido: "todos" }}>Ver todas <ArrowRight strokeWidth={1.75} /></Link></Button>
+      <div className="flex items-center gap-2">
+        {(data?.destacadas.length??0)>5&&<Button variant="ghost" aria-label="Ver otras fotos" title="Ver otras fotos" disabled={busy} onClick={()=>void refresh()} className={`gallery-refresh ${busy?'is-refreshing':''}`}><RefreshCw aria-hidden="true"/></Button>}
+        <Button asChild variant="link" className="h-11 px-0 text-accent font-bold"><Link to="/galeria" search={{ partido: "todos" }}>Ver todas <ArrowRight strokeWidth={1.75} /></Link></Button>
+      </div>
     </div>
-    {isPending ? <div className="gallery-image is-loading aspect-[16/10]"/> : !data?.destacadas.length ? <p className="py-6 text-body-sm text-muted-foreground">Todavía no hay fotos disponibles.</p> : <div className="gallery-mosaic">
-      {data.destacadas.map(({foto,albumId},index)=>{const album=albumes.find(a=>a.id===albumId);if(!album)return null;return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`}><GaleriaFoto foto={foto} alt={album.titulo}/><span className="gallery-caption"><strong>{album.titulo}</strong><span>{album.detalle}</span></span></Link></Button>;})}
+    {isPending|| (!!data?.destacadas.length&&initialLoading) ? <div className="gallery-image is-loading aspect-[16/10]"/> : !photos.length ? <p className="py-6 text-body-sm text-muted-foreground">Todavía no hay fotos disponibles.</p> : <div className={`gallery-highlight-stack ${incoming?'is-crossfading':''}`} aria-busy={busy}>
+      {mosaic(photos,!!incoming)}
+      {incoming&&mosaic(incoming)}
     </div>}
   </section>;
 }

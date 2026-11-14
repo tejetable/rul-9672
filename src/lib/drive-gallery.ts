@@ -27,11 +27,29 @@ export function buildAlbum(folder:DriveFile,files:DriveFile[],partidos:Partido[]
   const fecha=date.slice(0,10);const day=new Date(date).toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'short'}).replaceAll('.','').toUpperCase();
   return {id:folder.id,rival,titulo:`vs. ${rival}`,fecha,detalle:[resultado,day].filter(Boolean).join(' · '),...(partido?{partidoId:partido.id}:{}),...(resultado?{resultado}:{}),fotos:files.filter(f=>f.mimeType?.startsWith('image/')||f.mimeType?.startsWith('video/')).sort((a,b)=>captureDate(a).localeCompare(captureDate(b))).map(f=>({id:f.id,src:`https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w1600`,thumb:`https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w600`,pos:'50% 50%',...(f.mimeType?.startsWith('video/')?{video:true}: {})}))};
 }
-export function dailyHighlights(albumes:DriveAlbum[],day:string):{albumId:string;foto:FotoGaleria}[] {
-  let seed=Array.from(day).reduce((s,c)=>(s*31+c.charCodeAt(0))>>>0,0);
-  const all=albumes.slice(0,3).flatMap(a=>a.fotos.filter(f=>!f.video).map(foto=>({albumId:a.id,foto})));
-  for(let i=all.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);const a=all[i],b=all[j];if(a&&b){all[i]=b;all[j]=a;}}
-  return all.slice(0,5);
+export interface HighlightPhoto {albumId:string;foto:FotoGaleria}
+export function highlightPool(albumes:DriveAlbum[]):HighlightPhoto[] {
+  const recent=[...albumes].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,3);
+  const groups=recent.map(a=>a.fotos.filter(f=>!f.video).map(foto=>({albumId:a.id,foto})));
+  const pool:HighlightPhoto[]=[];const seen=new Set<string>();
+  // Round-robin keeps all three matches represented even if one has many photos.
+  for(let i=0;pool.length<30&&groups.some(g=>i<g.length);i++){
+    for(const group of groups){const item=group[i];if(item&&!seen.has(item.foto.id)&&pool.length<30){pool.push(item);seen.add(item.foto.id);}}
+  }
+  return pool;
+}
+export function randomHighlights(pool:HighlightPhoto[],previous:HighlightPhoto[]=[],random:()=>number=Math.random):HighlightPhoto[] {
+  const old=new Set(previous.map(p=>p.foto.id));
+  const unique=pool.filter((p,i)=>!p.foto.video&&pool.findIndex(other=>other.foto.id===p.foto.id)===i);
+  const shuffle=(items:HighlightPhoto[])=>items.map(item=>({item,rank:random()})).sort((a,b)=>a.rank-b.rank).map(({item})=>item);
+  const fresh=shuffle(unique.filter(p=>!old.has(p.foto.id)));
+  const candidates=fresh.length>=5?fresh:[...fresh,...shuffle(unique.filter(p=>old.has(p.foto.id)))];
+  const chosen=candidates.slice(0,5);
+  if(chosen.length>1&&new Set(chosen.map(p=>p.albumId)).size===1){
+    const alternate=candidates.find(p=>p.albumId!==chosen[0]?.albumId);
+    if(alternate)chosen[chosen.length-1]=alternate;
+  }
+  return chosen;
 }
 export function folderIdFromUrl(value:string):string|null {
   if(!value.trim())return null;

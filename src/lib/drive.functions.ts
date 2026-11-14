@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
-import { buildAlbum, dailyHighlights, type DriveFile, type DriveAlbum } from './drive-gallery';
+import { buildAlbum, highlightPool, type DriveFile, type DriveAlbum } from './drive-gallery';
 import type { Partido } from './dataService';
 export const getDriveGallery = createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).handler(async ({context})=>{
   const empty={albumes:[],destacadas:[],error:true};
@@ -9,10 +9,9 @@ export const getDriveGallery = createServerFn({method:'POST'}).middleware([requi
   const member=await context.supabase.rpc('mi_socio');
   if(!allowed.data && !member.data)return empty;
   const {supabaseAdmin}=await import('@/integrations/supabase/client.server');
-  const day=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});
-  const cacheId=`drive-gallery-${day}`;
+  const cacheId='drive-gallery-pool-v2';
   const cached=await supabaseAdmin.from('gallery_cache').select('payload,updated_at').eq('id',cacheId).maybeSingle();
-  if(cached.data && Date.now()-new Date(cached.data.updated_at).getTime()<600000) return cached.data.payload as unknown as {albumes:DriveAlbum[];destacadas:ReturnType<typeof dailyHighlights>;error:boolean};
+  if(cached.data && Date.now()-new Date(cached.data.updated_at).getTime()<600000) return cached.data.payload as unknown as {albumes:DriveAlbum[];destacadas:ReturnType<typeof highlightPool>;error:boolean};
   try {
     const list=async(q:string):Promise<DriveFile[]>=>{
       const rows:DriveFile[]=[];let token='';
@@ -31,7 +30,7 @@ export const getDriveGallery = createServerFn({method:'POST'}).middleware([requi
     const albumes=[];
     for(const folder of folders){if(!/^[\w-]+$/.test(folder.id))continue;albumes.push(buildAlbum(folder,await list(`'${folder.id}' in parents and (mimeType contains 'image/' or mimeType contains 'video/') and trashed=false`),partidos));}
     albumes.sort((a,b)=>b.fecha.localeCompare(a.fecha));
-    const result={albumes,destacadas:dailyHighlights(albumes,day),error:false};
+    const result={albumes,destacadas:highlightPool(albumes),error:false};
     await supabaseAdmin.from('gallery_cache').upsert({id:cacheId,payload:JSON.parse(JSON.stringify(result)),updated_at:new Date().toISOString()});
     return result;
   } catch {return empty;}

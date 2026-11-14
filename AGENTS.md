@@ -36,7 +36,7 @@ use the editor.
 - Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.
 - Match cards use pure helpers in src/lib/partidos.ts for Madrid-time countdowns and ICS exports so date behavior is independently tested.
 - Match selection and Madrid form conversion use src/lib/partidos.ts; PostgreSQL's estadisticas_liga owns totals and recent-first form, and guardar_resultado_partido saves results and optional ranking atomically so every role sees the same league data.
-- Gallery reads use the authenticated getDriveGallery server function and a ten-minute Cloud cache; drive-gallery.ts owns EXIF dates, explicit-first match linking and day-seeded highlights, never legacy filenames.
+- Gallery reads use authenticated getDriveGallery and a ten-minute Cloud cache; drive-gallery.ts owns EXIF, match linking and a 30-photo/3-album pool. The browser randomizes five, avoids current IDs and preloads crossfades without refetching.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
 
 - Verified email roles live in protected usuario_roles; RPCs bind them only to confirmed auth emails, guard assignments and keep session-scoped role selections in usuario_vista; browser role preferences never confer permissions.

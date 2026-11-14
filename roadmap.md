@@ -1,3 +1,4 @@
+- [x] Añadir refresco local de Fotos: grupo de hasta 30 de los 3 últimos álbumes, selección aleatoria sin repetir, precarga y fundido; 8 pruebas y fotos reales verificadas en 390/430px, cinco nuevas sin repeticiones ni llamadas de servidor por pulsación.
 - [x] Retirar variantes oscuras, fijar «only light» y beige exacto del navegador/manifest; colores idénticos con preferencia clara/oscura emulada.
 - [x] Reiniciar filtros en scroll 0 al cargar/volver y mantener «+» a 16px sobre barras inferiores y zona segura; acceso real comprobado en 360/390/430px y con barra inferior añadida para la prueba.
 - [ ] Comprobar antioscurecimiento en Chrome Android y Samsung Internet reales (requiere dispositivos físicos; Chromium emulado verificado).
