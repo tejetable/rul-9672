@@ -120,6 +120,13 @@
       "when": 1794648600701,
       "tag": "0016_validate_informative_notices_and_match_scores",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794648768911,
+      "tag": "0017_paid_membership_management",
+      "breakpoints": true
     }
   ]
 }

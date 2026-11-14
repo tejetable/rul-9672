@@ -40,3 +40,6 @@
 - [x] Separar Club en Partidos y Avisos y añadir edición y resultados.
 - [x] Adaptar calendario, posición y estadísticas calculadas; sustituir partidos inventados.
 - [x] Añadir LIGA automática y verificar resultado → último partido → puntos y racha.
+- [ ] Sustituir solicitudes por altas manuales con pago obligatorio y preparar creación desde pago verificado.
+- [ ] Listas paginadas, fichas de socios, pagos y cuota editable.
+- [ ] Equipo directivo compacto, búsqueda de personas y roles protegidos; verificar permisos y flujos.

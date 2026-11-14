@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       ajustes_club: {
         Row: {
+          cuota_socio: number | null
           email_club: string
           id: boolean
           nombre_club: string
@@ -24,6 +25,7 @@ export type Database = {
           whatsapp_club: string
         }
         Insert: {
+          cuota_socio?: number | null
           email_club?: string
           id?: boolean
           nombre_club?: string
@@ -32,6 +34,7 @@ export type Database = {
           whatsapp_club?: string
         }
         Update: {
+          cuota_socio?: number | null
           email_club?: string
           id?: boolean
           nombre_club?: string
@@ -180,6 +183,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pagos: {
+        Row: {
+          creado_at: string
+          fecha_pago: string
+          id: string
+          importe: number
+          metodo: string
+          referencia: string | null
+          registrado_por: string | null
+          socio_id: string
+          temporada: string
+        }
+        Insert: {
+          creado_at?: string
+          fecha_pago: string
+          id?: string
+          importe: number
+          metodo: string
+          referencia?: string | null
+          registrado_por?: string | null
+          socio_id: string
+          temporada: string
+        }
+        Update: {
+          creado_at?: string
+          fecha_pago?: string
+          id?: string
+          importe?: number
+          metodo?: string
+          referencia?: string | null
+          registrado_por?: string | null
+          socio_id?: string
+          temporada?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       partidos: {
         Row: {
@@ -696,6 +743,7 @@ export type Database = {
     Views: {
       ajustes_club_publicos: {
         Row: {
+          cuota_socio: number | null
           id: boolean | null
           nombre_club: string | null
           temporada_actual: string | null
@@ -703,6 +751,7 @@ export type Database = {
           whatsapp_club: string | null
         }
         Insert: {
+          cuota_socio?: number | null
           id?: boolean | null
           nombre_club?: string | null
           temporada_actual?: string | null
@@ -710,6 +759,7 @@ export type Database = {
           whatsapp_club?: string | null
         }
         Update: {
+          cuota_socio?: number | null
           id?: boolean | null
           nombre_club?: string | null
           temporada_actual?: string | null
@@ -734,6 +784,10 @@ export type Database = {
     }
     Functions: {
       acceso_password_club: { Args: { p_email: string }; Returns: Json }
+      alta_socio_con_pago: {
+        Args: { p_datos: Json; p_pago: Json }
+        Returns: string
+      }
       alta_socio_email: {
         Args: {
           p_email: string
@@ -779,6 +833,10 @@ export type Database = {
         }
         Returns: string
       }
+      crear_socio_desde_pago: {
+        Args: { datos: Json; pago: Json }
+        Returns: string
+      }
       elegir_vista: { Args: { p_role: string }; Returns: undefined }
       enlazar_roles_email: { Args: never; Returns: Json }
       enlazar_socio: {
@@ -787,6 +845,17 @@ export type Database = {
       }
       entrar_negocio: { Args: { p_pin: string }; Returns: string }
       estado_sesion_socia: { Args: never; Returns: string }
+      gestion_socios: { Args: never; Returns: Json }
+      gestionar_rol_persona: {
+        Args: {
+          p_activo: boolean
+          p_email: string
+          p_motivo?: string
+          p_patrocinador?: string
+          p_rol: Database["public"]["Enums"]["club_role"]
+        }
+        Returns: undefined
+      }
       guardar_resultado_partido: {
         Args: {
           p_contra: number
@@ -810,9 +879,14 @@ export type Database = {
       marcar_apertura: { Args: never; Returns: undefined }
       mi_patrocinador: { Args: never; Returns: string }
       mi_socio: { Args: never; Returns: string }
+      personas_club: { Args: never; Returns: Json }
       quitar_directiva: {
         Args: { p_motivo: string; p_user: string }
         Returns: undefined
+      }
+      registrar_pago_socio: {
+        Args: { p_pago: Json; p_socio: string }
+        Returns: string
       }
       reservar_directiva: {
         Args: { p_email: string; p_nombre: string; p_socio?: string }

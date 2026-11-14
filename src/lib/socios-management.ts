@@ -1,0 +1,22 @@
+import {z} from 'zod';
+import type {Socio} from './dataService';
+export const UNETE_DESTINO='whatsapp';
+export const UNETE_MENSAJE='¡Hola! Quiero hacerme socio/a del R.U. Lucense.';
+export const PAGE_SIZE=20;
+export const SEARCH_DELAY=250;
+export const pagoSchema=z.object({metodo:z.enum(['efectivo','transferencia','bizum']),importe:z.number().finite().positive('Indica un importe mayor que cero.'),fecha:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),referencia:z.string().trim().optional()});
+export type PagoInput=z.infer<typeof pagoSchema>;
+export interface Pago {id:string;socio_id:string;temporada:string;metodo:string;importe:number;fecha_pago:string;referencia:string|null}
+export interface PersonaRol {id:string;email:string;nombre:string;rol:string;socio_id:string|null;patrocinador_id:string|null;activo:boolean}
+export interface Persona {nombre:string;email:string;roles:PersonaRol[];activo:boolean}
+export type Filtro='todas'|'activas'|'password'|'desactivadas'|'sin_pago';
+export type Orden='numero'|'nombre'|'fecha';
+export function alCorriente(pagos:Pago[],id:string,temporada:string){return pagos.some(p=>p.socio_id===id&&p.temporada===temporada);}
+export function listaSocios(socios:Socio[],q:string,filtro:Filtro,orden:Orden,status:Record<string,boolean>,pagos:Pago[],temporada:string){
+ const text=q.trim().toLocaleLowerCase('es');
+ return socios.filter(s=>[s.nombre,s.email??'',s.telefono,String(s.numeroSocio)].some(v=>v.toLocaleLowerCase('es').includes(text)))
+ .filter(s=>filtro==='todas'||(filtro==='activas'&&s.estado==='activa')||(filtro==='desactivadas'&&s.estado==='desactivada')||(filtro==='password'&&s.estado!=='desactivada'&&status[s.email??'']===false)||(filtro==='sin_pago'&&!alCorriente(pagos,s.id,temporada)))
+ .sort((a,b)=>orden==='nombre'?a.nombre.localeCompare(b.nombre,'es'):orden==='fecha'?b.fechaAlta.localeCompare(a.fechaAlta):a.numeroSocio-b.numeroSocio);
+}
+export function paginaSocios<T>(rows:T[],page:number){const pages=Math.max(1,Math.ceil(rows.length/PAGE_SIZE));const current=Math.min(Math.max(page,1),pages);return {rows:rows.slice((current-1)*PAGE_SIZE,current*PAGE_SIZE),pages,current};}
+export function hoyMadrid(){return new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Madrid',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
