@@ -67,7 +67,7 @@ export function UltimoResultado({partidos}:{partidos:Partido[]}) {
   const jugados=[...partidos].filter(p=>p.jugado).sort((a,b)=>(inicioPartido(a)?.getTime()??0)-(inicioPartido(b)?.getTime()??0));
   const [idx,setIdx]=useState<number|null>(null);const [fade,setFade]=useState(false);const [x0,setX0]=useState<number|null>(null);
   if(!jugados.length)return null;
-  const last=jugados.length-1,i=Math.min(idx??last,last),partido=jugados[i];
+  const last=jugados.length-1,i=Math.min(idx??last,last),partido=jugados[i]!;
   const ir=(n:number)=>{if(n<0||n>last||n===i)return;setFade(true);setTimeout(()=>{setIdx(n);setFade(false);},100);};
   const album=data?.albumes.find(a=>a.partidoId===partido.id);
   const resultado=resultadoPartido(partido);
