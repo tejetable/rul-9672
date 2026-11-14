@@ -1,3 +1,4 @@
+import {PasswordAccessStatus} from './PasswordAccessStatus';
 import {accessMessage} from "@/lib/email-access";
 import {InviteForm} from "./ClubAdmin";
 
@@ -106,7 +107,7 @@ export function SociasPanel() {
               </div>
               <span className={`label-club rounded-full px-3 py-1 ${ESTADO[s.estado].cls}`}>{ESTADO[s.estado].label}</span>
             </div>
-            {s.cambioDispositivo && (
+            <PasswordAccessStatus email={s.email??''}/>{s.cambioDispositivo && (
               <p className="mt-2 flex items-center gap-2 text-body-sm font-bold">
                 <Smartphone size={16} strokeWidth={1.75} /> Cambio de dispositivo
               </p>

@@ -377,7 +377,7 @@
 .access-motto { max-width:350px; margin:28px 0 0; font-size:30px; line-height:1; text-transform:uppercase; font-weight:900; text-wrap:balance; letter-spacing:0; animation:access-phrase-in 360ms 120ms ease-out both; }
 .access-gold { display:block; width:48px; height:3px; margin-top:24px; background:var(--gold); }
 .access-bottom { display:flex; flex-direction:column; gap:12px; flex-shrink:0; animation:access-phrase-in 360ms 240ms ease-out both; }
-.access-button { height:56px; min-height:56px; width:100%; border-radius:16px; font-size:15px; font-weight:900; letter-spacing:.06em; box-shadow:none; }
+.access-button { height:56px; min-height:56px; width:100%; border-radius:16px; font-size:15px; font-weight:900; letter-spacing:0; box-shadow:none; }
 .access-button-secondary,.access-button-secondary:hover { background:transparent; border:1.5px solid var(--primary); color:var(--primary); }
 .access-season { text-align:center; font-size:12px; color:var(--access-muted); margin-top:4px; }
 .access-compact .access-crest { width:96px; }
@@ -403,3 +403,10 @@
 @media (min-height:801px) { .access-screen:not(.access-compact) .access-crest { width:180px; } }
 @media (min-width:640px) { .access-screen { height:calc(100dvh - 48px); } }
 @media (prefers-reduced-motion:reduce) { .access-crest,.access-motto,.access-bottom { animation:none; transition:none; } .access-identity { transition:none; } }
+
+/* Google branding tokens are independent of the club palette. */
+:root { --google-background:#FFFFFF; --google-border:#747775; --google-text:#1F1F1F; }
+.google-button,.google-button:hover { background:var(--google-background); border:1px solid var(--google-border); color:var(--google-text); font-family:"Google Sans",var(--font-lato); font-size:14px; line-height:20px; font-weight:500; gap:10px; padding:0 12px; letter-spacing:0; }
+.google-button svg { width:18px; height:18px; }
+.access-compact { height:auto; min-height:calc(100dvh - 48px); }
+.access-compact .access-identity { min-height:260px; }

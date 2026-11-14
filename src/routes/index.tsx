@@ -1,3 +1,4 @@
+import {GoogleAcceso} from '@/components/GoogleAcceso';
 import {ClubAdmin,ClubAdminMenu} from "@/components/ClubAdmin";
 import {DEMO_MODE} from "@/lib/club-settings";
 import {EmailAcceso} from "@/components/EmailAcceso";
@@ -66,7 +67,7 @@ export function AppFrame({ children, crema = false }: { children: React.ReactNod
 }
 
 function Bienvenida({onEnter,onJoin}:{onEnter:()=>void;onJoin:()=>void}) {
- return <AccesoVisual><Button onClick={onEnter} className="access-button">ENTRAR</Button><Button variant="outline" onClick={onJoin} className="access-button access-button-secondary">HAZTE SOCIA/O</Button><p className="access-season">Temporada 2026/27</p></AccesoVisual>;
+ return <AccesoVisual><GoogleAcceso/><Button variant="outline" onClick={onEnter} className="access-button access-button-secondary">ENTRAR CON EMAIL</Button><Button variant="link" onClick={onJoin} className="h-auto whitespace-normal text-body-sm">¿Aún no eres socia/o? Hazte socia/o</Button><p className="access-season">Temporada 2026/27</p></AccesoVisual>;
 }
 
 function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {

@@ -681,6 +681,7 @@ export type Database = {
       }
     }
     Functions: {
+      acceso_password_club: { Args: { p_email: string }; Returns: Json }
       alta_socio_email: {
         Args: {
           p_email: string

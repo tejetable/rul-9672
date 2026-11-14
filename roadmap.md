@@ -29,6 +29,11 @@
 - [x] Añadir roles por email y formularios de Directiva, socias y negocios.
 - [x] Añadir solicitudes públicas pendientes de pago y confirmación en efectivo.
 - [x] Verificar acceso, permisos, solicitudes y cambio de rol en escritorio y móvil.
-- [ ] Verificar recepción del código/enlace por email (requiere acceso al buzón del destinatario).
+- [ ] Verificar recepción de invitaciones y recuperación por email (requiere acceso al buzón del destinatario).
 - [x] Rediseñar bienvenida, email, código y selección de rol con escudo transparente; comprobar 360×740, 390×844 y 430×932.
 - [ ] Configurar WhatsApp real del club y comprobar chat final (falta número con prefijo de país).
+- [x] Sustituir OTP por Google y email/contraseña; alta pública con contraseña y recuperación.
+- [x] Conectar emails seguros a altas manuales; mostrar estado real y reenviar desde fichas.
+- [ ] Personalizar invitación y recuperación (requiere dominio de envío).
+- [x] Verificar ficha de Super admin autenticado, permisos, formularios y diseño móvil; 47 pruebas pasan.
+- [ ] Verificar alta → confirmación → contraseña → reentrada y Google con misma cuenta (requiere buzón y autorización de Google).

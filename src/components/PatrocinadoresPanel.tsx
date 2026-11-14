@@ -1,3 +1,4 @@
+import {PasswordAccessStatus} from './PasswordAccessStatus';
 import { BajaForm } from "@/components/BajaForm";
 import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
 import { Button } from "@/components/ui/button";
@@ -91,7 +92,7 @@ export function PatrocinadoresPanel() {
               <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-background">
                 <div className="h-full rounded-full bg-accent" style={{ width: `${prog.pct}%` }} />
               </div>
-              <EmailNegocio id={p.id} email={p.emailAcceso??""}/>{p.activo && <Button variant="ghost" onClick={() => setBaja(p.id)}>Desactivar</Button>}
+              <PasswordAccessStatus email={p.emailAcceso??''}/><EmailNegocio id={p.id} email={p.emailAcceso??""}/>{p.activo && <Button variant="ghost" onClick={() => setBaja(p.id)}>Desactivar</Button>}
             </li>
           );
         })}

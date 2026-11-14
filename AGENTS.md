@@ -39,10 +39,10 @@ use the editor.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
 
 - Verified email roles live in protected usuario_roles; RPCs bind them only to confirmed auth emails, guard assignments and keep session-scoped role selections in usuario_vista; browser role preferences never confer permissions.
-- All sign-in uses Cloud email OTP/magic links; admin assignments use role-checked RPCs instead of invitation tokens or PIN endpoints.
+- Sign-in uses managed Google OAuth or Cloud password auth; admin assignments stay role-checked and password invitations use authenticated server functions with role verification before admin access.
 - Club WhatsApp comes from singleton Cloud settings through dataService; empty contact numbers hide club links and access messages use each member’s optional recipient number.
 - Public settings reads use the explicitly projected ajustes_club_publicos view; the underlying settings and club email are readable only by Super admin so public contact links never expose administrative fields.
 - Reserve the document scrollbar gutter and suppress duplicate Radix compensation; keep the member header sticky inside the app frame and full-screen overlays in portals to prevent layout shifts and clipping.
 
 - Public membership applications call a validated RPC that returns only a request ID; payment approval is role-checked and transactional, with payment reference fields reserved for future verified payment callbacks.
-- Welcome, email entry and role selection share AccesoVisual and semantic access tokens; use input-otp for native paste, numeric keyboard and focus progression rather than custom digit handling.
+- Welcome, email entry and role selection share AccesoVisual and semantic access tokens; password forms share validation and visibility controls; recovery and invitation links use public dedicated routes and Auth session verification.
