@@ -582,10 +582,11 @@ body:has(.member-navigation) { --bottom-navigation:76px; }
 @keyframes fixture-pulse { 50% { opacity:.25; } }
 @media(prefers-reduced-motion:reduce) { .fixture-live-dot { animation:none; } }
 
-.result-nav { position:relative; display:flex; align-items:center; gap:8px; }
+.result-nav { display:grid; grid-template-columns:36px 1fr 36px; align-items:center; margin-bottom:12px; }
 .result-arrow { display:flex; width:36px; height:36px; flex-shrink:0; align-items:center; justify-content:center; border-radius:999px; background:color-mix(in srgb, var(--primary) 6%, transparent); color:var(--primary); font-size:22px; font-weight:700; line-height:1; }
 .result-arrow:disabled { opacity:.3; }
-.result-latest { position:absolute; right:0; top:100%; margin-top:4px; font-size:11px; font-weight:700; color:var(--accent); }
+.result-pager { display:flex; height:24px; align-items:center; justify-content:center; gap:12px; margin-top:8px; }
+.result-latest { font-size:12px; font-weight:700; color:var(--accent); }
 .result-body { transition:opacity 200ms ease; }
 .result-card .result-matchup { grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:8px; }
 .result-card .result-team { align-items:center; text-align:center; }

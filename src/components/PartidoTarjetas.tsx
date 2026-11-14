@@ -77,9 +77,8 @@ export function UltimoResultado({partidos}:{partidos:Partido[]}) {
   return <><article className="result-card" aria-label="Resultado del partido" onTouchStart={e=>setX0(e.touches[0]?.clientX??null)} onTouchEnd={e=>{if(x0===null)return;const d=(e.changedTouches[0]?.clientX??x0)-x0;if(Math.abs(d)>40)ir(d<0?i+1:i-1);setX0(null);}}>
     <div className="result-nav">
       <button type="button" className="result-arrow" aria-label="Partido anterior" disabled={i===0} onClick={()=>ir(i-1)}>‹</button>
-      <div className="flex min-w-0 flex-1 items-center justify-center gap-2"><h2 className="result-kicker">{i===last?'ÚLTIMO PARTIDO':`JORNADA ${partido.jornada??'—'}`}</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
+      <div className="flex min-w-0 items-center justify-center gap-2 whitespace-nowrap"><h2 className="result-kicker">{`JORNADA ${partido.jornada??'—'}`}</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
       <button type="button" className="result-arrow" aria-label="Partido siguiente" disabled={i===last} onClick={()=>ir(i+1)}>›</button>
-      {i!==last&&<button type="button" className="result-latest" onClick={()=>ir(last)}>Ver el último</button>}
     </div>
     <div className="result-body" style={{opacity:fade?0:1}}>
       <div className="result-matchup">
@@ -91,7 +90,7 @@ export function UltimoResultado({partidos}:{partidos:Partido[]}) {
       {folder&&<div className="flex justify-center"><Button asChild variant="link" className="h-9 p-0 text-accent text-body-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:folder}} search={{foto:''}}>Ver fotos del partido <ArrowRight/></Link></Button></div>}
     </div>
   </article>
-  {jugados.length>8?<p className="mt-2 text-center text-body-sm font-bold">J{partido.jornada??i+1} / {jugados.length}</p>:<div className="result-dots" aria-hidden="true">{jugados.map((p,n)=><span key={p.id} className={n===i?'is-active':''}/>)}</div>}</>;
+  <div className="result-pager">{jugados.length>8?<p className="text-body-sm font-bold">J{partido.jornada??i+1} / {jugados.length}</p>:<div className="result-dots" aria-hidden="true">{jugados.map((p,n)=><span key={p.id} className={n===i?'is-active':''}/>)}</div>}{i!==last&&<button type="button" className="result-latest" onClick={()=>ir(last)}>Ir al último ›</button>}</div></>;
 }
 export function Liga() {
   const db=useClubData();const [ahora,setAhora]=useState(()=>new Date());
