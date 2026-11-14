@@ -20,6 +20,7 @@ export type Database = {
           id: boolean
           nombre_club: string
           temporada_actual: string
+          url_clasificacion_futgal: string
           whatsapp_club: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           id?: boolean
           nombre_club?: string
           temporada_actual?: string
+          url_clasificacion_futgal?: string
           whatsapp_club?: string
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           id?: boolean
           nombre_club?: string
           temporada_actual?: string
+          url_clasificacion_futgal?: string
           whatsapp_club?: string
         }
         Relationships: []
@@ -97,6 +100,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      clasificacion_club: {
+        Row: {
+          actualizado_at: string
+          actualizado_por: string | null
+          id: string
+          jornada: number
+          posicion: number
+        }
+        Insert: {
+          actualizado_at?: string
+          actualizado_por?: string | null
+          id?: string
+          jornada?: number
+          posicion: number
+        }
+        Update: {
+          actualizado_at?: string
+          actualizado_por?: string | null
+          id?: string
+          jornada?: number
+          posicion?: number
+        }
+        Relationships: []
       }
       equipo_invitaciones: {
         Row: {
@@ -163,8 +190,11 @@ export type Database = {
           goles_contra: number | null
           goles_favor: number | null
           id: string
+          jornada: number | null
           jugado: boolean
           lugar: string
+          pabellon: string
+          resultado: string | null
           rival: string
         }
         Insert: {
@@ -175,8 +205,11 @@ export type Database = {
           goles_contra?: number | null
           goles_favor?: number | null
           id?: string
+          jornada?: number | null
           jugado?: boolean
           lugar?: string
+          pabellon?: string
+          resultado?: string | null
           rival: string
         }
         Update: {
@@ -187,8 +220,11 @@ export type Database = {
           goles_contra?: number | null
           goles_favor?: number | null
           id?: string
+          jornada?: number | null
           jugado?: boolean
           lugar?: string
+          pabellon?: string
+          resultado?: string | null
           rival?: string
         }
         Relationships: []
@@ -663,19 +699,35 @@ export type Database = {
           id: boolean | null
           nombre_club: string | null
           temporada_actual: string | null
+          url_clasificacion_futgal: string | null
           whatsapp_club: string | null
         }
         Insert: {
           id?: boolean | null
           nombre_club?: string | null
           temporada_actual?: string | null
+          url_clasificacion_futgal?: string | null
           whatsapp_club?: string | null
         }
         Update: {
           id?: boolean | null
           nombre_club?: string | null
           temporada_actual?: string | null
+          url_clasificacion_futgal?: string | null
           whatsapp_club?: string | null
+        }
+        Relationships: []
+      }
+      estadisticas_liga: {
+        Row: {
+          e: number | null
+          g: number | null
+          goles_contra: number | null
+          goles_favor: number | null
+          p: number | null
+          pj: number | null
+          puntos: number | null
+          racha: string[] | null
         }
         Relationships: []
       }
@@ -735,6 +787,15 @@ export type Database = {
       }
       entrar_negocio: { Args: { p_pin: string }; Returns: string }
       estado_sesion_socia: { Args: never; Returns: string }
+      guardar_resultado_partido: {
+        Args: {
+          p_contra: number
+          p_favor: number
+          p_id: string
+          p_posicion?: number
+        }
+        Returns: undefined
+      }
       has_club_role: {
         Args: { r: Database["public"]["Enums"]["club_role"] }
         Returns: boolean

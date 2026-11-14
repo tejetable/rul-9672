@@ -410,3 +410,21 @@
 .google-button svg { width:18px; height:18px; }
 .access-compact { height:auto; min-height:calc(100dvh - 48px); }
 .access-compact .access-identity { min-height:260px; }
+
+/* Result-only palette exceptions: never used for general alerts or controls. */
+:root { --result-draw:#D4A72C; --result-defeat:#B5473A; }
+.result-V { background:var(--accent); color:var(--primary-foreground); }
+.result-E { background:var(--result-draw); color:var(--primary); }
+.result-D { background:var(--result-defeat); color:var(--primary-foreground); }
+.result-chip { border-radius:999px; padding:4px 8px; font-size:10px; font-weight:700; }
+.league-strip { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; padding:12px; background:var(--result-surface); border-radius:16px; }
+.league-strip .label-club { font-size:9px; }
+.league-dot { display:block; width:10px; height:10px; border-radius:50%; background:var(--border); }
+.league-dot.result-V { background:var(--accent); }
+.league-dot.result-E { background:var(--result-draw); }
+.league-dot.result-D { background:var(--result-defeat); }
+.league-caption { font-size:10px; }
+.league-link { font-size:11px; padding:0; height:44px; white-space:normal; text-align:right; }
+.fixture-matchup { grid-template-columns:minmax(0,1fr) 100px minmax(0,1fr); }
+.fixture-team p,.result-team p { overflow-wrap:anywhere; }
+@media(max-width:359px) { .league-strip { flex-wrap:wrap; } .league-link { margin-left:auto; } }

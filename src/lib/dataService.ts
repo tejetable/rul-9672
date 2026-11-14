@@ -66,6 +66,7 @@ export interface Canje {
 }
 export interface Partido {
   id: string;
+  jornada?: number | null;
   rival: string;
   fechaHora: string;
   lugar: string;
@@ -81,7 +82,7 @@ export interface Aviso {
   titulo: string;
   texto: string;
   fecha: string;
-  tipo: "partido" | "ventaja" | "club";
+  tipo: "otro" | "ventaja" | "club";
   /** A quién va dirigido; sin valor = todos */
   para?: "todos" | "socias" | "negocios";
 }
@@ -97,6 +98,9 @@ export interface DB {
 }
 
 const emptyDB = (): DB => ({ socios: [], patrocinadores: [], ventajas: [], canjes: [], partidos: [], avisos: [], visitas: [], socioActualId: null });
+export interface LigaStats { pj:number; g:number; e:number; p:number; puntos:number; goles_favor:number; goles_contra:number; racha:string[] }
+let liga:LigaStats={pj:0,g:0,e:0,p:0,puntos:0,goles_favor:0,goles_contra:0,racha:[]};
+let clasificacion:{jornada:number;posicion:number}|null=null;
 let settings=defaultSettings;
 let db = emptyDB();
 let role: 'socia' | 'negocio' | 'directiva' | 'super_admin' | null = null;
@@ -137,14 +141,17 @@ export const dataService = {
   esSuper:()=>roles.some(r=>r.rol==='super_admin')||canManageTeam(role),
   esDirectiva:()=>role==='directiva'||role==='super_admin',
   ajustes:()=>settings,
+  liga:()=>liga,
+  clasificacion:()=>clasificacion,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
   async cargarAjustes(){
-    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual").maybeSingle();
+    const r=await supabase.from("ajustes_club_publicos").select("id,whatsapp_club,nombre_club,temporada_actual,url_clasificacion_futgal").maybeSingle();
     check(r.error);settings={
       whatsapp_club:r.data?.whatsapp_club??defaultSettings.whatsapp_club,
       nombre_club:r.data?.nombre_club??defaultSettings.nombre_club,
       temporada_actual:r.data?.temporada_actual??defaultSettings.temporada_actual,
       email_club:'',
+      url_clasificacion_futgal:r.data?.url_clasificacion_futgal??defaultSettings.url_clasificacion_futgal,
     };
     if(this.esSuper()){
       const privateSettings=await supabase.from("ajustes_club").select("email_club").maybeSingle();
@@ -164,6 +171,12 @@ export const dataService = {
   async emailNegocio(id:string,email:string){const r=await supabase.rpc('asignar_negocio_email',{p_id:id,p_email:email});check(r.error);await this.refresh();await this.enviarPassword(email);},
   async elegirRol(id:string){const chosen=roles.find(r=>r.id===id);if(!chosen)throw new Error('Rol no autorizado');const r=await supabase.rpc('elegir_vista',{p_role:id});check(r.error);selectedRole=id;role=chosen.rol;linkedSocio=chosen.socio_id;sessionState=role==='socia'?'ok':null;window.localStorage.setItem('rul-last-email-role',id);await this.refresh();},
   async albumes(){return (await getDriveGallery()).albumes;},
+  async guardarPartido(input:{id?:string;jornada:number;rival:string;fechaHora:string;esLocal:boolean;lugar:string;competicion:string;driveUrl:string}){
+    const folder=folderIdFromUrl(input.driveUrl);if(input.driveUrl.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');
+    const row={jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder};
+    const r=input.id?await supabase.from('partidos').update(row).eq('id',input.id).select('id').single():await supabase.from('partidos').insert(row).select('id').single();check(r.error);await this.refresh();
+  },
+  async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);await this.refresh();},
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {
     role=null;
@@ -183,7 +196,7 @@ export const dataService = {
   },
   async refresh() {
     if (!userId || !role) { db = emptyDB(); notify(); return; }
-    const [socios, pats, ventajas, visitas, partidos, avisos, leidos] = await Promise.all([
+    const [socios, pats, ventajas, visitas, partidos, avisos, leidos, stats, tabla] = await Promise.all([
       allRows((a,b) => supabase.from('socios').select('*').order('numero_socio').range(a,b)),
       allRows((a,b) => supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,importe_patrocinio,fecha_baja,motivo_baja,email_acceso').order('fecha_alta').range(a,b)),
       allRows((a,b) => supabase.from('ventajas').select('*').order('id').range(a,b)),
@@ -194,11 +207,15 @@ export const dataService = {
       allRows((a,b) => supabase.from('partidos').select('*').order('fecha_hora',{ascending:false}).range(a,b)),
       allRows((a,b) => supabase.from('avisos').select('*').order('publicado_at',{ascending:false}).range(a,b)),
       allRows((a,b) => supabase.from('avisos_leidos').select('aviso_id').eq('user_id',userId ?? '').order('aviso_id').range(a,b)),
+      supabase.from('estadisticas_liga').select('*').single(),
+      supabase.from('clasificacion_club').select('jornada,posicion').order('actualizado_at',{ascending:false}).limit(1).maybeSingle(),
     ]);
+    check(stats.error);check(tabla.error);
+    liga={pj:stats.data?.pj??0,g:stats.data?.g??0,e:stats.data?.e??0,p:stats.data?.p??0,puntos:stats.data?.puntos??0,goles_favor:stats.data?.goles_favor??0,goles_contra:stats.data?.goles_contra??0,racha:stats.data?.racha??[]};clasificacion=tabla.data;
     db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:v.titulo,descripcion:v.descripcion,condiciones:v.condiciones,activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
-      partidos: partidos.map(p=>({id:p.id,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.lugar,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
+      partidos: partidos.map(p=>({id:p.id,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
       avisos:avisos.map(a=>({id:a.id,titulo:a.titulo,texto:a.texto,fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
     if(role==='socia'){const status=await supabase.rpc('estado_sesion_socia');sessionState=status.data as typeof sessionState;}
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}

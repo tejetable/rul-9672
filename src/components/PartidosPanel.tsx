@@ -1,7 +1,43 @@
-import {useState} from 'react';
-import {Button} from '@/components/ui/button';
-import {dataService,useClubData,runAction} from '@/lib/dataService';
-export function PartidosPanel(){
-  const db=useClubData();const [edit,setEdit]=useState<string|null>(null);const [url,setUrl]=useState('');
-  return <section className="mt-8 border-t border-border pt-5"><h2 className="club-section-title">Partidos · Fotos</h2>{db.partidos.map(p=><div key={p.id} className="mt-3 rounded-panel bg-surface p-4"><p className="font-bold">vs. {p.rival}</p>{edit===p.id ? <><label className="mt-3 block text-body-sm">Enlace de la carpeta de fotos (Drive)<input value={url} onChange={e=>setUrl(e.target.value)} className="club-input mt-1 w-full" placeholder="https://drive.google.com/drive/folders/…"/></label><Button className="mt-3" onClick={()=>runAction(async()=>{await dataService.guardarCarpetaPartido(p.id,url);setEdit(null);})}>Guardar</Button><Button variant="ghost" onClick={()=>setEdit(null)}>Cancelar</Button></> : <Button variant="ghost" onClick={()=>{setEdit(p.id);setUrl(p.driveFolderId?`https://drive.google.com/drive/folders/${p.driveFolderId}`:'');}}>Editar partido</Button>}</div>)}</section>;
+import { useState } from 'react';
+import { Plus, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { dataService, useClubData, runAction, type Partido } from '@/lib/dataService';
+import { fechaMadridCampos, fechaMadridISO, inicioPartido, proximoPartido } from '@/lib/partidos';
+
+const PABELLON = 'Pavillón Municipal de Guntín';
+export function PartidosPanel() {
+  const db=useClubData();const [edit,setEdit]=useState<Partido|'nuevo'|null>(null),[resultado,setResultado]=useState<string|null>(null);
+  const ahora=new Date(),proximo=proximoPartido(db.partidos,ahora);
+  const lista=[...db.partidos].sort((a,b)=>Number(a.jugado)-Number(b.jugado)||(a.jugado ? -1:1)*((inicioPartido(a)?.getTime()??Infinity)-(inicioPartido(b)?.getTime()??Infinity)));
+  return <section className="px-5 pt-5 pb-32">
+    <h1 className="club-section-title">Partidos</h1>
+    <article className="mt-4 rounded-panel bg-surface p-4"><p className="label-club">Próximo partido</p><p className="mt-2 font-black">{proximo?`vs. ${proximo.rival}`:'Por confirmar'}</p>{proximo&&<><p className="text-body-sm">Jornada {proximo.jornada} · {fechaMadridCampos(proximo).fecha} · {fechaMadridCampos(proximo).hora}</p><Button variant="ghost" onClick={()=>setEdit(proximo)}><Pencil size={16}/>Editar</Button></>}</article>
+    <Button className="mt-4 w-full club-button" onClick={()=>setEdit('nuevo')}><Plus/>AÑADIR PARTIDO</Button>
+    {edit&&<PartidoForm key={edit==='nuevo'?'nuevo':edit.id} partido={edit==='nuevo'?undefined:edit} onClose={()=>setEdit(null)}/>}
+    <div className="mt-5 space-y-3">{lista.map(p=>{
+      const pasado=(inicioPartido(p)?.getTime()??Infinity)<=ahora.getTime();const campos=fechaMadridCampos(p);
+      const favor=p.esLocal?p.golesLocal:p.golesVisitante,contra=p.esLocal?p.golesVisitante:p.golesLocal;
+      return <article key={p.id} className="rounded-panel bg-surface p-4"><p className="label-club">Jornada {p.jornada??'—'} · {p.esLocal?'En casa':'Fuera'}</p><p className="mt-1 font-black">R.U. Lucense {p.jugado?`${favor} – ${contra}`:'vs.'} {p.rival}</p><p className="text-body-sm mt-1">{campos.fecha||'Fecha por confirmar'} · {campos.hora}</p><p className="text-body-sm">{p.lugar}</p><div className="mt-2 flex flex-wrap gap-2"><Button variant="ghost" onClick={()=>setEdit(p)}><Pencil size={16}/>Editar partido</Button>{(pasado||p.jugado)&&<Button onClick={()=>setResultado(p.id)}>{p.jugado?'Corregir resultado':'METER RESULTADO'}</Button>}</div>{resultado===p.id&&<ResultadoForm partido={p} onClose={()=>setResultado(null)}/>}</article>;
+    })}</div>
+  </section>;
+}
+function PartidoForm({partido,onClose}:{partido?:Partido|undefined;onClose:()=>void}) {
+  const campos=partido?fechaMadridCampos(partido):{fecha:'',hora:''};
+  const [form,setForm]=useState({jornada:partido?.jornada??7,rival:partido?.rival??'',fecha:campos.fecha,hora:campos.hora,esLocal:partido?.esLocal??true,lugar:partido?.lugar??PABELLON,competicion:partido?.competicion??'Primera Futgal · Grupo 2',driveUrl:partido?.driveFolderId?`https://drive.google.com/drive/folders/${partido.driveFolderId}`:''});
+  const [busy,setBusy]=useState(false);
+  return <form className="mt-5 space-y-3 border-y border-border py-4" onSubmit={e=>{e.preventDefault();runAction(async()=>{setBusy(true);try{await dataService.guardarPartido({...form,...(partido?{id:partido.id}:{}),fechaHora:fechaMadridISO(form.fecha,form.hora)});onClose();}finally{setBusy(false);}});}}>
+    <h2 className="club-section-title">{partido?'Editar partido':'Añadir partido'}</h2>
+    <label className="block text-body-sm">Jornada<input required type="number" min="1" step="1" value={form.jornada} onChange={e=>setForm({...form,jornada:Number(e.target.value)})} className="club-input mt-1 w-full p-3"/></label>
+    <label className="block text-body-sm">Rival<input required maxLength={200} value={form.rival} onChange={e=>setForm({...form,rival:e.target.value})} className="club-input mt-1 w-full p-3"/></label>
+    <div className="grid grid-cols-2 gap-3"><label className="min-w-0 text-body-sm">Fecha<input required type="date" value={form.fecha} onChange={e=>setForm({...form,fecha:e.target.value})} className="club-input mt-1 w-full min-w-0 p-2"/></label><label className="min-w-0 text-body-sm">Hora<input required type="time" value={form.hora} onChange={e=>setForm({...form,hora:e.target.value})} className="club-input mt-1 w-full min-w-0 p-2"/></label></div>
+    <div className="club-tabs grid-cols-2">{[true,false].map(local=><Button key={String(local)} type="button" variant="ghost" aria-pressed={form.esLocal===local} onClick={()=>setForm({...form,esLocal:local,lugar:local?PABELLON:form.lugar===PABELLON?'':form.lugar})}>{local?'Local':'Visitante'}</Button>)}</div>
+    <label className="block text-body-sm">Pabellón<input required value={form.lugar} onChange={e=>setForm({...form,lugar:e.target.value})} className="club-input mt-1 w-full p-3"/></label>
+    <label className="block text-body-sm">Competición<input required value={form.competicion} onChange={e=>setForm({...form,competicion:e.target.value})} className="club-input mt-1 w-full p-3"/></label>
+    <label className="block text-body-sm">Enlace de Drive (opcional)<input value={form.driveUrl} onChange={e=>setForm({...form,driveUrl:e.target.value})} className="club-input mt-1 w-full p-3" placeholder="https://drive.google.com/drive/folders/…"/></label>
+    <Button disabled={busy} type="submit">{busy?'Guardando…':'Guardar partido'}</Button><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
+  </form>;
+}
+function ResultadoForm({partido,onClose}:{partido:Partido;onClose:()=>void}) {
+  const [favor,setFavor]=useState(String((partido.esLocal?partido.golesLocal:partido.golesVisitante)??'')),[contra,setContra]=useState(String((partido.esLocal?partido.golesVisitante:partido.golesLocal)??'')),[posicion,setPosicion]=useState(String(dataService.clasificacion()?.posicion??'')),[busy,setBusy]=useState(false);
+  return <form className="mt-4 space-y-3 border-t border-border pt-4" onSubmit={e=>{e.preventDefault();runAction(async()=>{setBusy(true);try{await dataService.guardarResultado(partido.id,Number(favor),Number(contra),posicion?Number(posicion):null);onClose();}finally{setBusy(false);}});}}><div className="grid grid-cols-2 gap-3"><label className="text-body-sm">Goles a favor<input required type="number" min="0" step="1" value={favor} onChange={e=>setFavor(e.target.value)} className="club-input mt-1 w-full p-3"/></label><label className="text-body-sm">Goles en contra<input required type="number" min="0" step="1" value={contra} onChange={e=>setContra(e.target.value)} className="club-input mt-1 w-full p-3"/></label></div><label className="block text-body-sm">Posición en la tabla tras esta jornada (opcional)<input type="number" min="1" step="1" value={posicion} onChange={e=>setPosicion(e.target.value)} className="club-input mt-1 w-full p-3"/></label><Button asChild variant="link" className="p-0 text-body-sm"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Ver en Futgal ↗</a></Button><div><Button type="submit" disabled={busy}>{busy?'Guardando…':'Guardar resultado'}</Button><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button></div></form>;
 }

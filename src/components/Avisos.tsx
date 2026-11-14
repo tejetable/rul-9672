@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
-import {PartidosPanel} from '@/components/PartidosPanel';
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { dataService, type Aviso, useClubData, runAction } from "@/lib/dataService";
 
 const PARA: Record<NonNullable<Aviso["para"]>, string> = { todos: "Todos", socias: "Socias/os", negocios: "Negocios" };
-const TIPO: Record<Aviso["tipo"], string> = { club: "Club", partido: "Partido", ventaja: "Ventaja" };
+const TIPO: Record<Aviso["tipo"], string> = { club: "Club", ventaja: "Ventaja", otro: "Otro" };
 
 export function ListaAvisos({ quien }: { quien: "socias" | "negocios" }) {
   const db = useClubData();
@@ -79,7 +78,6 @@ export function AvisosPanel() {
           </li>
         ))}
       </ul>
-      <PartidosPanel />
     </section>
   );
 }

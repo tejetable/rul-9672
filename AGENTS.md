@@ -35,6 +35,7 @@ use the editor.
 - Display both physical-card faces from the uploaded artwork with the member number overlaid; keep digital identification outside the artwork to preserve the printed design.
 - Member and business notice bells share AvisosCampana; opening it marks only the current audience's notices as read through dataService.
 - Match cards use pure helpers in src/lib/partidos.ts for Madrid-time countdowns and ICS exports so date behavior is independently tested.
+- Match selection and Madrid form conversion use src/lib/partidos.ts; PostgreSQL's estadisticas_liga owns totals and recent-first form, and guardar_resultado_partido saves results and optional ranking atomically so every role sees the same league data.
 - Gallery reads use the authenticated getDriveGallery server function and a ten-minute Cloud cache; drive-gallery.ts owns EXIF dates, explicit-first match linking and day-seeded highlights, never legacy filenames.
 - Shared visual scales live in src/styles.css as Tailwind theme tokens; ClubCabecera provides compact headers and screens use semantic surface, heading, control and label roles.
 

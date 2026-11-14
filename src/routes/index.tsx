@@ -15,7 +15,7 @@ import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
-import { AvisosPanel } from "@/components/Avisos";
+import { ClubPanel } from "@/components/ClubPanel";
 import { SociasPanel } from "@/components/SociasPanel";
 import { PatrocinadoresPanel } from "@/components/PatrocinadoresPanel";
 import { NegocioApp } from "@/components/NegocioApp";
@@ -87,7 +87,7 @@ function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
 
 function Directiva() {
   const [page,setPage]=useState<"equipo"|"ajustes"|null>(null);
-  const [t, setT] = useState<"socias" | "patro" | "avisos">("socias");
+  const [t, setT] = useState<"socias" | "patro" | "club">("socias");
   if(page&&dataService.esSuper())return <ClubAdmin page={page} onClose={()=>setPage(null)}/>;
   return (
     <div className="flex flex-1 flex-col">
@@ -95,11 +95,11 @@ function Directiva() {
       {!dataService.ajustes().whatsapp_club&&<p className="mx-5 mt-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
 
       <div className="club-tabs mx-5 mt-4 grid-cols-3">
-        {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["avisos", "Avisos"]] as const).map(([id, l]) => (
+        {([["socias", "Socias/os"], ["patro", "Patrocinadores"], ["club", "Club"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setT(id)} className={`h-auto min-h-11 rounded-control text-label font-bold ${t === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}
       </div>
-      {t === "socias" ? <SociasPanel /> : t === "patro" ? <PatrocinadoresPanel /> : <AvisosPanel />}
+      {t === "socias" ? <SociasPanel /> : t === "patro" ? <PatrocinadoresPanel /> : <ClubPanel />}
 
     </div>
   );

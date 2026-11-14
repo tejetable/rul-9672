@@ -1,12 +1,12 @@
 import {Link} from "@tanstack/react-router";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
-import {useClubData} from "@/lib/dataService";
+import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useState } from "react";
 import { ArrowRight, CalendarPlus, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
-import { calendarioPartido, cuentaPartido, inicioPartido } from "@/lib/partidos";
+import { calendarioPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido } from "@/lib/partidos";
 
 function LugoSilueta() {
   return <svg className="fixture-silhouette" viewBox="0 0 260 130" aria-hidden="true" fill="currentColor">
@@ -31,7 +31,7 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
     if (!ics) return;
     const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
     const enlace = document.createElement("a");
-    enlace.href = url; enlace.download = "ru-lucense-abella-14-nov.ics";
+    enlace.href = url; enlace.download = `rul-partido-${partido.id}.ics`;
     enlace.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -40,17 +40,17 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
     <div className="relative z-10">
       <div className="flex items-center justify-between gap-2">
         <h1 className="fixture-chip">PRÓXIMO PARTIDO</h1>
-        <span className="fixture-chip">{partido.esLocal ? "EN CASA" : "FUERA"}</span>
+        <div className="flex flex-wrap justify-end gap-1">{partido.jornada && <span className="fixture-chip">JORNADA {partido.jornada}</span>}<span className="fixture-chip">{partido.esLocal ? "EN CASA" : "FUERA"}</span></div>
       </div>
       <p className="fixture-subtitle">Concello de Guntín - R.U. Lucense · {partido.competicion}</p>
       <div className="fixture-matchup">
-        <div className="fixture-team"><img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-14 object-contain" /><p>R.U. LUCENSE</p></div>
+        {partido.esLocal ? <EquipoPartido /> : <EquipoPartido rival={partido.rival} />}
         <div className="text-center"><p className="fixture-time">{hora}</p><p className="fixture-date">{dia}</p></div>
-        <div className="fixture-team"><span className="fixture-opponent">AFC</span><p>{partido.rival.toUpperCase()}</p></div>
+        {partido.esLocal ? <EquipoPartido rival={partido.rival} /> : <EquipoPartido />}
       </div>
       <span className="fixture-gold" />
       <div className="fixture-countdown" aria-live="polite">
-        {cuenta?.estado === "en_juego" ? <span className="fixture-chip"><span className="fixture-live-dot" />EN JUEGO</span> : cuenta?.estado === "hoy" ? <p className="font-black text-xl">HOY · {hora}</p> : <div className="grid w-full grid-cols-3 gap-2">
+        {cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : cuenta?.estado === "en_juego" ? <span className="fixture-chip"><span className="fixture-live-dot" />EN JUEGO</span> : cuenta?.estado === "hoy" ? <p className="font-black text-xl">HOY · {hora}</p> : <div className="grid w-full grid-cols-3 gap-2">
           {[[cuenta?.dias, "DÍAS"], [cuenta?.horas, "HORAS"], [cuenta?.minutos, "MIN"]].map(([numero, label]) => <div key={label} className="fixture-counter"><p>{numero ?? "—"}</p><span>{label}</span></div>)}
         </div>}
       </div>
@@ -63,15 +63,32 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
   </article>;
 }
 
-export function UltimoResultado() {
-  const db=useClubData();const ultimo=db.partidos.find(p=>p.jugado);const {data}=useDriveGallery();const album=data?.albumes.find(a=>a.partidoId===ultimo?.id);
-  return <article className="result-card" aria-label="Último resultado">
-    <div className="flex items-center justify-between gap-2"><h2 className="result-kicker">ÚLTIMO RESULTADO · 07 NOV</h2><span className="result-victory">VICTORIA</span></div>
+function EquipoPartido({rival}:{rival?:string}) {
+  return <div className="fixture-team">{rival ? <span className="fixture-opponent">{rival.split(' ').slice(0,3).map(w=>w[0]).join('').toUpperCase()}</span> : <img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-14 object-contain"/>}<p>{rival??'R.U. LUCENSE'}</p></div>;
+}
+export function UltimoResultado({partido}:{partido:Partido}) {
+  const {data}=useDriveGallery();const album=data?.albumes.find(a=>a.partidoId===partido.id);
+  const resultado=resultadoPartido(partido);
+  const fecha=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'short'});
+  return <article className="result-card" aria-label="Último partido">
+    <div className="flex items-center justify-between gap-2"><h2 className="result-kicker">ÚLTIMO PARTIDO · {fecha}</h2>{resultado&&<span className={`result-chip result-${resultado}`}>{resultado==='V'?'VICTORIA':resultado==='E'?'EMPATE':'DERROTA'}</span>}</div>
     <div className="result-matchup">
-      <div className="result-team"><img src={escudo.url} alt="Escudo del R.U. Lucense" className="size-9 object-contain" /><p>R.U. Lucense</p></div>
-      <p className="result-score">18 <span className="result-separator">–</span> <span className="result-loser">0</span></p>
-      <div className="result-team"><span className="result-opponent">PMF</span><p>P.M. Friol</p></div>
+      <div className="result-team">{partido.esLocal&&<img src={escudo.url} alt="R.U. Lucense" className="size-9 object-contain"/>}<p>{partido.esLocal?'R.U. Lucense':partido.rival}</p></div>
+      <p className="result-score">{partido.golesLocal} <span className="result-separator">–</span> {partido.golesVisitante}</p>
+      <div className="result-team">{!partido.esLocal&&<img src={escudo.url} alt="R.U. Lucense" className="size-9 object-contain"/>}<p>{partido.esLocal?partido.rival:'R.U. Lucense'}</p></div>
     </div>
-    {album && <Button asChild variant="link" className="h-9 p-0 text-accent text-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:album.id}} search={{foto:''}}>Ver fotos del partido <ArrowRight strokeWidth={1.75}/></Link></Button>}
+    {album&&<Button asChild variant="link" className="h-9 p-0 text-accent text-body-sm font-bold"><Link to="/galeria/$folderId" params={{folderId:album.id}} search={{foto:''}}>Ver fotos del partido <ArrowRight/></Link></Button>}
   </article>;
+}
+export function Liga() {
+  const db=useClubData();const [ahora,setAhora]=useState(()=>new Date());
+  useEffect(()=>{const timer=setInterval(()=>setAhora(new Date()),30000);return()=>clearInterval(timer);},[]);
+  const proximo=proximoPartido(db.partidos,ahora),enCurso=partidoEnCurso(db.partidos,ahora),ultimo=ultimoPartido(db.partidos);
+  const stats=dataService.liga(),tabla=dataService.clasificacion();
+  return <section aria-label="Liga">
+    {enCurso&&<ProximoPartido partido={enCurso}/>}
+    {proximo ? <div className={enCurso?'mt-4':''}><ProximoPartido partido={proximo}/></div> : <div className="mt-4 border-y border-border py-4"><p className="label-club">Próximo partido</p><p className="font-black">Por confirmar</p></div>}
+    <div className="league-strip" aria-label="Nuestra liga"><div><p className="label-club">NUESTRA LIGA</p><p className="club-stat">{tabla?`${tabla.posicion}.º`:'—'}</p></div><div><p className="text-body-sm font-bold">{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p><div className="mt-2 flex items-center gap-2"><div className="flex gap-1" aria-label={`Racha: ${stats.racha.join(', ')||'sin resultados'}`}>{Array.from({length:5},(_,i)=><span key={i} title={stats.racha[i]==='V'?'Victoria':stats.racha[i]==='E'?'Empate':stats.racha[i]==='D'?'Derrota':'Sin resultado'} className={`league-dot ${stats.racha[i]?`result-${stats.racha[i]}`:''}`}/>)}</div><span className="league-caption">Últimos 5</span></div></div><Button asChild variant="link" className="league-link"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Clasificación ↗</a></Button></div>
+    {ultimo&&<UltimoResultado partido={ultimo}/>}
+  </section>;
 }

@@ -37,3 +37,6 @@
 - [ ] Personalizar invitación y recuperación (requiere dominio de envío).
 - [x] Verificar ficha de Super admin autenticado, permisos, formularios y diseño móvil; 47 pruebas pasan.
 - [ ] Verificar alta → confirmación → contraseña → reentrada y Google con misma cuenta (requiere buzón y autorización de Google).
+- [x] Separar Club en Partidos y Avisos y añadir edición y resultados.
+- [x] Adaptar calendario, posición y estadísticas calculadas; sustituir partidos inventados.
+- [x] Añadir LIGA automática y verificar resultado → último partido → puntos y racha.

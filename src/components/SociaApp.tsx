@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, MapPin } from "lucide-react";
-import { ProximoPartido, UltimoResultado } from "@/components/PartidoTarjetas";
+import { Liga } from "@/components/PartidoTarjetas";
 import { Galeria } from "@/components/Galeria";
 import { SociaCabecera } from "@/components/SociaCabecera";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
@@ -88,11 +88,9 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
 }
 
 function Equipo({ db }: { db: DB }) {
-  const proximo = db.partidos.find((p) => !p.jugado);
   return (
     <section className="px-5 pt-5">
-      {proximo && <ProximoPartido partido={proximo} />}
-      <UltimoResultado />
+      <Liga />
       <div id="fotos-equipo" className="scroll-mt-20">
         <Galeria />
       </div>
