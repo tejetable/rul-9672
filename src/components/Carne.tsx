@@ -9,9 +9,9 @@ export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDo
   return (
     <div className="mx-auto w-full max-w-[390px]">
       <div className="flex flex-col items-center text-center">
-        <div className="qr-blanco self-center w-full max-w-[280px] rounded-tile p-4">
+        <div className="carnet-qr self-center w-full max-w-[280px]"><div className="qr-blanco rounded-tile p-4">
           <QRCodeSVG value={`RUL:${numero}`} size={240} marginSize={2} bgColor="#FFFFFF" fgColor="#0D4631" className="aspect-square h-auto w-full" aria-label={`Identificación de socio o socia ${numero}`} />
-        </div>
+        </div></div>
         <p className="card-member-name mt-4">{nombre}</p>
         <p className="card-number" aria-label={`Número de socio o socia ${numero}`}><span className="card-number-pre">Nº</span>{String(numero).padStart(4, "0")}</p>
         <p aria-label={`Socio o socia de la temporada ${temporada}`} className="mt-2 text-body-sm text-muted-foreground">Soci@ de la temporada {temporada}</p>

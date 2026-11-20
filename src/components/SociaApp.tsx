@@ -35,7 +35,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
   const indicador = (on: boolean) => on && <span className="member-tab-bar" aria-hidden="true" />;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="theme-noche flex flex-1 flex-col">
       <SociaCabecera />
       <div className="flex-1 pb-24">
         {tab === "equipo" && <Equipo db={db} />}
@@ -73,7 +73,7 @@ function CarnetSheet({ socio, onClose, onDondeUsar }: { socio: Socio; onClose: (
   return (
     <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}><Dialog.Portal>
     <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60" />
-    <Dialog.Content aria-describedby={undefined} className="animate-sheet carnet-overlay fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8"
+    <Dialog.Content aria-describedby={undefined} className="theme-noche animate-sheet carnet-overlay fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8"
       style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
       onTouchStart={(e) => setY0((e.touches[0]?.clientY ?? 0))}
       onTouchMove={(e) => y0 !== null && setDy(Math.max(0, (e.touches[0]?.clientY ?? 0) - y0))}

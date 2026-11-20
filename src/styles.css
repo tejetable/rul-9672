@@ -1111,3 +1111,90 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .cal-result-score > .is-sep { min-width: 0; }
 .cal-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cal-card > .min-w-0 { min-width: 0; }
+
+/* ═════════════════════════ Tema «Noche de partido» (app de soci@) ═════════════════════════
+   Fondo verde noche, tarjetas en verde, letra y acentos en oro. Solo en las pantallas de soci@ (El Equipo,
+   Ventajas, Carnet, Calendario y Fotos). Negocio y Directiva siguen en claro: son herramientas de trabajo.
+   El oro metálico (--foil) solo en filetes, el marco del QR, la ficha del 4º y el número de soci@. */
+.theme-noche {
+  --noche: #08301F; --noche-2: #0A3A27; --verde-2: #145A3F;
+  --foil: linear-gradient(115deg,#8E6A2F 0%,#C9A160 18%,#F3E0B2 34%,#D2A862 48%,#9C7434 64%,#E2C48A 82%,#A57B3B 100%);
+  --background: var(--noche); --foreground: #FFFFFF;
+  --card: var(--verde); --card-foreground: #FFFFFF; --popover: var(--verde); --popover-foreground: #FFFFFF;
+  --primary: var(--oro-claro); --primary-foreground: var(--verde);
+  --secondary: var(--verde); --secondary-foreground: #FFFFFF; --muted: var(--verde-2); --muted-foreground: rgba(255,255,255,.74);
+  --border: rgba(217,183,122,.2); --input: rgba(217,183,122,.3); --divider: rgba(217,183,122,.16); --ring: var(--oro-claro);
+  --arena-claro: var(--verde); --tinta-suave: rgba(255,255,255,.74);
+  --surface-raised: var(--verde); --surface-line: rgba(217,183,122,.16);
+  --ink-soft: rgba(255,255,255,.74); --ink-faint: rgba(255,255,255,.45);
+  --win-ink: #7FD6AE; --loss-ink: #F2958B; --draw-ink: rgba(255,255,255,.74);
+  --result-draw: #6B5B47; --result-defeat: var(--rojo);
+  --fixture-chip: rgba(217,183,122,.14);
+  background: var(--background); color: var(--foreground);
+}
+main:has(.theme-noche), main.theme-noche, body:has(.theme-noche) { background: #08301F; }
+.theme-noche .text-accent, .theme-noche .text-gold { color: var(--oro-claro); }
+.theme-noche .benefit-perk { color: var(--oro-claro); }
+.theme-noche .benefit-logo { background: var(--verde-2); box-shadow: inset 0 0 0 1px var(--surface-line); color: var(--oro-claro); }
+.theme-noche .club-section-title { color: var(--oro-claro); }
+
+/* Barra inferior */
+.theme-noche .member-navigation { background: var(--noche-2); border-top-color: rgba(217,183,122,.22); }
+.theme-noche .member-tab.is-on { color: var(--oro-claro); }
+.theme-noche .member-tab-bar { background: var(--oro-claro); }
+.theme-noche .member-carnet-key { background: var(--foil); border-color: var(--noche-2); }
+
+/* Tarjeta de temporada */
+.theme-noche .sc-next { background: var(--noche-2); }
+.theme-noche .sc-perf { height: 3px; background: var(--foil); }
+.theme-noche .sc-btn-light { background: var(--oro-claro); color: var(--verde); }
+.theme-noche .sc-btn-light:hover { background: var(--oro-claro); opacity: .92; }
+.theme-noche .sc-btn-ghost { border-color: rgba(217,183,122,.7); color: var(--oro-claro); }
+.theme-noche .sc-lower, .theme-noche .sc-points strong { color: #FFFFFF; }
+.theme-noche .sc-label { color: var(--oro-claro); }
+.theme-noche .sc-pos-tile { background: var(--foil); color: var(--verde); }
+.theme-noche .sc-pos-go { color: var(--verde); }
+.theme-noche .sc-arrow, .theme-noche .sc-arrow:hover:not(:disabled) { background: rgba(217,183,122,.14); color: var(--oro-claro); }
+.theme-noche .sc-latest, .theme-noche .sc-photos, .theme-noche .sc-up-where.is-home { color: var(--oro-claro); }
+.theme-noche .sc-up-j { color: var(--oro-claro); }
+.theme-noche .sc-calendar-link { color: var(--oro-claro); }
+.theme-noche .sc-calendar-link:hover { background: rgba(217,183,122,.08); }
+.theme-noche .sc-result-word.is-E, .theme-noche .cal-result.is-E, .theme-noche .rul-chip--draw, .theme-noche .sc-result-bar.is-E { background: var(--result-draw); }
+.theme-noche .sc-form-dot.is-E { border-color: rgba(255,255,255,.74); color: #FFFFFF; }
+.theme-noche .court { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+
+/* Calendario */
+.theme-noche .calendar-filter { background: rgba(217,183,122,.12); }
+.theme-noche .calendar-filter button { color: rgba(255,255,255,.74); }
+.theme-noche .calendar-filter button.is-active { background: var(--oro-claro); color: var(--verde); }
+.theme-noche .cal-card { background: var(--verde); }
+.theme-noche .cal-card.is-next { background: var(--verde-2); box-shadow: inset 0 0 0 2px var(--oro-claro); }
+.theme-noche .cal-j { color: var(--oro-claro); }
+.theme-noche .cal-j > span { color: rgba(217,183,122,.7); }
+.theme-noche .flap { background: var(--noche-2); }
+.theme-noche .flap-tile { --flap-bg: var(--verde-2); --flap-ink: #FFFFFF; }
+.theme-noche .flap-tile::after { background: rgba(0,0,0,.35); }
+.theme-noche .flap-tile.is-num { --flap-bg: var(--oro-claro); --flap-ink: var(--verde); }
+.theme-noche .flap-row.is-loser .flap-tile.is-name { --flap-ink: rgba(255,255,255,.5); }
+.theme-noche .flap-row.is-loser .flap-tile.is-num { --flap-bg: rgba(255,255,255,.14); --flap-ink: rgba(255,255,255,.8); }
+.theme-noche .flap-meta { color: var(--oro-claro); }
+
+/* Carnet */
+.theme-noche.carnet-overlay { background: radial-gradient(120% 50% at 50% 0%, #0F4A33 0%, var(--noche) 60%); }
+.theme-noche .carnet-qr { position: relative; overflow: hidden; padding: 5px; border-radius: 22px; background: var(--foil); }
+.theme-noche .carnet-qr::after { content: ""; position: absolute; inset: -50%; z-index: 0; background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.6) 50%, transparent 56%); animation: carnet-brillo 3.2s ease-in-out infinite; }
+.theme-noche .carnet-qr > .qr-blanco { position: relative; z-index: 1; border-radius: 17px; }
+@keyframes carnet-brillo { 0% { transform: translateX(-40%); } 60%, 100% { transform: translateX(40%); } }
+@media (prefers-reduced-motion: reduce) { .theme-noche .carnet-qr::after { animation-duration: 8s; } }
+.theme-noche .card-number { background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.theme-noche .card-number-pre { color: var(--oro-claro); -webkit-text-fill-color: var(--oro-claro); }
+.theme-noche .rul-chip--win { background: transparent; color: var(--oro-claro); box-shadow: inset 0 0 0 1.5px var(--oro-claro); }
+.theme-noche .rul-chip--win::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #3CC48D; box-shadow: 0 0 0 3px rgba(60,196,141,.2); }
+.theme-noche .rul-btn--secondary { background: var(--oro-claro); color: var(--verde); border-color: transparent; }
+.theme-noche .digital-card { border-color: rgba(217,183,122,.5); }
+.theme-noche .seg-toggle { background: rgba(217,183,122,.12); }
+.theme-noche .seg-toggle button { color: rgba(255,255,255,.74); }
+.theme-noche .seg-toggle button[aria-checked="true"] { color: var(--verde); }
+.theme-noche .seg-thumb { background: var(--oro-claro); }
+.theme-noche .member-tab, .theme-noche .member-tab:hover, .theme-noche .member-tab:focus, .theme-noche .member-tab:active { background: transparent !important; }
+.theme-noche { --control-secondary-hover: var(--verde-2); }
