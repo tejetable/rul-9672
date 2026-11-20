@@ -71,3 +71,27 @@ export function rachaCronologica(recientes:readonly string[]):(string|null)[]{
  const ultimos=recientes.slice(0,5).reverse();
  return [...Array<null>(5-ultimos.length).fill(null),...ultimos];
 }
+
+const madridParts=(d:Date)=>{const tz={timeZone:"Europe/Madrid"} as const;return {
+  dia:d.toLocaleDateString("es-ES",{...tz,weekday:"short"}).replace(".",""),num:d.toLocaleDateString("es-ES",{...tz,day:"numeric"}),
+  mes:d.toLocaleDateString("es-ES",{...tz,month:"short"}).replace(".",""),hora:d.toLocaleTimeString("es-ES",{...tz,hour:"2-digit",minute:"2-digit"})};};
+/** "Fin de semana del 29 nov" when the date is a reference; otherwise "Sáb 28 nov · 18:30" (time only if confirmed). */
+export function fechaPartidoTexto(partido:Partido):string{
+  const d=inicioPartido(partido);if(!d)return "Fecha por confirmar";
+  const p=madridParts(d);
+  if(partido.fechaConfirmada===false)return `Fin de semana del ${p.num} ${p.mes}`;
+  const base=`${p.dia.charAt(0).toUpperCase()}${p.dia.slice(1)} ${p.num} ${p.mes}`;
+  return partido.horaConfirmada===false?base:`${base} · ${p.hora}`;
+}
+export function golesLiga(partidos:readonly Partido[]){
+  let gf=0,gc=0;
+  for(const p of partidos){if(!p.jugado||p.golesLocal===null||p.golesVisitante===null)continue;gf+=p.esLocal?p.golesLocal:p.golesVisitante;gc+=p.esLocal?p.golesVisitante:p.golesLocal;}
+  return {gf,gc,dg:gf-gc};
+}
+export function textoDiferencia(dg:number){return dg>0?`+${dg}`:dg<0?`−${Math.abs(dg)}`:"0";}
+/** Unplayed fixtures from the next one onward, by jornada, optionally home-only. */
+export function proximosCalendario(partidos:readonly Partido[],ahora:Date,soloCasa=false,limite=3){
+  const siguiente=proximoPartido([...partidos],ahora);
+  const desde=siguiente?.jornada??Infinity;
+  return [...partidos].filter(p=>!p.jugado&&(p.jornada??0)>=desde&&(!soloCasa||p.esLocal)).sort((a,b)=>(a.jornada??0)-(b.jornada??0)).slice(0,limite);
+}

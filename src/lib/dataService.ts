@@ -82,6 +82,7 @@ export interface Partido {
   golesVisitante: number | null;
   jugado: boolean;
   horaConfirmada?: boolean;
+  fechaConfirmada?: boolean;
   driveFolderId?: string | null;
 }
 export interface Aviso {
@@ -154,6 +155,7 @@ export const dataService = {
   async salirNegocioPrueba(){const r=await supabase.rpc('salir_negocio_prueba');check(r.error);negocioPrueba=null;await this.refresh();},
   async borrarVisitasPrueba(id:string){const r=await supabase.rpc('borrar_visitas_prueba',{p_negocio:id});check(r.error);await this.refresh();},
   roles:()=>roles,
+  rolSeleccionado:()=>selectedRole,
   autenticado:()=>!!userId,
   esSuper:()=>roles.some(r=>r.rol==='super_admin')||canManageTeam(role),
   esDirectiva:()=>role==='directiva'||role==='super_admin',
@@ -181,6 +183,7 @@ export const dataService = {
   async guardarAjustes(input:typeof defaultSettings){const r=await supabase.from("ajustes_club").update(settingsSchema.parse(input)).eq("id",true).select();check(r.error);if(!r.data?.length)throw new Error("Solo Super admin puede editar ajustes.");await this.cargarAjustes();},
   async estadoPassword(email:string){const r=await supabase.rpc('acceso_password_club',{p_email:normalizarEmail(email)});check(r.error);return !!(r.data as {activo?:boolean}|null)?.activo;},
   acceso:()=>acceso,
+  async pagoTemporada(socioId:string,temporada:string){const r=await supabase.from('pagos').select('id').eq('socio_id',socioId).eq('temporada',temporada).limit(1);check(r.error);return (r.data?.length??0)>0;},
   passwordEntrada:()=>loginPassword,
   recordarPasswordEntrada:(value:string)=>{loginPassword=value;},
   async cargarAcceso(){const r=await supabase.rpc('estado_acceso_personal');check(r.error);acceso=r.data as unknown as typeof acceso;if((r.data as {google?:boolean}|null)?.google)loginPassword='';notify();},
@@ -199,7 +202,7 @@ export const dataService = {
   async albumes(){return (await getDriveGallery()).albumes;},
   async guardarPartido(input:{id?:string;jornada:number;rival:string;fechaHora:string;esLocal:boolean;lugar:string;competicion:string;driveUrl:string;horaConfirmada?:boolean}){
     const folder=folderIdFromUrl(input.driveUrl);if(input.driveUrl.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');
-    const row={hora_confirmada:input.horaConfirmada??true,jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder};
+    const row={fecha_confirmada:true,hora_confirmada:input.horaConfirmada??true,jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder};
     const r=input.id?await supabase.from('partidos').update(row).eq('id',input.id).select('id').single():await supabase.from('partidos').insert(row).select('id').single();check(r.error);await this.refresh();
   },
   async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);await this.refresh();},
@@ -244,7 +247,7 @@ export const dataService = {
     db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:textoMiembros(v.titulo),descripcion:textoMiembros(v.descripcion),condiciones:textoMiembros(v.condiciones),activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,esPrueba:v.es_prueba,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
-      partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
+      partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,fechaConfirmada:p.fecha_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
       avisos:avisos.map(a=>({id:a.id,titulo:textoMiembros(a.titulo),texto:textoMiembros(a.texto),fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
     if(role==='socia'){const status=await supabase.rpc('estado_sesion_socia');sessionState=status.data as typeof sessionState;}
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}

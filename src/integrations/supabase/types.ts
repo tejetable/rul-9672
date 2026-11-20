@@ -287,6 +287,7 @@ export type Database = {
           competicion: string | null
           drive_folder_id: string | null
           es_local: boolean
+          fecha_confirmada: boolean
           fecha_hora: string | null
           goles_contra: number | null
           goles_favor: number | null
@@ -303,6 +304,7 @@ export type Database = {
           competicion?: string | null
           drive_folder_id?: string | null
           es_local?: boolean
+          fecha_confirmada?: boolean
           fecha_hora?: string | null
           goles_contra?: number | null
           goles_favor?: number | null
@@ -319,6 +321,7 @@ export type Database = {
           competicion?: string | null
           drive_folder_id?: string | null
           es_local?: boolean
+          fecha_confirmada?: boolean
           fecha_hora?: string | null
           goles_contra?: number | null
           goles_favor?: number | null

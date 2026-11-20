@@ -620,3 +620,46 @@ body:has(.member-navigation) { --bottom-navigation:76px; }
 main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[data-radix-popper-content-wrapper] > *,[role="dialog"] { box-shadow: 0 1px 2px rgba(13,70,49,.12) !important; }
 [class*="backdrop-blur"] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 .club-list-card > li + li { border-top: 1px solid var(--divider); }
+
+/* Próximo partido, liga y calendario */
+.fixture-kicker { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
+.league-summary { grid-column: 2 / 4; grid-row: 1; display: flex; flex-direction: column; gap: 2px; }
+.league-strip { grid-template-rows: auto 28px; }
+.league-goals { font-size: 12px; font-weight: 700; color: var(--muted-foreground); }
+.league-dg-pos { color: var(--esmeralda); }
+.league-dg-neg { color: #B5473A; }
+.calendar-filter { display: inline-flex; height: 32px; padding: 2px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 6%, transparent); }
+.calendar-filter button { height: 28px; padding: 0 10px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--muted-foreground); }
+.calendar-filter button.is-active { background: var(--background); color: var(--primary); box-shadow: 0 1px 2px rgba(13,70,49,.12); }
+.calendar-list { list-style: none; margin: 0; padding: 0; }
+.calendar-row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 0 8px 4px; }
+.calendar-row + .calendar-row { border-top: 1px solid var(--divider); }
+.calendar-row.is-next::before { content: ""; position: absolute; left: -8px; top: 12px; bottom: 12px; width: 3px; border-radius: 2px; background: var(--primary); }
+.calendar-j { width: 32px; flex-shrink: 0; font-size: 12px; font-weight: 900; color: var(--muted-foreground); }
+.calendar-rival { display: block; font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendar-date { display: block; font-size: 14px; color: var(--muted-foreground); }
+.calendar-home { font-size: 12px; font-weight: 700; color: var(--primary); }
+.calendar-away { font-size: 12px; color: var(--muted-foreground); }
+.calendar-score { display: inline-flex; align-items: center; gap: 6px; font-weight: 900; }
+.league-strip { grid-template-columns: auto minmax(0,1fr) auto; grid-template-rows: auto auto auto; row-gap: 8px; }
+.league-strip .league-heading { grid-column: 1 / 4; grid-row: 1; }
+.league-strip .league-position { grid-column: 1; grid-row: 2; }
+.league-strip .league-summary { grid-column: 2 / 4; grid-row: 2; }
+.league-strip .league-form { grid-column: 1 / 3; grid-row: 3; }
+.league-strip .league-link { grid-column: 3; grid-row: 3; }
+.card-status { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--divider); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.card-status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.card-status-dot.is-ok { background: var(--esmeralda); }
+.card-status-dot.is-pending { background: #D4A72C; }
+.benefit-logo { display: flex; width: 44px; height: 44px; flex-shrink: 0; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: color-mix(in srgb, var(--primary) 8%, transparent); font-size: 14px; font-weight: 900; color: var(--primary); }
+.benefit-logo img { width: 100%; height: 100%; object-fit: contain; }
+.member-sticky-action { position: fixed; left: 0; right: 0; margin-inline: auto; max-width: 430px; bottom: calc(var(--bottom-navigation, 76px) + env(safe-area-inset-bottom)); z-index: 15; padding: 12px 16px; background: var(--background); border-top: 1px solid var(--divider); }
+.onboarding { position: fixed; inset: 0; z-index: 60; margin-inline: auto; max-width: 430px; display: flex; flex-direction: column; background: var(--background); padding: calc(8px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); }
+.onboarding-track { display: flex; flex: 1; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.onboarding-track::-webkit-scrollbar { display: none; }
+.onboarding-slide { flex: 0 0 100%; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; text-align: center; padding: 0 8px; }
+.onboarding-slide h2 { font-size: 28px; font-weight: 900; line-height: 1.1; text-transform: uppercase; }
+.onboarding-slide p { font-size: 16px; max-width: 300px; }
+.onboarding-dots { display: flex; justify-content: center; gap: 8px; height: 24px; align-items: center; }
+.onboarding-dots span { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in srgb, var(--primary) 20%, transparent); }
+.onboarding-dots span.is-active { background: var(--primary); }

@@ -28,7 +28,9 @@ export function Galeria() {
   useEffect(()=>{
     if(!data)return;
     const token=++generation.current;
-    void preloadPhotos(randomHighlights(data.destacadas)).then(ready=>{
+    const reciente=[...data.albumes].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+    const primeras=reciente?reciente.fotos.filter(f=>!f.video).slice(0,5).map(foto=>({foto,albumId:reciente.id})):[];
+    void preloadPhotos(primeras.length>=5?primeras:randomHighlights(data.destacadas)).then(ready=>{
       if(alive.current&&generation.current===token){setPhotos(ready);setInitialLoading(false);}
     });
   },[data]);
@@ -44,13 +46,15 @@ export function Galeria() {
       if(alive.current&&token===generation.current){setPhotos(ready);setIncoming(null);}
     }finally{lock.current=false;if(alive.current)setBusy(false);}
   };
+  const recienteAlbum=[...albumes].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+  const ultimo=recienteAlbum?[recienteAlbum.titulo,recienteAlbum.resultado,recienteAlbum.fecha?new Date(`${recienteAlbum.fecha}T12:00:00`).toLocaleDateString('es-ES',{day:'numeric',month:'short'}).replace('.',''):''].filter(Boolean).join(' · '):'';
   const mosaic=(selection:HighlightPhoto[],outgoing=false)=><div className={`gallery-mosaic gallery-highlight-layer ${outgoing?'is-outgoing':''}`}>{selection.map(({foto,albumId},index)=>{
     const album=albumes.find(a=>a.id===albumId);if(!album)return null;
-    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded/><span className="gallery-caption"><strong>{album.titulo}</strong><span>{album.detalle}</span></span></Link></Button>;
+    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded/></Link></Button>;
   })}</div>;
   return <section className="mt-6" aria-label="Fotos del equipo">
     <div className="mb-3 flex items-center justify-between gap-3">
-      <h2 className="club-section-title">Fotos</h2>
+      <div className="min-w-0"><h2 className="club-section-title mb-0">Último partido</h2>{ultimo&&<p className="truncate text-body-sm font-bold">{ultimo}</p>}</div>
       <div className="flex items-center gap-2">
         {(data?.destacadas.length??0)>5&&<Button variant="ghost" aria-label="Ver otras fotos" title="Ver otras fotos" disabled={busy} onClick={()=>void refresh()} className={`gallery-refresh ${busy?'is-refreshing':''}`}><RefreshCw aria-hidden="true"/></Button>}
         <Button asChild variant="link" className="h-11 px-0 text-accent font-bold"><Link to="/galeria" search={{ partido: "todos" }}>Ver todas <ArrowRight strokeWidth={1.75} /></Link></Button>

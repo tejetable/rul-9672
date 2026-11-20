@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BienvenidaRouteImport } from './routes/bienvenida'
+import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CreatePasswordRouteImport } from './routes/create-password'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
@@ -27,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const BienvenidaRoute = BienvenidaRouteImport.update({
   id: '/bienvenida',
   path: '/bienvenida',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarioRoute = CalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatePasswordRoute = CreatePasswordRouteImport.update({
@@ -68,6 +74,7 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bienvenida': typeof BienvenidaRoute
+  '/calendario': typeof CalendarioRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/bienvenida': typeof BienvenidaRoute
+  '/calendario': typeof CalendarioRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bienvenida': typeof BienvenidaRoute
+  '/calendario': typeof CalendarioRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/bienvenida'
+    | '/calendario'
     | '/create-password'
     | '/galeria'
     | '/privacidad'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/bienvenida'
+    | '/calendario'
     | '/create-password'
     | '/galeria'
     | '/privacidad'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/bienvenida'
+    | '/calendario'
     | '/create-password'
     | '/galeria'
     | '/privacidad'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BienvenidaRoute: typeof BienvenidaRoute
+  CalendarioRoute: typeof CalendarioRoute
   CreatePasswordRoute: typeof CreatePasswordRoute
   GaleriaRoute: typeof GaleriaRoute
   PrivacidadRoute: typeof PrivacidadRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/bienvenida'
       fullPath: '/bienvenida'
       preLoaderRoute: typeof BienvenidaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendario': {
+      id: '/calendario'
+      path: '/calendario'
+      fullPath: '/calendario'
+      preLoaderRoute: typeof CalendarioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create-password': {
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BienvenidaRoute: BienvenidaRoute,
+  CalendarioRoute: CalendarioRoute,
   CreatePasswordRoute: CreatePasswordRoute,
   GaleriaRoute: GaleriaRoute,
   PrivacidadRoute: PrivacidadRoute,

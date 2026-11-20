@@ -6,7 +6,7 @@ import { ArrowRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
-import { rachaCronologica, directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
+import { fechaPartidoTexto, golesLiga, proximosCalendario, textoDiferencia, rachaCronologica, directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
 
 function LugoSilueta() {
   return <svg className="fixture-silhouette" viewBox="0 0 260 130" aria-hidden="true" fill="currentColor">
@@ -34,24 +34,22 @@ export function ProximoPartido({ partido }: { partido: Partido }) {
     <LugoSilueta />
     <div className="relative z-10">
       <div className="fixture-heading">
-        <h1 className="fixture-chip">PRÓXIMO PARTIDO</h1>
-        {partido.jornada && <span className="fixture-chip">JORNADA {partido.jornada}</span>}<span className="fixture-chip">{partido.esLocal ? "EN CASA" : "FUERA"}</span>
+        <h1 className="fixture-kicker">{partido.jornada ? `Jornada ${partido.jornada} · ` : ""}{partido.esLocal ? "En casa" : "Fuera"}</h1>
       </div>
-      <p className="fixture-subtitle">Concello de Guntín - R.U. Lucense · {partido.competicion}</p>
       <div className="fixture-matchup">
         {partido.esLocal ? <EquipoPartido /> : <EquipoPartido rival={partido.rival} />}
-        <div className="min-w-0 text-center"><p className={partido.horaConfirmada === false ? "fixture-unconfirmed" : "fixture-time"}>{hora}</p>{live||cuenta?.estado==='hoy'?<span className="fixture-chip fixture-day-chip">{live?'EN JUEGO':'HOY'}</span>:<p className="fixture-date">{dia}</p>}</div>
+        <div className="min-w-0 text-center"><p className={partido.horaConfirmada === false ? "fixture-unconfirmed" : "fixture-time"}>{hora}</p>{live||cuenta?.estado==='hoy'?<span className="fixture-chip fixture-day-chip">{live?'EN JUEGO':'HOY'}</span>:<p className="fixture-date">{partido.fechaConfirmada===false?fechaPartidoTexto(partido):dia}</p>}</div>
         {partido.esLocal ? <EquipoPartido rival={partido.rival} /> : <EquipoPartido />}
       </div>
       <span className="fixture-gold" />
       <div className="fixture-countdown" aria-live="polite">
-        {partido.horaConfirmada === false ? null : cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : live ? null : cuenta?.estado === "hoy" ? <p className="text-body-sm font-bold">Empieza en {Math.floor(minutes/60)>0?`${Math.floor(minutes/60)} h `:''}{minutes%60} min</p> : <div className="grid w-full grid-cols-3 gap-2">
+        {partido.horaConfirmada === false || partido.fechaConfirmada === false ? null : cuenta?.estado === "resultado_pendiente" ? <p className="font-bold">Resultado pendiente</p> : live ? null : cuenta?.estado === "hoy" ? <p className="text-body-sm font-bold">Empieza en {Math.floor(minutes/60)>0?`${Math.floor(minutes/60)} h `:''}{minutes%60} min</p> : <div className="grid w-full grid-cols-3 gap-2">
           {[[cuenta?.dias, "DÍAS"], [cuenta?.horas, "HORAS"], [cuenta?.minutos, "MIN"]].map(([numero, label]) => <div key={label} className="fixture-counter"><p>{numero ?? "—"}</p><span>{label}</span></div>)}
         </div>}
       </div>
-      <p className="fixture-location"><MapPin size={16} strokeWidth={1.75} />{partido.lugar}</p>
-      <div className={`mt-4 grid ${twitch?'grid-cols-2':'grid-cols-1'} gap-2`}>
-        <Button asChild variant="ghost" className="fixture-directions"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partido.lugar)}`} target="_blank" rel="noopener noreferrer"><Navigation strokeWidth={1.75} />Cómo llegar</a></Button>
+      {partido.lugar.trim()&&<p className="fixture-location"><MapPin size={16} strokeWidth={1.75} />{partido.lugar}</p>}
+      <div className={`mt-4 grid ${twitch&&partido.lugar.trim()?'grid-cols-2':'grid-cols-1'} gap-2`}>
+        {partido.lugar.trim()&&<Button asChild variant="ghost" className="fixture-directions"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partido.lugar)}`} target="_blank" rel="noopener noreferrer"><Navigation strokeWidth={1.75} />Cómo llegar</a></Button>}
         {twitch&&<Button asChild variant="ghost" className="fixture-calendar"><a href={twitch} target="_blank" rel="noopener noreferrer"><Twitch strokeWidth={1.75}/>{live&&<span className="fixture-live-dot"/>}{live?'Ver en directo':'Ver en Twitch'}</a></Button>}
       </div>
     </div>
@@ -96,17 +94,40 @@ export function Liga() {
   const db=useClubData();const [ahora,setAhora]=useState(()=>new Date());
   useEffect(()=>{const timer=setInterval(()=>setAhora(new Date()),30000);return()=>clearInterval(timer);},[]);
   const proximo=proximoPartido(db.partidos,ahora),enCurso=partidoEnCurso(db.partidos,ahora);
-  const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha);
+  const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha),goles=golesLiga(db.partidos);
   return <section aria-label="Liga">
     {enCurso&&<ProximoPartido partido={enCurso}/>}
     {proximo ? <div className={enCurso?'mt-4':''}><ProximoPartido partido={proximo}/></div> : <div className="mt-4 border-y border-border py-4"><p className="label-club">Próximo partido</p><p className="font-black">Por confirmar</p></div>}
     <div className="league-strip" aria-label="Nuestra liga">
       <p className="label-club league-heading">NUESTRA LIGA</p>
       <p className="club-stat league-position">{tabla?`${tabla.posicion}.º`:'—'}</p>
-      <p className="league-summary">{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p>
+      <div className="league-summary"><p>{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p><p className="league-goals">GF {goles.gf} · GC {goles.gc} · DG <span className={goles.dg>0?'league-dg-pos':goles.dg<0?'league-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p></div>
       <div className="league-form"><div className="league-dots" aria-label={`Racha del más antiguo al más reciente: ${racha.filter(Boolean).join(', ')||'sin resultados'}`}>{racha.map((resultado,i)=><span key={i} title={resultado==='V'?'Victoria':resultado==='E'?'Empate':resultado==='D'?'Derrota':'Sin resultado'} className={`league-dot ${resultado?`result-${resultado}`:''}`}/>)}</div><span className="league-caption">Últimos 5</span></div>
       <Button asChild variant="link" className="league-link"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Clasificación ↗</a></Button>
     </div>
     <UltimoResultado partidos={db.partidos}/>
+    <CalendarioResumen/>
+  </section>;
+}
+export function CasaFiltro({casa,onChange}:{casa:boolean;onChange:(v:boolean)=>void}){
+  return <div className="calendar-filter" role="group" aria-label="Filtrar partidos">{[["Todos",false],["En casa",true]].map(([l,v])=><button key={String(l)} type="button" aria-pressed={casa===v} className={casa===v?'is-active':''} onClick={()=>onChange(!!v)}>{l}</button>)}</div>;
+}
+export function CalendarioFila({partido,destacado=false}:{partido:Partido;destacado?:boolean}){
+  const r=resultadoPartido(partido);
+  const favor=partido.esLocal?partido.golesLocal:partido.golesVisitante,contra=partido.esLocal?partido.golesVisitante:partido.golesLocal;
+  return <li id={`jornada-${partido.jornada}`} className={`calendar-row ${destacado?'is-next':''}`} aria-current={destacado?'true':undefined}>
+    <span className="calendar-j">J{partido.jornada}</span>
+    <span className="min-w-0 flex-1"><span className="calendar-rival">vs {partido.rival}</span><span className="calendar-date">{fechaPartidoTexto(partido)}</span></span>
+    {r?<span className="calendar-score"><span className={`league-dot result-${r}`} aria-label={r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}/>{favor}–{contra}</span>:<span className={partido.esLocal?'calendar-home':'calendar-away'}>{partido.esLocal?'Casa':'Fuera'}</span>}
+  </li>;
+}
+function CalendarioResumen(){
+  const db=useClubData();const [casa,setCasa]=useState(false);const [ahora]=useState(()=>new Date());
+  const lista=proximosCalendario(db.partidos,ahora,casa);
+  if(!db.partidos.length)return null;
+  return <section className="mt-6" aria-label="Calendario">
+    <div className="mb-3 flex items-center justify-between gap-3"><h2 className="club-section-title mb-0">Calendario</h2><CasaFiltro casa={casa} onChange={setCasa}/></div>
+    {lista.length?<ul className="calendar-list">{lista.map(p=><CalendarioFila key={p.id} partido={p}/>)}</ul>:<p className="py-4 text-body-sm text-muted-foreground">No quedan partidos.</p>}
+    <Button asChild variant="link" className="mt-1 h-11 px-0 text-accent font-bold"><Link to="/calendario">Ver todo el calendario <ArrowRight strokeWidth={1.75}/></Link></Button>
   </section>;
 }

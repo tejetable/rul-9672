@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard, MapPin } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard } from "lucide-react";
+import frente from "@/assets/carne-fisico-frente.jpg.asset.json";
+import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
+import { fechaPartidoTexto, proximoPartido } from "@/lib/partidos";
 import { Liga } from "@/components/PartidoTarjetas";
 import { Galeria } from "@/components/Galeria";
 import { SociaCabecera } from "@/components/SociaCabecera";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
-import { dataService, type DB, type Socio, useClubData, runAction } from "@/lib/dataService";
+import { dataService, type DB, type Patrocinador, type Socio, useClubData, runAction } from "@/lib/dataService";
 
 type Tab = "equipo" | "ventajas";
 
@@ -26,6 +29,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
   const db = useClubData();
   const [carnet, setCarnet] = useState(false);
   useEffect(() => { runAction(() => dataService.marcarApertura(socio.id)); }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, [tab]);
   if (!db) return null;
   const tabCls = (on: boolean) => `member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1 text-body-sm ${on ? "font-bold text-primary" : "font-normal text-muted-foreground"}`;
   const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;
@@ -35,7 +39,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
       <SociaCabecera />
       <div className="flex-1 pb-24">
         {tab === "equipo" && <Equipo db={db} />}
-        {tab === "ventajas" && <Ventajas db={db} />}
+        {tab === "ventajas" && <Ventajas db={db} onCarnet={() => setCarnet(true)} />}
       </div>
       <nav aria-label="Secciones de socio o socia" className="member-navigation fixed inset-x-0 mx-auto w-full max-w-[430px] bottom-0 z-20 grid grid-cols-3 border-t border-border bg-background pt-1">
         <Button variant="ghost" onClick={() => setTab("equipo")} aria-current={tab === "equipo" ? "page" : undefined} className={tabCls(tab === "equipo")}>
@@ -55,14 +59,17 @@ export function SociaApp({ socio }: { socio: Socio }) {
           Ventajas
         </Button>
       </nav>
-      {carnet && <CarnetSheet socio={socio} onClose={() => setCarnet(false)} />}
+      {carnet && <CarnetSheet socio={socio} onClose={() => setCarnet(false)} onDondeUsar={() => { setCarnet(false); setTab("ventajas"); }} />}
+      <Bienvenida db={db} />
     </div>
   );
 }
 
-function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) {
+function CarnetSheet({ socio, onClose, onDondeUsar }: { socio: Socio; onClose: () => void; onDondeUsar: () => void }) {
   const [dy, setDy] = useState(0);
   const [y0, setY0] = useState<number | null>(null);
+  const [alCorriente, setAlCorriente] = useState<boolean | null>(null);
+  useEffect(() => { let vivo = true; dataService.pagoTemporada(socio.id, socio.temporada).then((v) => { if (vivo) setAlCorriente(v); }).catch(() => {}); return () => { vivo = false; }; }, [socio.id, socio.temporada]);
   return (
     <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}><Dialog.Portal>
     <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60" />
@@ -76,12 +83,9 @@ function CarnetSheet({ socio, onClose }: { socio: Socio; onClose: () => void }) 
         <span className="h-1 w-10 rounded-full bg-primary/30" />
         <ChevronDown size={20} strokeWidth={1.75} className="text-muted-foreground" />
       </Button>
-      <div className="flex min-h-14 items-center justify-between gap-3 border-b border-border">
-        <Dialog.Title className="club-section-title">Tu carnet</Dialog.Title>
-        <span className="label-club pb-1 text-muted-foreground">{socio.temporada}</span>
-      </div>
-            <div className="mt-6">
-        <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} />
+      <Dialog.Title className="sr-only">Tu carnet</Dialog.Title>
+      <div className="mt-4">
+        <Carne nombre={socio.nombre} numero={socio.numeroSocio} temporada={socio.temporada} alCorriente={alCorriente} onDondeUsar={onDondeUsar} />
       </div>
     </Dialog.Content></Dialog.Portal></Dialog.Root>
   );
@@ -98,83 +102,106 @@ function Equipo({ db }: { db: DB }) {
   );
 }
 
-function Ventajas({ db }: { db: DB }) {
+const iniciales = (n: string) => n.replace(/["'.]/g, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+function LogoNegocio({ p }: { p: Patrocinador }) {
+  return <span className="benefit-logo" aria-hidden="true">{p.logoUrl ? <img src={p.logoUrl} alt="" /> : iniciales(p.nombre)}</span>;
+}
+
+function Ventajas({ db, onCarnet }: { db: DB; onCarnet: () => void }) {
   const [sel, setSel] = useState<string | null>(null);
   const pats = db.patrocinadores.filter((p) => p.activo);
   const p = pats.find((x) => x.id === sel);
+  useEffect(() => { window.scrollTo(0, 0); }, [sel]);
 
   if (p) {
     const vs = db.ventajas.filter((v) => v.patrocinadorId === p.id && v.activa);
+    const dir = p.direccion?.trim();
+    const conDireccion = !!dir && !/pendiente/i.test(dir);
     return (
-      <section className="px-4 pt-4">
-        <Button variant="ghost" onClick={() => setSel(null)} className="label-club flex h-auto min-h-11 items-center gap-1">
+      <section className="px-4 pt-4 pb-24">
+        <Button variant="ghost" onClick={() => setSel(null)} className="label-club -ml-2 flex h-11 items-center gap-1 px-2">
           <ChevronLeft size={18} strokeWidth={1.75} /> Ventajas
         </Button>
-        <p className="club-chip mt-2">{p.categoria}</p>
-        <h1 className="club-section-title mt-3">{p.nombre}</h1>
-                <div className="mt-6 space-y-3">
+        <div className="mt-2 flex items-center gap-3">
+          <LogoNegocio p={p} />
+          <div className="min-w-0"><h1 className="text-section font-black leading-tight">{p.nombre}</h1><p className="label-club text-muted-foreground">{p.categoria}</p></div>
+        </div>
+        <h2 className="club-section-title mt-6">Qué te da</h2>
+        <div className="divide-y divide-[var(--divider)]">
           {vs.map((v) => (
-            <div key={v.id} className="rounded-panel bg-surface p-4">
-              <p className="title-club text-heading text-accent">{v.destacado}</p>
-              <p className="mt-2 text-item font-bold">{v.titulo}</p>
+            <div key={v.id} className="py-3 first:pt-0">
+              <p className="text-item font-bold">{v.titulo}</p>
               <p className="mt-1">{v.descripcion}</p>
               {v.tarifas && (
-                <table className="mt-4 w-full text-body-sm">
-                  <thead>
-                    <tr className="label-club text-muted-foreground">
-                      <th className="py-2 text-left">Servicio</th>
-                      <th className="py-2 text-right">Normal</th>
-                      <th className="py-2 text-right" aria-label="Socio o socia">Soci@</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {v.tarifas.map((t) => (
-                      <tr key={t.servicio} className="border-t border-border">
-                        <td className="py-2 pr-2">{t.servicio}</td>
-                        <td className="py-2 text-right text-muted-foreground line-through">{t.normal}</td>
-                        <td className="py-2 text-right font-black">{t.socio}</td>
-                      </tr>
-                    ))}
-                  </tbody>
+                <table className="mt-3 w-full text-body-sm">
+                  <thead><tr className="label-club text-muted-foreground"><th className="py-2 text-left">Servicio</th><th className="py-2 text-right">Normal</th><th className="py-2 text-right" aria-label="Socio o socia">Soci@</th></tr></thead>
+                  <tbody>{v.tarifas.map((t) => (<tr key={t.servicio} className="border-t border-[var(--divider)]"><td className="py-2 pr-2">{t.servicio}</td><td className="py-2 text-right text-muted-foreground line-through">{t.normal}</td><td className="py-2 text-right font-black">{t.socio}</td></tr>))}</tbody>
                 </table>
               )}
-              <p className="mt-3 text-body-sm text-muted-foreground">{v.condiciones}</p>
+              {v.condiciones && <p className="mt-2 text-body-sm text-muted-foreground">{v.condiciones}</p>}
             </div>
           ))}
-          <p className="flex items-center gap-2 text-body-sm text-muted-foreground"><MapPin size={16} strokeWidth={1.75} /> {p.direccion}</p>
         </div>
+        {conDireccion && <><h2 className="club-section-title mt-6">Dónde</h2><p>{dir}</p><Button asChild variant="link" className="h-11 px-0 font-bold text-accent"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.nombre} ${dir}`)}`} target="_blank" rel="noopener noreferrer">Cómo llegar →</a></Button></>}
+        <div className="member-sticky-action"><Button onClick={onCarnet} className="h-11 w-full rounded-control font-bold">Enseñar mi carnet</Button></div>
       </section>
     );
   }
 
   return (
     <section className="px-4 pt-4">
-      <p className="text-muted-foreground">Negocios de nuestra tierra que empujan con nosotros.</p>
-      <ul className="mt-6 space-y-3">
+      <ul className="divide-y divide-[var(--divider)]">
         {pats.map((pt) => {
-          const vs = db.ventajas.filter((v) => v.patrocinadorId === pt.id && v.activa);
+          const v = db.ventajas.find((x) => x.patrocinadorId === pt.id && x.activa);
           return (
             <li key={pt.id}>
-              <Button variant="ghost" onClick={() => setSel(pt.id)} className="flex h-auto w-full items-center gap-4 whitespace-normal rounded-panel bg-surface p-4 text-left transition-transform duration-200 active:scale-[.98]">
-                <span className={`flex size-14 shrink-0 items-center justify-center rounded-control bg-primary font-black text-primary-foreground ${(vs[0]?.destacado?.length ?? 0) > 4 ? "text-[11px] uppercase" : "text-item"}`}>
-                  {vs[0]?.destacado}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="label-club block text-muted-foreground">{pt.categoria}</span>
-                  <span className="block font-black">{pt.nombre}</span>
-                  <span className="block text-body-sm">{vs.length > 1 ? `${vs.length} ventajas` : vs[0]?.titulo}</span>
-                </span>
-                <ChevronRight size={20} strokeWidth={1.75} />
-              </Button>
+              <button type="button" onClick={() => setSel(pt.id)} className="flex min-h-16 w-full items-center gap-3 py-2 text-left">
+                <LogoNegocio p={pt} />
+                <span className="min-w-0 flex-1"><span className="block truncate text-item font-bold">{pt.nombre}</span><span className="label-club block truncate text-muted-foreground">{pt.categoria}</span></span>
+                {v?.destacado && <span className="shrink-0 text-body-sm font-bold text-muted-foreground">{v.destacado}</span>}
+                <ChevronRight size={18} strokeWidth={1.75} className="shrink-0 text-muted-foreground" />
+              </button>
             </li>
           );
         })}
       </ul>
-      <a href={folleto.url} target="_blank" rel="noreferrer" className="mt-6 flex h-auto min-h-12 items-center justify-center gap-2 rounded-panel btn-suave font-bold">
-        <FileText size={18} strokeWidth={1.75} /> Ver el folleto completo (PDF)
-      </a>
-      <p className="mt-4 text-left text-body-sm text-muted-foreground">Enseña tu carnet en el mostrador. Así el negocio sabe que vienes por el club.</p>
+      <Button asChild variant="link" className="mt-4 h-11 px-0 font-bold text-accent"><a href={folleto.url} target="_blank" rel="noreferrer">Ver el folleto completo (PDF) →</a></Button>
     </section>
   );
 }
 
+const CLAVE_BIENVENIDA = "rul-bienvenida-socia-vista";
+function Bienvenida({ db }: { db: DB }) {
+  const [open, setOpen] = useState(false);
+  const [i, setI] = useState(0);
+  useEffect(() => { try { if (!localStorage.getItem(CLAVE_BIENVENIDA)) setOpen(true); } catch { /* sin almacenamiento */ } }, []);
+  if (!open) return null;
+  const cerrar = () => { try { localStorage.setItem(CLAVE_BIENVENIDA, "1"); } catch { /* ignore */ } setOpen(false); };
+  const negocios = db.patrocinadores.filter((p) => p.activo).slice(0, 3);
+  const prox = proximoPartido(db.partidos, new Date());
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) => setI(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth));
+  return (
+    <div className="onboarding" role="dialog" aria-modal="true" aria-label="Bienvenida">
+      <div className="flex h-11 justify-end"><Button variant="ghost" onClick={cerrar} className="h-11 px-2 font-bold">Saltar</Button></div>
+      <div className="onboarding-track" onScroll={onScroll}>
+        <section className="onboarding-slide">
+          <h2>Este es tu carnet</h2>
+          <img src={frente.url} alt="Carnet de socio o socia del R.U. Lucense" className="w-full max-w-[220px] rounded-tile" />
+          <p>Enséñalo en los negocios amigos del club.</p>
+        </section>
+        <section className="onboarding-slide">
+          <h2>Así ayudas al club</h2>
+          <ul className="w-full max-w-[300px] divide-y divide-[var(--divider)] text-left">{negocios.map((n) => <li key={n.id} className="flex min-h-14 items-center gap-3"><LogoNegocio p={n} /><span className="font-bold">{n.nombre}</span></li>)}</ul>
+          <p>Cada vez que lo enseñas, el negocio ve lo que le trae el club. Así siguen patrocinándonos.</p>
+        </section>
+        <section className="onboarding-slide">
+          <h2>Sigue al equipo</h2>
+          {prox && <div className="fixture-card w-full max-w-[300px]"><p className="fixture-kicker">Jornada {prox.jornada} · {prox.esLocal ? "En casa" : "Fuera"}</p><div className="mt-3 flex items-center justify-center gap-3"><img src={escudo.url} alt="" className="size-10 object-contain" /><span className="font-black">vs {prox.rival}</span></div><p className="mt-2 text-body-sm">{fechaPartidoTexto(prox)}</p></div>}
+          <p>Próximo partido, resultados, fotos y la clasificación.</p>
+          <Button onClick={cerrar} className="h-11 w-full max-w-[300px] rounded-control font-bold">Empezar</Button>
+        </section>
+      </div>
+      <div className="onboarding-dots" aria-hidden="true">{[0, 1, 2].map((n) => <span key={n} className={n === i ? "is-active" : ""} />)}</div>
+    </div>
+  );
+}

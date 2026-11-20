@@ -232,6 +232,13 @@
       "when": 1795196069261,
       "tag": "0032_stripe_initial_password_logical_availability",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1795198678103,
+      "tag": "0033_calendario_completo_temporada",
+      "breakpoints": true
     }
   ]
 }
