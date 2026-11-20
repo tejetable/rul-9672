@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CalendarioFila, CasaFiltro } from "@/components/PartidoTarjetas";
+import { CalendarioCard, CasaFiltro } from "@/components/PartidoTarjetas";
 import { useClubData } from "@/lib/dataService";
 import { proximoPartido } from "@/lib/partidos";
 
@@ -30,7 +30,7 @@ function Calendario() {
     <header className="club-header"><Button asChild variant="ghost" size="icon"><Link to="/" aria-label="Volver a El Equipo"><ArrowLeft /></Link></Button><h1 className="club-section-title mb-0 flex-1">Calendario</h1><CasaFiltro casa={casa} onChange={setCasa} /></header>
     <div className="px-4">
       {!db.partidos.length && <p className="py-8 text-muted-foreground">Cargando partidos…</p>}
-      {vueltas.map(([titulo, lista]) => lista.length > 0 && <section key={titulo} className="mt-6"><h2 className="club-section-title">{titulo}</h2><ul className="calendar-list surface-card">{lista.map((p) => <CalendarioFila key={p.id} partido={p} destacado={p.id === proximo?.id} />)}</ul></section>)}
+      {vueltas.map(([titulo, lista]) => lista.length > 0 && <section key={titulo} className="mt-6"><h2 className="club-section-title">{titulo}</h2><ul className="cal-list">{lista.map((p) => <CalendarioCard key={p.id} partido={p} destacado={p.id === proximo?.id} />)}</ul></section>)}
     </div>
   </main></div>;
 }

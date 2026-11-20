@@ -945,11 +945,12 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .rul-btn--secondary { background: var(--blanco); color: var(--verde); border-color: var(--verde); }
 .rul-btn--negocio { min-height: 56px; width: 100%; font-size: 18px; }
 
-/* Navegación de soci@ (componente Navegación): barra blanca, Carnet en el centro sobre verde. */
-.member-navigation { background: var(--blanco); border-top-color: transparent; }
-.member-tab { color: var(--tinta-suave); font-size: 12px; font-weight: 700; }
-.member-tab[aria-current="page"] { color: var(--verde); }
-.member-carnet-key { display: flex; width: 64px; height: 56px; margin-top: -22px; align-items: center; justify-content: center; border-radius: 16px; background: var(--verde); color: var(--blanco); }
+/* Navegación de soci@: barra sobre arena, Carnet en un círculo oro que sobresale (el acento fijo de la app). */
+.member-tab { color: var(--tinta-suave); font-size: 13px; font-weight: 400; }
+.member-tab.is-on { color: var(--verde); font-weight: 900; }
+.member-tab-bar { position: absolute; top: 4px; width: 20px; height: 3px; border-radius: 999px; background: var(--esmeralda); }
+.member-carnet-key { display: flex; width: 64px; height: 64px; margin-top: -26px; align-items: center; justify-content: center; border-radius: 50%; background: var(--oro); color: var(--verde); border: 4px solid var(--background); transition: transform 150ms; }
+.member-tab:active .member-carnet-key { transform: scale(.95); }
 
 /* Pestañas segmentadas (componente Navegación · tabs) */
 .club-tabs { background: var(--arena-claro); border-radius: 12px; }
@@ -976,3 +977,47 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .card-number-pre { margin-right: 6px; font-family: var(--font-lato); font-size: 16px; font-weight: 900; vertical-align: 6px; }
 .card-member-name + .card-number { margin-top: 8px; }
 .visit-secondary, .visit-secondary:hover { background: var(--blanco) !important; color: var(--verde) !important; border: 2px solid var(--verde) !important; }
+
+/* ───────── Tarjeta de temporada v2: posición pulsable, sin etiquetas redundantes, próximos dentro ───────── */
+.sc-league { grid-template-columns: auto minmax(0,1fr); column-gap: 16px; }
+.sc-pos-tile { position: relative; display: flex; width: 76px; height: 76px; flex: none; align-items: center; justify-content: center; border-radius: 12px; background: var(--blanco); color: var(--verde); border: 2px solid transparent; transition: border-color 150ms, transform 120ms; }
+.sc-pos-tile:hover { border-color: color-mix(in oklab, var(--verde) 25%, transparent); }
+.sc-pos-tile:active { transform: scale(.97); }
+.sc-pos-tile:focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
+.sc-pos-tile .sc-pos-num { font-size: 46px; line-height: 1; margin-left: 4px; }
+.sc-pos-go { position: absolute; top: 6px; right: 6px; color: var(--esmeralda-texto); }
+.sc-points { font-size: 13px; }
+.sc-points strong { font-size: 20px; }
+.sc-goals { margin-top: 2px; }
+.sc-form { margin-top: 8px; }
+.sc-upcoming { padding: 4px 0 6px; border-top: 1px solid var(--surface-line); padding-top: 14px; }
+.sc-upcoming ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.sc-up-row { display: flex; align-items: center; gap: 12px; min-height: 56px; }
+.sc-up-row + .sc-up-row { border-top: 1px solid var(--surface-line); }
+.sc-up-j { width: 30px; flex: none; font-family: var(--font-display); font-size: 18px; line-height: 1; color: var(--tinta-suave); }
+.sc-up-rival { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 700; }
+.sc-up-date { display: block; font-size: 13px; color: var(--tinta-suave); }
+.sc-up-where { flex: none; font-size: 12px; font-weight: 700; color: var(--tinta-suave); }
+.sc-up-where.is-home { color: var(--esmeralda-texto); }
+.sc-calendar-link { display: flex; min-height: 52px; align-items: center; justify-content: center; gap: 6px; border-top: 1px solid var(--surface-line); font-size: 16px; font-weight: 900; color: var(--verde); }
+.sc-calendar-link:hover { background: color-mix(in oklab, var(--verde) 4%, transparent); }
+
+/* ───────── Calendario completo: un partido por tarjeta ───────── */
+.cal-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cal-card { display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 12px 14px; border-radius: 16px; background: var(--arena-claro); scroll-margin: 96px; }
+.cal-card.is-next { background: var(--verde); color: var(--blanco); }
+.cal-j { display: flex; width: 40px; flex: none; flex-direction: column; align-items: center; font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--verde); }
+.cal-j > span { font-family: var(--font-lato); font-size: 11px; font-weight: 900; letter-spacing: .06em; color: var(--tinta-suave); }
+.cal-card.is-next .cal-j, .cal-card.is-next .cal-j > span { color: var(--oro-claro); }
+.cal-next-tag { display: block; font-size: 12px; font-weight: 700; color: var(--oro-claro); }
+.cal-rival { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 700; }
+.cal-meta { display: block; font-size: 13px; color: var(--tinta-suave); }
+.cal-card.is-next .cal-meta { color: color-mix(in srgb, var(--blanco) 82%, transparent); }
+.cal-time { flex: none; font-family: var(--font-display); font-size: 22px; line-height: 1; }
+.cal-card.is-next .cal-time { color: var(--oro-claro); }
+.cal-result { display: inline-flex; flex: none; align-items: center; overflow: hidden; border-radius: 10px; color: var(--blanco); font-weight: 900; }
+.cal-result-letter { display: flex; width: 26px; height: 36px; align-items: center; justify-content: center; font-size: 13px; background: rgba(0,0,0,.18); }
+.cal-result-score { padding: 0 10px; font-family: var(--font-display); font-weight: 400; font-size: 20px; line-height: 36px; }
+.cal-result.is-V { background: var(--esmeralda-texto); }
+.cal-result.is-E { background: var(--tinta-suave); }
+.cal-result.is-D { background: var(--rojo); }

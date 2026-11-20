@@ -94,7 +94,6 @@ export function Liga() {
   useClubData();
   return <section aria-label="Liga">
     <TemporadaCard/>
-    <CalendarioResumen/>
   </section>;
 }
 
@@ -118,7 +117,9 @@ export function TemporadaCard(){
     <div className="sc-lower">
       <TablaResumen/>
       <ResultadosCarrusel partidos={db.partidos}/>
+      <ProximosEnCard partidos={db.partidos} siguienteId={partido?.id} ahora={ref}/>
     </div>
+    <Link to="/calendario" className="sc-calendar-link">Calendario completo<ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></Link>
   </article>;
 }
 
@@ -171,17 +172,19 @@ function TablaResumen(){
   const db=useClubData();
   const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha),goles=golesLiga(db.partidos);
   const nombre=(r:string|null)=>r==='V'?'Victoria':r==='E'?'Empate':r==='D'?'Derrota':'Sin resultado';
+  const url=dataService.ajustes().url_clasificacion_futgal;
   return <section className="sc-league" aria-label="Nuestra liga">
-    <div className="sc-pos"><span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span><span className="sc-pos-label">en la liga</span></div>
+    <a className="sc-pos-tile" href={url} target="_blank" rel="noopener noreferrer" aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
+      <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
+      <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
+    </a>
     <div className="sc-league-body">
       <p className="sc-points"><strong>{stats.puntos}</strong> pts <span className="sc-sep">·</span> {stats.g}G {stats.e}E {stats.p}P</p>
-      <p className="sc-goals">Goles {goles.gf}–{goles.gc} · <span className={goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p>
-      <div className="sc-form" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
+      <p className="sc-goals">Goles {goles.gf}–{goles.gc} <span className="sc-sep">·</span> <span className={goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p>
+      <div className="sc-form" role="img" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
         {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}
-        <span className="sc-form-label" aria-hidden="true">Últimos 5</span>
       </div>
     </div>
-    <a className="sc-table-link" href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer" aria-label="Ver la clasificación completa">Clasificación<ArrowUpRight size={14} strokeWidth={2} aria-hidden="true"/></a>
   </section>;
 }
 
@@ -233,14 +236,32 @@ export function CalendarioFila({partido,destacado=false}:{partido:Partido;destac
     {r?<span className="calendar-score"><span className={`league-dot result-${r}`} aria-label={r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}/>{favor}–{contra}</span>:<span className={partido.esLocal?'calendar-home':'calendar-away'}>{partido.esLocal?'Casa':'Fuera'}</span>}
   </li>;
 }
-function CalendarioResumen(){
-  const db=useClubData();const [casa,setCasa]=useState(false);const [ahora]=useState(()=>new Date());
-  const siguiente=partidoEnCurso(db.partidos,ahora)??proximoPartido(db.partidos,ahora);
-  const lista=proximosCalendario(db.partidos,ahora,casa,4).filter(p=>p.id!==siguiente?.id).slice(0,3);
-  if(!db.partidos.length)return null;
-  return <section className="mt-6" aria-label="Calendario">
-    <div className="mb-3 flex items-center justify-between gap-3"><h2 className="club-section-title mb-0">Calendario</h2><CasaFiltro casa={casa} onChange={setCasa}/></div>
-    {lista.length?<ul className="calendar-list surface-card">{lista.map(p=><CalendarioFila key={p.id} partido={p}/>)}</ul>:<p className="py-4 text-body-sm text-muted-foreground">No quedan partidos.</p>}
-    <Button asChild variant="link" className="mt-1 h-11 px-0 text-accent font-bold"><Link to="/calendario">Ver todo el calendario <ArrowRight strokeWidth={1.75}/></Link></Button>
+/** Los siguientes partidos después del próximo, dentro de la tarjeta de temporada. */
+function ProximosEnCard({partidos,siguienteId,ahora}:{partidos:Partido[];siguienteId?:string|undefined;ahora:Date}){
+  const lista=proximosCalendario(partidos,ahora,false,4).filter(p=>p.id!==siguienteId).slice(0,3);
+  if(!lista.length)return null;
+  return <section className="sc-upcoming" aria-label="Después">
+    <p className="sc-label">Después</p>
+    <ul>{lista.map(p=><li key={p.id} className="sc-up-row">
+      <span className="sc-up-j">J{p.jornada}</span>
+      <span className="min-w-0 flex-1"><span className="sc-up-rival">{nombreCorto(p.rival)}</span><span className="sc-up-date">{fechaPartidoTexto(p)}</span></span>
+      <span className={`sc-up-where ${p.esLocal?'is-home':''}`}>{p.esLocal?'Casa':'Fuera'}</span>
+    </li>)}</ul>
   </section>;
+}
+
+/** Un partido del calendario completo, en su propia tarjeta. Los jugados enseñan el resultado. */
+export function CalendarioCard({partido,destacado=false}:{partido:Partido;destacado?:boolean}){
+  const r=resultadoPartido(partido);
+  const favor=partido.esLocal?partido.golesLocal:partido.golesVisitante,contra=partido.esLocal?partido.golesVisitante:partido.golesLocal;
+  return <li id={`jornada-${partido.jornada}`} className={`cal-card ${destacado?'is-next':''} ${r?'is-played':''}`} aria-current={destacado?'true':undefined}>
+    <span className="cal-j"><span>J</span>{partido.jornada}</span>
+    <span className="min-w-0 flex-1">
+      {destacado&&<span className="cal-next-tag">Próximo partido</span>}
+      <span className="cal-rival">{nombreCorto(partido.rival)}</span>
+      <span className="cal-meta">{fechaPartidoTexto(partido)} · {partido.esLocal?'Casa':'Fuera'}</span>
+    </span>
+    {r?<span className={`cal-result is-${r}`} aria-label={`${r==='V'?'Victoria':r==='E'?'Empate':'Derrota'} ${favor} a ${contra}`}><span className="cal-result-letter">{r}</span><span className="cal-result-score">{favor}–{contra}</span></span>
+      :null}
+  </li>;
 }

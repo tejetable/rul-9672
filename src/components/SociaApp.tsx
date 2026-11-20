@@ -31,8 +31,8 @@ export function SociaApp({ socio }: { socio: Socio }) {
   useEffect(() => { runAction(() => dataService.marcarApertura(socio.id)); }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [tab]);
   if (!db) return null;
-  const tabCls = (_on: boolean) => "member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1";
-  const indicador = (_on: boolean) => null;
+  const tabCls = (on: boolean) => `member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1 ${on ? "is-on" : ""}`;
+  const indicador = (on: boolean) => on && <span className="member-tab-bar" aria-hidden="true" />;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -50,7 +50,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
           El Equipo
         </Button>
         <Button variant="ghost" onClick={() => setCarnet(true)} className="member-tab flex h-auto min-h-16 flex-col items-center justify-end gap-1 pb-2" aria-label="Abrir carnet">
-          <span className="member-carnet-key"><IdCard size={26} strokeWidth={1.75} /></span>
+          <span className="member-carnet-key"><IdCard size={26} strokeWidth={2} /></span>
           Carnet
         </Button>
         <Button variant="ghost" onClick={() => setTab("ventajas")} aria-current={tab === "ventajas" ? "page" : undefined} className={tabCls(tab === "ventajas")}>
