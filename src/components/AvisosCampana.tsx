@@ -1,3 +1,4 @@
+import { fechaHumana } from "@/lib/fechas";
 import {ListCard,ListRow} from './ListRow';
 import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -42,7 +43,7 @@ export function AvisosCampana({ quien }: { quien: "socias" | "negocios" }) {
           </div>
           <div className="px-4 pb-4">
           {avisos.length === 0 && <p className="mt-6 text-muted-foreground">Todavía no hay avisos.</p>}
-          {selected?<div className="mt-4 space-y-3"><Button variant="link" onClick={()=>setSelected(null)}>Volver a avisos</Button><h2 className="font-bold">{selected.titulo}</h2><p className="whitespace-pre-line">{selected.texto}</p></div>:<ListCard label="Avisos" className="mt-4">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={a.texto} date={new Date(a.fecha).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>}
+          {selected?<div className="mt-4 space-y-3"><Button variant="link" onClick={()=>setSelected(null)}>Volver a avisos</Button><h2 className="font-bold">{selected.titulo}</h2><p className="whitespace-pre-line">{selected.texto}</p></div>:<ListCard label="Avisos" className="mt-4">{avisos.map(a=><ListRow key={a.id} leading={<Bell/>} name={a.titulo} subtitle={a.texto} date={fechaHumana(a.fecha)} dateTime={a.fecha} onClick={()=>setSelected(a)}/>)}</ListCard>}
           </div></div>
         </Dialog.Content>
       </Dialog.Portal>

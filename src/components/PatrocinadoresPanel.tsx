@@ -69,7 +69,7 @@ export function PatrocinadoresPanel() {
         ))}
         <div className="rounded-panel bg-primary p-4 text-primary-foreground">
           <p className="text-heading font-black leading-none text-gold">{summary.nuevas_verificadas}</p>
-          <p className="label-club mt-2 text-[11px] opacity-80">Clientas nuevas del mes (verificadas)</p>
+          <p className="label-club mt-2 text-[11px] opacity-80">Personas nuevas del mes</p>
         </div>
       </div>
       <div className="mt-6 club-tabs grid-cols-3">
@@ -78,12 +78,12 @@ export function PatrocinadoresPanel() {
         ))}
       </div>
 
-      <span className="label-club mt-3 inline-block rounded-full border border-dashed border-primary px-3 py-1 text-muted-foreground">Datos de demostración</span>
+      
       <GestionSheet title="Nuevo patrocinador" open={form} onClose={()=>setForm(false)}>{form&&<NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }}/>}</GestionSheet>
       {!form&&!selected&&!baja&&<DirectivaFab label="Nuevo patrocinador" onClick={()=>setForm(true)}/>}
       {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
       <h2 className="club-section-title mt-6">Bajas</h2><div className="mt-2 grid grid-cols-2 gap-2">{["no ve retorno","precio","cierre del negocio","otro"].map(m => <div key={m} className="rounded-panel bg-surface p-4"><p className="font-black">{summary.bajas[m] ?? 0}</p><p className="text-body-sm">{m}</p></div>)}</div>
-      <ListCard label="Patrocinadores" className="mt-6">{db.patrocinadores.map(p=>{const stats=adaptarStats(summary.patrocinadores[p.id]??emptyStats);return <ListRow key={p.id} leading={<Store/>} name={p.nombre} subtitle={p.emailAcceso||p.categoria} date={`${stats.visitas} visitas`} status={p.activo?'active':'off'} onClick={()=>setSelected(p.id)}/>;})}</ListCard>
+      <ListCard label="Patrocinadores" className="mt-6">{db.patrocinadores.map(p=>{const stats=adaptarStats(summary.patrocinadores[p.id]??emptyStats);return <ListRow key={p.id} leading={<Store/>} name={p.nombre} subtitle={p.emailAcceso||p.categoria} date={`${stats.visitas} ${stats.visitas===1?"visita":"visitas"}`} status={p.activo?'active':'off'} onClick={()=>setSelected(p.id)}/>;})}</ListCard>
       <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><div className="grid grid-cols-2 gap-3">{(()=>{const raw=summary.patrocinadores[pat.id]??emptyStats;const stats=adaptarStats(raw);return [["Visitas",stats.visitas],["Nuevas verif.",stats.nuevasVerificadas],["Nuevas decl.",stats.nuevasDeclaradas],["Repiten",stats.repiten],["% nuevas",`${stats.pctNuevas}%`],["90 días",`${raw.objetivo_nuevas_90d}/5`]].map(([label,value])=><div key={label} className="py-2"><p className="font-black">{value}</p><p className="label-club">{label}</p></div>);})()}</div><EmailNegocio id={pat.id} email={pat.emailAcceso??''}/>{pat.activo&&<Button variant="outline" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Desactivar</Button>}<PersonPassword email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
       <Button variant="ghost" onClick={exportarCSV} className="mt-6 flex h-auto min-h-12 w-full items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
         <Download size={18} strokeWidth={1.75} /> Exportar CSV
