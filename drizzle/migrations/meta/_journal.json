@@ -211,6 +211,13 @@
       "when": 1794656645521,
       "tag": "0029_editable_member_number_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1795194450400,
+      "tag": "0030_stripe_paid_membership_and_physical_cards",
+      "breakpoints": true
     }
   ]
 }

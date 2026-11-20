@@ -17,6 +17,7 @@ export type Database = {
       ajustes_club: {
         Row: {
           cuota_socio: number | null
+          email_avisos: string
           email_club: string
           id: boolean
           nombre_club: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           cuota_socio?: number | null
+          email_avisos?: string
           email_club?: string
           id?: boolean
           nombre_club?: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           cuota_socio?: number | null
+          email_avisos?: string
           email_club?: string
           id?: boolean
           nombre_club?: string
@@ -131,6 +134,45 @@ export type Database = {
         }
         Relationships: []
       }
+      emails_log: {
+        Row: {
+          asunto: string
+          clave: string
+          creado_at: string
+          destinatario: string
+          enviado_at: string | null
+          error: string | null
+          estado: string
+          id: string
+          intentos: number
+          provider_id: string | null
+        }
+        Insert: {
+          asunto: string
+          clave: string
+          creado_at?: string
+          destinatario: string
+          enviado_at?: string | null
+          error?: string | null
+          estado?: string
+          id?: string
+          intentos?: number
+          provider_id?: string | null
+        }
+        Update: {
+          asunto?: string
+          clave?: string
+          creado_at?: string
+          destinatario?: string
+          enviado_at?: string | null
+          error?: string | null
+          estado?: string
+          id?: string
+          intentos?: number
+          provider_id?: string | null
+        }
+        Relationships: []
+      }
       equipo_invitaciones: {
         Row: {
           email: string
@@ -190,10 +232,13 @@ export type Database = {
       pagos: {
         Row: {
           creado_at: string
+          detalle_metodo: string | null
+          estado: string
           fecha_pago: string
           id: string
           importe: number
           metodo: string
+          reembolsado_at: string | null
           referencia: string | null
           registrado_por: string | null
           socio_id: string
@@ -201,10 +246,13 @@ export type Database = {
         }
         Insert: {
           creado_at?: string
+          detalle_metodo?: string | null
+          estado?: string
           fecha_pago: string
           id?: string
           importe: number
           metodo: string
+          reembolsado_at?: string | null
           referencia?: string | null
           registrado_por?: string | null
           socio_id: string
@@ -212,10 +260,13 @@ export type Database = {
         }
         Update: {
           creado_at?: string
+          detalle_metodo?: string | null
+          estado?: string
           fecha_pago?: string
           id?: string
           importe?: number
           metodo?: string
+          reembolsado_at?: string | null
           referencia?: string | null
           registrado_por?: string | null
           socio_id?: string
@@ -466,13 +517,16 @@ export type Database = {
       socios: {
         Row: {
           cambio_dispositivo: boolean
+          carnet_fisico: string
           consentimiento_at: string | null
           dispositivo_id: string | null
           email: string | null
+          es_prueba: boolean
           estado: string
           fecha_activacion: string | null
           fecha_alta: string
           fecha_baja: string | null
+          fecha_entrega: string | null
           id: string
           mayor_de_edad: boolean
           motivo_baja: string | null
@@ -485,13 +539,16 @@ export type Database = {
         }
         Insert: {
           cambio_dispositivo?: boolean
+          carnet_fisico?: string
           consentimiento_at?: string | null
           dispositivo_id?: string | null
           email?: string | null
+          es_prueba?: boolean
           estado?: string
           fecha_activacion?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
+          fecha_entrega?: string | null
           id?: string
           mayor_de_edad?: boolean
           motivo_baja?: string | null
@@ -504,13 +561,16 @@ export type Database = {
         }
         Update: {
           cambio_dispositivo?: boolean
+          carnet_fisico?: string
           consentimiento_at?: string | null
           dispositivo_id?: string | null
           email?: string | null
+          es_prueba?: boolean
           estado?: string
           fecha_activacion?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
+          fecha_entrega?: string | null
           id?: string
           mayor_de_edad?: boolean
           motivo_baja?: string | null
@@ -569,6 +629,112 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "solicitudes_socios_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_checkouts: {
+        Row: {
+          auth_nuevo: boolean
+          consentimiento_at: string
+          creado_at: string
+          email: string
+          es_prueba: boolean
+          id: string
+          importe_centimos: number
+          nombre: string
+          pagado_at: string | null
+          password_claimed_at: string | null
+          password_saved_at: string | null
+          session_id: string | null
+          socio_id: string | null
+          telefono: string
+          temporada: string
+          user_id: string | null
+        }
+        Insert: {
+          auth_nuevo?: boolean
+          consentimiento_at?: string
+          creado_at?: string
+          email: string
+          es_prueba: boolean
+          id?: string
+          importe_centimos: number
+          nombre: string
+          pagado_at?: string | null
+          password_claimed_at?: string | null
+          password_saved_at?: string | null
+          session_id?: string | null
+          socio_id?: string | null
+          telefono?: string
+          temporada: string
+          user_id?: string | null
+        }
+        Update: {
+          auth_nuevo?: boolean
+          consentimiento_at?: string
+          creado_at?: string
+          email?: string
+          es_prueba?: boolean
+          id?: string
+          importe_centimos?: number
+          nombre?: string
+          pagado_at?: string | null
+          password_claimed_at?: string | null
+          password_saved_at?: string | null
+          session_id?: string | null
+          socio_id?: string | null
+          telefono?: string
+          temporada?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_checkouts_socio_id_fkey"
+            columns: ["socio_id"]
+            isOneToOne: false
+            referencedRelation: "socios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_eventos: {
+        Row: {
+          creado_at: string
+          error: string | null
+          estado: string
+          event_id: string
+          procesado_at: string | null
+          session_id: string | null
+          socio_id: string | null
+          tipo: string
+        }
+        Insert: {
+          creado_at?: string
+          error?: string | null
+          estado?: string
+          event_id: string
+          procesado_at?: string | null
+          session_id?: string | null
+          socio_id?: string | null
+          tipo: string
+        }
+        Update: {
+          creado_at?: string
+          error?: string | null
+          estado?: string
+          event_id?: string
+          procesado_at?: string | null
+          session_id?: string | null
+          socio_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_eventos_socio_id_fkey"
             columns: ["socio_id"]
             isOneToOne: false
             referencedRelation: "socios"
@@ -937,6 +1103,10 @@ export type Database = {
         Returns: string
       }
       entrar_negocio: { Args: { p_pin: string }; Returns: string }
+      entregar_carnet_fisico: {
+        Args: { p_entregado: boolean; p_socio: string }
+        Returns: undefined
+      }
       estado_acceso_personal: { Args: never; Returns: Json }
       estado_sesion_socia: { Args: never; Returns: string }
       gestion_socios: { Args: never; Returns: Json }
@@ -984,12 +1154,28 @@ export type Database = {
       mi_patrocinador: { Args: never; Returns: string }
       mi_socio: { Args: never; Returns: string }
       negocio_prueba_actual: { Args: never; Returns: string }
+      password_alta_stripe: {
+        Args: { p_accion: string; p_session: string }
+        Returns: string
+      }
       personas_club: { Args: never; Returns: Json }
       preparar_eliminar_socio: {
         Args: { p_nombre: string; p_socio: string }
         Returns: Json
       }
       preparar_password_usuario: { Args: { p_email: string }; Returns: string }
+      procesar_alta_stripe: {
+        Args: {
+          p_event: string
+          p_fecha: string
+          p_importe: number
+          p_metodo: string
+          p_prueba: boolean
+          p_referencia: string
+          p_session: string
+        }
+        Returns: string
+      }
       quitar_directiva: {
         Args: { p_motivo: string; p_user: string }
         Returns: undefined
@@ -1044,8 +1230,13 @@ export type Database = {
         Args: { p_patrocinador_id: string; p_periodo: string }
         Returns: Json
       }
+      stripe_auth_email: { Args: { p_email: string }; Returns: Json }
       transferir_super_admin: {
         Args: { nuevo_perfil_id: string }
+        Returns: undefined
+      }
+      vincular_auth_stripe: {
+        Args: { p_nuevo: boolean; p_session: string; p_user: string }
         Returns: undefined
       }
       vincular_directiva: {
