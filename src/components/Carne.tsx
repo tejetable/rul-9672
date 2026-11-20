@@ -27,7 +27,7 @@ export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDo
           {reverso && <a href={folleto.url} target="_blank" rel="noreferrer" className="physical-card-benefits-qr rounded-md focus-visible:outline-2 focus-visible:outline-ring" aria-label="Abrir el folleto de ventajas"><QRCodeSVG value={folleto.url} size={160} className="card-qr-code h-full w-full" /></a>}
         </article>
         <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="card-kicker text-muted-foreground">{reverso ? "Ventajas" : "Tu carnet"}</span>
+          
           <Button variant="ghost" onClick={() => setReverso((v) => !v)} className="h-10 text-xs font-bold hover:bg-primary/10"><ArrowLeftRight /> {reverso ? "Ver carnet" : "Dar la vuelta"}</Button>
         </div>
       </div>

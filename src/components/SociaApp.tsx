@@ -118,7 +118,7 @@ function Ventajas({ db, onCarnet }: { db: DB; onCarnet: () => void }) {
     const dir = p.direccion?.trim();
     const conDireccion = !!dir && !/pendiente/i.test(dir);
     return (
-      <section className="px-4 pt-4 pb-24">
+      <section className="px-4 pt-4 pb-32">
         <Button variant="ghost" onClick={() => setSel(null)} className="label-club -ml-2 flex h-11 items-center gap-1 px-2">
           <ChevronLeft size={18} strokeWidth={1.75} /> Ventajas
         </Button>
