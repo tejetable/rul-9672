@@ -1021,3 +1021,64 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .cal-result.is-V { background: var(--esmeralda-texto); }
 .cal-result.is-E { background: var(--tinta-suave); }
 .cal-result.is-D { background: var(--rojo); }
+
+/* ───────── Liga: ficha y datos alineados arriba y abajo (mismo alto, mismo aire entre filas) ───────── */
+:root { --pos-tile: 72px; }
+.sc-league { display: flex; align-items: stretch; gap: 14px; }
+.sc-pos-tile { width: var(--pos-tile); height: var(--pos-tile); }
+.sc-league-body { display: flex; min-width: 0; height: var(--pos-tile); flex-direction: column; justify-content: space-between; }
+.sc-league-body .sc-points, .sc-league-body .sc-goals { margin: 0; line-height: 1; }
+.sc-league-body .sc-points { height: 20px; display: flex; align-items: flex-end; gap: 4px; white-space: nowrap; }
+.sc-league-body .sc-points strong { font-size: 22px; line-height: .8; }
+.sc-league-body .sc-goals { height: 16px; display: flex; align-items: center; gap: 4px; font-size: 13px; }
+.sc-league-body .sc-form { margin: 0; height: 20px; }
+
+/* ───────── Marcador de pista: la pista de Guntín. El azul (--pista) solo vive aquí: es imagen, no color de interfaz. ───────── */
+:root { --pista: #2C4A78; }
+.court { position: relative; overflow: hidden; aspect-ratio: 2 / 1; border-radius: 12px; background: var(--pista); color: #fff; }
+.court-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.court-futsal { stroke: rgba(255,255,255,.5); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.court-basket { stroke: rgba(126,200,230,.32); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.court-spot { fill: rgba(255,255,255,.6); }
+.court-side { position: absolute; top: 12px; z-index: 1; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.78); }
+.court-side.is-l { left: 16px; } .court-side.is-r { right: 16px; }
+.court-halves { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; }
+.court-half { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; padding: 0 22px; }
+.court-goals { font-family: var(--font-display); font-size: 72px; line-height: .9; font-variant-numeric: normal; }
+.court-team { max-width: 100%; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 900; }
+.court-half.is-loser .court-goals { color: rgba(255,255,255,.55); }
+.court-half.is-loser .court-team { color: rgba(255,255,255,.82); font-weight: 700; }
+.court-halves.from-right { animation: sc-in-right 240ms cubic-bezier(.2,.8,.2,1) both; }
+.court-halves.from-left { animation: sc-in-left 240ms cubic-bezier(.2,.8,.2,1) both; }
+.sc-results .court { margin-top: 10px; }
+@media (max-width: 370px) { .court-goals { font-size: 60px; } }
+@media (prefers-reduced-motion: reduce) { .court-halves.from-right, .court-halves.from-left { animation: none; } }
+
+/* ───────── Marcador de paletas (calendario completo) ───────── */
+.flap-board { padding: 12px 14px 14px; }
+.flap { margin-top: 10px; padding: 10px; border-radius: 12px; background: var(--blanco); }
+.flap-row { display: flex; gap: 6px; }
+.flap-row + .flap-row { margin-top: 6px; }
+.flap-tile { position: relative; display: flex; height: 48px; align-items: center; overflow: hidden; border-radius: 6px; background: var(--arena-claro); color: var(--verde); font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; perspective: 300px; }
+.flap-tile::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(13,70,49,.16); }
+.flap-tile.is-name { flex: 1; min-width: 0; padding: 0 12px; font-size: 19px; }
+.flap-tile.is-num { width: 48px; flex: none; justify-content: center; font-size: 30px; background: var(--verde); color: var(--oro-claro); }
+.flap-tile.is-num::after { background: rgba(0,0,0,.35); }
+.flap-face { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transform-origin: 50% 50%; animation: flap-in 420ms cubic-bezier(.3,1.3,.5,1) both; }
+@keyframes flap-in { 0% { transform: rotateX(-90deg); opacity: .2; } 60% { transform: rotateX(12deg); opacity: 1; } 100% { transform: rotateX(0); } }
+.flap-row.is-loser .flap-tile.is-name { color: color-mix(in oklab, var(--verde) 50%, transparent); }
+.flap-row.is-loser .flap-tile.is-num { background: var(--tinta-suave); color: var(--blanco); }
+.flap-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.cal-card.is-tappable { cursor: pointer; transition: transform 120ms; }
+.cal-card.is-tappable:active { transform: scale(.985); }
+.cal-card.is-tappable:focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .flap-face { animation: none; } }
+/* Ajuste óptico: la altura de mayúscula de «15» arranca en el borde superior de la ficha y los puntos acaban en su borde inferior; el aire entre filas es el mismo (12,5 px). */
+.sc-league-body .sc-points { transform: translateY(-3px); }
+.sc-league-body .sc-goals { transform: translateY(-1.5px); }
+.sc-league-body .sc-form { transform: translateY(1px); }
+.court-side { top: auto; bottom: 12px; }
+.court-goals { font-size: 64px; }
+.court-half { padding-bottom: 10px; }
+.flap-meta .sc-result-word { font-family: var(--font-lato); letter-spacing: 0; text-transform: none; }
+.court-side { bottom: 18px; }

@@ -188,39 +188,91 @@ function TablaResumen(){
   </section>;
 }
 
-function ResultadosCarrusel({partidos}:{partidos:Partido[]}){
-  const {data}=useDriveGallery();
+/** Navegación entre partidos jugados (flechas, «Último» y deslizar). La comparten la pista y las paletas. */
+function useNavegadorResultados(partidos:Partido[]){
   const jugados=[...partidos].filter(p=>p.jugado).sort((a,b)=>(inicioPartido(a)?.getTime()??0)-(inicioPartido(b)?.getTime()??0));
   const [idx,setIdx]=useState<number|null>(null);const [x0,setX0]=useState<number|null>(null);const [dir,setDir]=useState<0|1|-1>(0);
-  if(!jugados.length)return null;
-  const last=jugados.length-1,i=Math.min(idx??last,last),partido=jugados[i]!;
+  const last=jugados.length-1,i=Math.max(0,Math.min(idx??last,last)),partido=jugados[i];
   const ir=(n:number)=>{if(n<0||n>last||n===i)return;setDir(n>i?1:-1);setIdx(n);};
+  const irA=(id:string)=>{const n=jugados.findIndex(p=>p.id===id);if(n>=0)ir(n);};
+  const swipe={onTouchStart:(e:React.TouchEvent)=>setX0(e.touches[0]?.clientX??null),onTouchEnd:(e:React.TouchEvent)=>{if(x0===null)return;const dx=(e.changedTouches[0]?.clientX??x0)-x0;if(Math.abs(dx)>40)ir(dx<0?i+1:i-1);setX0(null);}};
+  return {partido,i,last,dir,ir,irA,swipe};
+}
+type Nav=ReturnType<typeof useNavegadorResultados>;
+function NavFlechas({nav,etiqueta}:{nav:Nav;etiqueta:string}){
+  const {i,last,ir,partido}=nav;
+  return <div className="sc-results-head">
+    <p className="sc-label">{i===last?etiqueta:`Jornada ${partido?.jornada??''}`}</p>
+    <div className="sc-pager">
+      {i!==last&&<button type="button" className="sc-latest" onClick={()=>ir(last)}>Último</button>}
+      <button type="button" className="sc-arrow" aria-label="Partido anterior" disabled={i===0} onClick={()=>ir(i-1)}><ChevronLeft size={18} strokeWidth={2}/></button>
+      <button type="button" className="sc-arrow" aria-label="Partido siguiente" disabled={i===last} onClick={()=>ir(i+1)}><ChevronRight size={18} strokeWidth={2}/></button>
+    </div>
+  </div>;
+}
+function fechaCorta(p:Partido){const d=inicioPartido(p)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';return d.charAt(0).toUpperCase()+d.slice(1);}
+function equipos(p:Partido){
+  const local=p.esLocal?'R.U. Lucense':nombreCorto(p.rival),visit=p.esLocal?nombreCorto(p.rival):'R.U. Lucense';
+  const gl=p.golesLocal??0,gv=p.golesVisitante??0;
+  return {local,visit,gl,gv,pierdeLocal:gl<gv,pierdeVisit:gv<gl};
+}
+
+/** La pista de Guntín vista desde arriba: cada equipo en su campo, con sus goles. El azul es imagen, no color de interfaz. */
+function PistaSVG(){
+  return <svg className="court-lines" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true" fill="none">
+    <g className="court-basket"><path d="M8 18H44A84 84 0 0 1 44 182H8"/><path d="M392 18H356A84 84 0 0 0 356 182H392"/></g>
+    <g className="court-futsal"><rect x="8" y="8" width="384" height="184" rx="2"/><line x1="200" y1="8" x2="200" y2="192"/><circle cx="200" cy="100" r="22"/>
+      <path d="M8 72A28 28 0 0 1 36 100A28 28 0 0 1 8 128"/><path d="M392 72A28 28 0 0 0 364 100A28 28 0 0 0 392 128"/></g>
+    <circle cx="200" cy="100" r="2.5" className="court-spot"/>
+  </svg>;
+}
+function MarcadorPista({partido,dir}:{partido:Partido;dir:0|1|-1}){
+  const {local,visit,gl,gv,pierdeLocal,pierdeVisit}=equipos(partido);
+  return <div className="court" role="img" aria-label={`${local} ${gl}, ${visit} ${gv}`}>
+    <PistaSVG/>
+    <span className="court-side is-l" aria-hidden="true">Local</span><span className="court-side is-r" aria-hidden="true">Visitante</span>
+    <div key={partido.id} className={`court-halves ${dir>0?'from-right':dir<0?'from-left':''}`} aria-hidden="true">
+      <div className={`court-half ${pierdeLocal?'is-loser':''}`}><span className="court-goals">{gl}</span><span className="court-team">{local}</span></div>
+      <div className={`court-half ${pierdeVisit?'is-loser':''}`}><span className="court-goals">{gv}</span><span className="court-team">{visit}</span></div>
+    </div>
+  </div>;
+}
+
+function ResultadosCarrusel({partidos}:{partidos:Partido[]}){
+  const {data}=useDriveGallery();
+  const nav=useNavegadorResultados(partidos);
+  const partido=nav.partido;
+  if(!partido)return null;
   const r=resultadoPartido(partido);
   const album=data?.albumes.find(a=>a.partidoId===partido.id);
   const folder=album?.id??partido.driveFolderId;
-  const d=inicioPartido(partido)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';
-  const fecha=d.charAt(0).toUpperCase()+d.slice(1);
-  const local=partido.esLocal;
-  const ganaLocal=(partido.golesLocal??0)>(partido.golesVisitante??0),ganaVisit=(partido.golesVisitante??0)>(partido.golesLocal??0);
-  return <section className="sc-results" aria-label="Resultados"
-    onTouchStart={e=>setX0(e.touches[0]?.clientX??null)}
-    onTouchEnd={e=>{if(x0===null)return;const dx=(e.changedTouches[0]?.clientX??x0)-x0;if(Math.abs(dx)>40)ir(dx<0?i+1:i-1);setX0(null);}}>
-    <div className="sc-results-head">
-      <p className="sc-label">{i===last?'Último resultado':`Jornada ${partido.jornada??''}`}</p>
-      <div className="sc-pager">
-        {i!==last&&<button type="button" className="sc-latest" onClick={()=>ir(last)}>Último</button>}
-        <button type="button" className="sc-arrow" aria-label="Partido anterior" disabled={i===0} onClick={()=>ir(i-1)}><ChevronLeft size={18} strokeWidth={2}/></button>
-        <button type="button" className="sc-arrow" aria-label="Partido siguiente" disabled={i===last} onClick={()=>ir(i+1)}><ChevronRight size={18} strokeWidth={2}/></button>
-      </div>
-    </div>
-    <div key={partido.id} className={`sc-score ${dir>0?'from-right':dir<0?'from-left':''}`}>
-      {r&&<span className={`sc-result-bar is-${r}`} aria-hidden="true"/>}
-      <p className={`sc-score-row ${ganaVisit?'is-loser':''}`}><Emblema rival={local?undefined:partido.rival} size="sm"/><span className="sc-score-name">{local?'R.U. Lucense':nombreCorto(partido.rival)}</span><span className="sc-score-goals">{partido.golesLocal}</span></p>
-      <p className={`sc-score-row ${ganaLocal?'is-loser':''}`}><Emblema rival={local?partido.rival:undefined} size="sm"/><span className="sc-score-name">{local?nombreCorto(partido.rival):'R.U. Lucense'}</span><span className="sc-score-goals">{partido.golesVisitante}</span></p>
-    </div>
+  return <section className="sc-results" aria-label="Resultados" {...nav.swipe}>
+    <NavFlechas nav={nav} etiqueta="Último resultado"/>
+    <MarcadorPista partido={partido} dir={nav.dir}/>
     <div className="sc-score-foot">
-      <p>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}<span>{fecha}{partido.jornada?` · J${partido.jornada}`:''}</span></p>
+      <p>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}<span>{fechaCorta(partido)}{partido.jornada?` · J${partido.jornada}`:''}</span></p>
       {folder&&<Link className="sc-photos" to="/galeria/$folderId" params={{folderId:folder}} search={{foto:''}}>Fotos<ArrowRight size={14} strokeWidth={2} aria-hidden="true"/></Link>}
+    </div>
+  </section>;
+}
+
+/** Marcador de paletas (calendario completo): al cambiar de partido, las paletas giran. */
+function Paleta({texto,clase='',delay=0}:{texto:string|number;clase?:string;delay?:number}){
+  return <span className={`flap-tile ${clase}`}><span key={String(texto)} className="flap-face" style={{animationDelay:`${delay}ms`}}>{texto}</span></span>;
+}
+export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:{id:string;n:number}|null}){
+  const nav=useNavegadorResultados(partidos);
+  useEffect(()=>{if(elegido)nav.irA(elegido.id);},[elegido]); // eslint-disable-line react-hooks/exhaustive-deps
+  const partido=nav.partido;
+  if(!partido)return null;
+  const {local,visit,gl,gv,pierdeLocal,pierdeVisit}=equipos(partido);
+  const r=resultadoPartido(partido);
+  return <section className="flap-board surface-card" aria-label="Resultados" {...nav.swipe}>
+    <NavFlechas nav={nav} etiqueta="Último resultado"/>
+    <div className="flap" role="img" aria-label={`Jornada ${partido.jornada}: ${local} ${gl}, ${visit} ${gv}`}>
+      <div className={`flap-row ${pierdeLocal?'is-loser':''}`} aria-hidden="true"><Paleta texto={local} clase="is-name"/><Paleta texto={gl} clase="is-num" delay={90}/></div>
+      <div className={`flap-row ${pierdeVisit?'is-loser':''}`} aria-hidden="true"><Paleta texto={visit} clase="is-name" delay={60}/><Paleta texto={gv} clase="is-num" delay={150}/></div>
+      <div className="flap-meta"><span>J{partido.jornada} · {fechaCorta(partido)}</span>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}</div>
     </div>
   </section>;
 }
@@ -251,10 +303,11 @@ function ProximosEnCard({partidos,siguienteId,ahora}:{partidos:Partido[];siguien
 }
 
 /** Un partido del calendario completo, en su propia tarjeta. Los jugados enseñan el resultado. */
-export function CalendarioCard({partido,destacado=false}:{partido:Partido;destacado?:boolean}){
+export function CalendarioCard({partido,destacado=false,onVer}:{partido:Partido;destacado?:boolean;onVer?:(id:string)=>void}){
   const r=resultadoPartido(partido);
   const favor=partido.esLocal?partido.golesLocal:partido.golesVisitante,contra=partido.esLocal?partido.golesVisitante:partido.golesLocal;
-  return <li id={`jornada-${partido.jornada}`} className={`cal-card ${destacado?'is-next':''} ${r?'is-played':''}`} aria-current={destacado?'true':undefined}>
+  const ver=r&&onVer?()=>onVer(partido.id):undefined;
+  return <li id={`jornada-${partido.jornada}`} className={`cal-card ${destacado?'is-next':''} ${r?'is-played':''} ${ver?'is-tappable':''}`} aria-current={destacado?'true':undefined} onClick={ver} onKeyDown={ver?(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();ver();}}:undefined} tabIndex={ver?0:undefined} role={ver?'button':undefined} aria-label={ver?`Ver en el marcador la jornada ${partido.jornada}`:undefined}>
     <span className="cal-j"><span>J</span>{partido.jornada}</span>
     <span className="min-w-0 flex-1">
       {destacado&&<span className="cal-next-tag">Próximo partido</span>}
