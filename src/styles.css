@@ -1317,3 +1317,6 @@ main:has(.theme-noche), main.theme-noche, body:has(.theme-noche) { background: #
 .duo-btn { display: inline-flex; border-radius: 999px; padding: 0; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .duo-btn:focus-visible { outline: 3px solid #B98E4A; outline-offset: 3px; }
 .duo-btn .vista-switch { --vs-w: 128px; }
+/* Cabecera de soci@: escudo (PNG transparente, sin caja) · interruptor de vista en el centro · avisos y menú */
+.socia-crest { display: block; width: auto; height: 40px; object-fit: contain; }
+.socia-header .duo-btn .vista-switch { --vs-w: 124px; }
