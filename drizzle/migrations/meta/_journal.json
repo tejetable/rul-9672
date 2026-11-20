@@ -218,6 +218,13 @@
       "when": 1795194450400,
       "tag": "0030_stripe_paid_membership_and_physical_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795195344639,
+      "tag": "0031_stripe_service_role_claim_compatibility",
+      "breakpoints": true
     }
   ]
 }

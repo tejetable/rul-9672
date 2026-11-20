@@ -1,0 +1,1 @@
+DO $$ DECLARE definition text; BEGIN SELECT pg_get_functiondef('public.crear_socio_desde_pago(jsonb,jsonb)'::regprocedure) INTO definition; definition:=replace(definition, 'current_setting(''request.jwt.claim.role'',true) IS DISTINCT FROM ''service_role''', 'auth.role() IS DISTINCT FROM ''service_role'''); EXECUTE definition; END $$;
