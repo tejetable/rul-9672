@@ -14,6 +14,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
+import escudoTransparente from "@/assets/escudo-rul-transparente.png.asset.json";
 
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
@@ -52,9 +53,10 @@ function Index() {
 
 function Cargando() {
   return (
-    <section className="flex flex-1 flex-col items-center justify-center px-4 text-center">
-      <img src={escudo.url} alt="Escudo del Real Unión Lucense F.S." width={450} height={676} className="crest crest-blend animate-rise w-36" />
-      <p className="label-club animate-rise mt-6" style={{ animationDelay: "200ms" }}>R.U. Lucense</p>
+    <section className="club-loading flex flex-1 flex-col items-center justify-center px-4 text-center">
+      <img src={escudoTransparente.url} alt="Escudo del Real Unión Lucense F.S." width={340} height={456} className="crest animate-rise w-36" />
+      <span className="club-loading-rule animate-rise" style={{ animationDelay: "120ms" }} aria-hidden="true" />
+      <p className="label-club animate-rise mt-4" style={{ animationDelay: "200ms" }}>R.U. Lucense</p>
     </section>
   );
 }
