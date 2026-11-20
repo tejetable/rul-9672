@@ -2,7 +2,7 @@ import {Link} from "@tanstack/react-router";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useState } from "react";
-import { ArrowRight, Twitch, MapPin, Navigation } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
@@ -91,22 +91,189 @@ export function UltimoResultado({partidos}:{partidos:Partido[]}) {
   <div className="result-pager">{jugados.length>8?<p className="text-body-sm font-bold">J{partido.jornada??i+1} / {jugados.length}</p>:<div className="result-dots" aria-hidden="true">{jugados.map((p,n)=><span key={p.id} className={n===i?'is-active':''}/>)}</div>}{i!==last&&<button type="button" className="result-latest" onClick={()=>ir(last)}>Ir al último ›</button>}</div></>;
 }
 export function Liga() {
-  const db=useClubData();const [ahora,setAhora]=useState(()=>new Date());
-  useEffect(()=>{const timer=setInterval(()=>setAhora(new Date()),30000);return()=>clearInterval(timer);},[]);
-  const proximo=proximoPartido(db.partidos,ahora),enCurso=partidoEnCurso(db.partidos,ahora);
-  const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha),goles=golesLiga(db.partidos);
+  useClubData();
   return <section aria-label="Liga">
-    {enCurso&&<ProximoPartido partido={enCurso}/>}
-    {proximo ? <div className={enCurso?'mt-4':''}><ProximoPartido partido={proximo}/></div> : <div className="mt-4 border-y border-border py-4"><p className="label-club">Próximo partido</p><p className="font-black">Por confirmar</p></div>}
-    <div className="league-strip" aria-label="Nuestra liga">
-      <p className="label-club league-heading">NUESTRA LIGA</p>
-      <p className="club-stat league-position">{tabla?`${tabla.posicion}.º`:'—'}</p>
-      <div className="league-summary"><p>{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p><p className="league-goals">GF {goles.gf} · GC {goles.gc} · DG <span className={goles.dg>0?'league-dg-pos':goles.dg<0?'league-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p></div>
-      <div className="league-form"><div className="league-dots" aria-label={`Racha del más antiguo al más reciente: ${racha.filter(Boolean).join(', ')||'sin resultados'}`}>{racha.map((resultado,i)=><span key={i} title={resultado==='V'?'Victoria':resultado==='E'?'Empate':resultado==='D'?'Derrota':'Sin resultado'} className={`league-dot ${resultado?`result-${resultado}`:''}`}/>)}</div><span className="league-caption">Últimos 5</span></div>
-      <Button asChild variant="link" className="league-link"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Clasificación ↗</a></Button>
+    <TemporadaCard/>
+  </section>;
+}
+
+const iniciales=(n:string)=>n.replace(/["'.]/g,'').split(/\s+/).filter(Boolean).slice(0,3).map(w=>w[0]).join('').toUpperCase();
+function Emblema({rival,size='lg'}:{rival?:string|undefined;size?:'lg'|'sm'}){
+  return rival?<span className={`sc-emblem sc-emblem-${size}`} aria-hidden="true">{iniciales(rival)}</span>:<img src={escudo.url} alt="" className={`sc-crest sc-crest-${size}`}/>;
+}
+function nombreCorto(n:string){return n.replace(/\s+F\.?S\.?(\s|$)/i,' ').replace(/\s+/g,' ').trim();}
+
+/** Próximo partido, liga y resultados en una sola pieza: talón oscuro arriba, temporada en claro abajo. */
+export function TemporadaCard(){
+  const db=useClubData();
+  const [ahora,setAhora]=useState<Date|null>(null);
+  useEffect(()=>{setAhora(new Date());const t=setInterval(()=>setAhora(new Date()),30000);return()=>clearInterval(t);},[]);
+  const ref=ahora??new Date();
+  const enCurso=partidoEnCurso(db.partidos,ref);
+  const partido=enCurso??proximoPartido(db.partidos,ref);
+  return <article className="season-card" aria-label="Temporada">
+    {partido?<SiguienteTalon partido={partido} ahora={ahora}/>:<div className="sc-next sc-next-empty"><p className="sc-kicker">Próximo partido</p><p className="sc-tbd">Por confirmar</p></div>}
+    <div className="sc-perf" aria-hidden="true"/>
+    <div className="sc-lower">
+      <TablaResumen/>
+      <ResultadosCarrusel partidos={db.partidos}/>
+      <ProximosEnCard partidos={db.partidos} siguienteId={partido?.id} ahora={ref}/>
     </div>
-    <UltimoResultado partidos={db.partidos}/>
-    <CalendarioResumen/>
+    <Link to="/calendario" className="sc-calendar-link">Calendario completo<ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></Link>
+  </article>;
+}
+
+function SiguienteTalon({partido,ahora}:{partido:Partido;ahora:Date|null}){
+  const inicio=inicioPartido(partido);
+  const cuenta=inicio&&ahora?cuentaPartido(inicio,ahora):null;
+  const live=!!ahora&&directoPartido(partido,ahora);
+  const sinHora=partido.horaConfirmada===false||partido.fechaConfirmada===false;
+  const hora=sinHora?null:inicio?.toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'});
+  const dia=inicio?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';
+  const fecha=partido.fechaConfirmada===false?fechaPartidoTexto(partido):dia.charAt(0).toUpperCase()+dia.slice(1);
+  const twitch=dataService.ajustes().url_twitch;
+  const lugar=partido.lugar.trim();
+  const min=inicio&&ahora?minutosHastaPartido(inicio,ahora):0;
+  let falta:string|null=null;
+  if(!sinHora&&cuenta&&!live){
+    if(cuenta.estado==='resultado_pendiente')falta='Resultado pendiente';
+    else if(cuenta.estado==='hoy')falta=`Hoy · empieza en ${Math.floor(min/60)>0?`${Math.floor(min/60)} h `:''}${min%60} min`;
+    else if(cuenta.estado==='pendiente')falta=cuenta.dias>0?`Faltan ${cuenta.dias} d ${cuenta.horas} h`:`Faltan ${cuenta.horas} h ${cuenta.minutos} min`;
+  }
+  const local=partido.esLocal;
+  return <div className="sc-next">
+    <LugoSilueta/>
+    <div className="sc-next-inner">
+      <div className="sc-topline">
+        <span className="sc-kicker">{live?<><span className="sc-live-dot"/>En juego</>:'Próximo partido'}</span>
+        <span className="sc-meta">{partido.jornada?`J${partido.jornada} · `:''}{local?'En casa':'Fuera'}</span>
+      </div>
+      <div className="sc-matchup">
+        <div className="sc-team"><Emblema rival={local?undefined:partido.rival}/><p>{local?'R.U. Lucense':nombreCorto(partido.rival)}</p></div>
+        <div className="sc-when">
+          {hora?<p className="sc-time">{hora}</p>:<p className="sc-time sc-time-tbd">Hora<br/>por confirmar</p>}
+          <p className="sc-date">{fecha}</p>
+        </div>
+        <div className="sc-team"><Emblema rival={local?partido.rival:undefined}/><p>{local?nombreCorto(partido.rival):'R.U. Lucense'}</p></div>
+      </div>
+      {(falta||lugar)&&<div className="sc-facts">
+        {falta&&<p className="sc-countdown" aria-live="polite">{falta}</p>}
+        {lugar&&<p className="sc-place"><MapPin size={14} strokeWidth={1.75} aria-hidden="true"/>{lugar}</p>}
+      </div>}
+      {(lugar||twitch)&&<div className={`sc-actions ${lugar&&twitch?'is-two':''}`}>
+        {lugar&&<a className="sc-btn sc-btn-light" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lugar)}`} target="_blank" rel="noopener noreferrer"><Navigation size={16} strokeWidth={1.75} aria-hidden="true"/>Cómo llegar</a>}
+        {twitch&&<a className="sc-btn sc-btn-ghost" href={twitch} target="_blank" rel="noopener noreferrer"><Twitch size={16} strokeWidth={1.75} aria-hidden="true"/>{live&&<span className="sc-live-dot"/>}{live?'Ver en directo':'Ver en Twitch'}</a>}
+      </div>}
+    </div>
+  </div>;
+}
+
+function TablaResumen(){
+  const db=useClubData();
+  const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha),goles=golesLiga(db.partidos);
+  const nombre=(r:string|null)=>r==='V'?'Victoria':r==='E'?'Empate':r==='D'?'Derrota':'Sin resultado';
+  const url=dataService.ajustes().url_clasificacion_futgal;
+  return <section className="sc-league" aria-label="Nuestra liga">
+    <a className="sc-pos-tile" href={url} target="_blank" rel="noopener noreferrer" aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
+      <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
+      <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
+    </a>
+    <div className="sc-league-body">
+      <p className="sc-points"><strong>{stats.puntos}</strong> pts <span className="sc-sep">·</span> {stats.g}G {stats.e}E {stats.p}P</p>
+      <p className="sc-goals">Goles {goles.gf}–{goles.gc} <span className="sc-sep">·</span> <span className={goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p>
+      <div className="sc-form" role="img" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
+        {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}
+      </div>
+    </div>
+  </section>;
+}
+
+/** Navegación entre partidos jugados (flechas, «Último» y deslizar). La comparten la pista y las paletas. */
+function useNavegadorResultados(partidos:Partido[]){
+  const jugados=[...partidos].filter(p=>p.jugado).sort((a,b)=>(inicioPartido(a)?.getTime()??0)-(inicioPartido(b)?.getTime()??0));
+  const [idx,setIdx]=useState<number|null>(null);const [x0,setX0]=useState<number|null>(null);const [dir,setDir]=useState<0|1|-1>(0);
+  const last=jugados.length-1,i=Math.max(0,Math.min(idx??last,last)),partido=jugados[i];
+  const ir=(n:number)=>{if(n<0||n>last||n===i)return;setDir(n>i?1:-1);setIdx(n);};
+  const irA=(id:string)=>{const n=jugados.findIndex(p=>p.id===id);if(n>=0)ir(n);};
+  const swipe={onTouchStart:(e:React.TouchEvent)=>setX0(e.touches[0]?.clientX??null),onTouchEnd:(e:React.TouchEvent)=>{if(x0===null)return;const dx=(e.changedTouches[0]?.clientX??x0)-x0;if(Math.abs(dx)>40)ir(dx<0?i+1:i-1);setX0(null);}};
+  return {partido,i,last,dir,ir,irA,swipe};
+}
+type Nav=ReturnType<typeof useNavegadorResultados>;
+function NavFlechas({nav,etiqueta}:{nav:Nav;etiqueta:string}){
+  const {i,last,ir,partido}=nav;
+  return <div className="sc-results-head">
+    <p className="sc-label">{i===last?etiqueta:`Jornada ${partido?.jornada??''}`}</p>
+    <div className="sc-pager">
+      {i!==last&&<button type="button" className="sc-latest" onClick={()=>ir(last)}>Último</button>}
+      <button type="button" className="sc-arrow" aria-label="Partido anterior" disabled={i===0} onClick={()=>ir(i-1)}><ChevronLeft size={18} strokeWidth={2}/></button>
+      <button type="button" className="sc-arrow" aria-label="Partido siguiente" disabled={i===last} onClick={()=>ir(i+1)}><ChevronRight size={18} strokeWidth={2}/></button>
+    </div>
+  </div>;
+}
+function fechaCorta(p:Partido){const d=inicioPartido(p)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';return d.charAt(0).toUpperCase()+d.slice(1);}
+function equipos(p:Partido){
+  const local=p.esLocal?'R.U. Lucense':nombreCorto(p.rival),visit=p.esLocal?nombreCorto(p.rival):'R.U. Lucense';
+  const gl=p.golesLocal??0,gv=p.golesVisitante??0;
+  return {local,visit,gl,gv,pierdeLocal:gl<gv,pierdeVisit:gv<gl};
+}
+
+/** La pista de Guntín vista desde arriba: cada equipo en su campo, con sus goles. El azul es imagen, no color de interfaz. */
+function PistaSVG(){
+  return <svg className="court-lines" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true" fill="none">
+    <g className="court-basket"><path d="M8 18H44A84 84 0 0 1 44 182H8"/><path d="M392 18H356A84 84 0 0 0 356 182H392"/></g>
+    <g className="court-futsal"><rect x="8" y="8" width="384" height="184" rx="2"/><line x1="200" y1="8" x2="200" y2="192"/><circle cx="200" cy="100" r="22"/>
+      <path d="M8 72A28 28 0 0 1 36 100A28 28 0 0 1 8 128"/><path d="M392 72A28 28 0 0 0 364 100A28 28 0 0 0 392 128"/></g>
+    <circle cx="200" cy="100" r="2.5" className="court-spot"/>
+  </svg>;
+}
+function MarcadorPista({partido,dir}:{partido:Partido;dir:0|1|-1}){
+  const {local,visit,gl,gv,pierdeLocal,pierdeVisit}=equipos(partido);
+  return <div className="court" role="img" aria-label={`${local} ${gl}, ${visit} ${gv}`}>
+    <PistaSVG/>
+    <span className="court-side is-l" aria-hidden="true">Local</span><span className="court-side is-r" aria-hidden="true">Visitante</span>
+    <div key={partido.id} className={`court-halves ${dir>0?'from-right':dir<0?'from-left':''}`} aria-hidden="true">
+      <div className={`court-half ${pierdeLocal?'is-loser':''}`}><span className="court-goals">{gl}</span><span className="court-team">{local}</span></div>
+      <div className={`court-half ${pierdeVisit?'is-loser':''}`}><span className="court-goals">{gv}</span><span className="court-team">{visit}</span></div>
+    </div>
+  </div>;
+}
+
+function ResultadosCarrusel({partidos}:{partidos:Partido[]}){
+  const {data}=useDriveGallery();
+  const nav=useNavegadorResultados(partidos);
+  const partido=nav.partido;
+  if(!partido)return null;
+  const r=resultadoPartido(partido);
+  const album=data?.albumes.find(a=>a.partidoId===partido.id);
+  const folder=album?.id??partido.driveFolderId;
+  return <section className="sc-results" aria-label="Resultados" {...nav.swipe}>
+    <NavFlechas nav={nav} etiqueta="Último resultado"/>
+    <MarcadorPista partido={partido} dir={nav.dir}/>
+    <div className="sc-score-foot">
+      <p>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}<span>{fechaCorta(partido)}{partido.jornada?` · J${partido.jornada}`:''}</span></p>
+      {folder&&<Link className="sc-photos" to="/galeria/$folderId" params={{folderId:folder}} search={{foto:''}}>Fotos<ArrowRight size={14} strokeWidth={2} aria-hidden="true"/></Link>}
+    </div>
+  </section>;
+}
+
+/** Marcador de paletas (calendario completo): al cambiar de partido, las paletas giran. */
+function Paleta({texto,clase='',delay=0}:{texto:string|number;clase?:string;delay?:number}){
+  return <span className={`flap-tile ${clase}`}><span key={String(texto)} className="flap-face" style={{animationDelay:`${delay}ms`}}>{texto}</span></span>;
+}
+export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:{id:string;n:number}|null}){
+  const nav=useNavegadorResultados(partidos);
+  useEffect(()=>{if(elegido)nav.irA(elegido.id);},[elegido]); // eslint-disable-line react-hooks/exhaustive-deps
+  const partido=nav.partido;
+  if(!partido)return null;
+  const {local,visit,gl,gv,pierdeLocal,pierdeVisit}=equipos(partido);
+  const r=resultadoPartido(partido);
+  return <section className="flap-board surface-card" aria-label="Resultados" {...nav.swipe}>
+    <NavFlechas nav={nav} etiqueta="Último resultado"/>
+    <div className="flap" role="img" aria-label={`Jornada ${partido.jornada}: ${local} ${gl}, ${visit} ${gv}`}>
+      <div className={`flap-row ${pierdeLocal?'is-loser':''}`} aria-hidden="true"><Paleta texto={local} clase="is-name"/><Paleta texto={gl} clase="is-num" delay={90}/></div>
+      <div className={`flap-row ${pierdeVisit?'is-loser':''}`} aria-hidden="true"><Paleta texto={visit} clase="is-name" delay={60}/><Paleta texto={gv} clase="is-num" delay={150}/></div>
+      <div className="flap-meta"><span>J{partido.jornada} · {fechaCorta(partido)}</span>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}</div>
+    </div>
   </section>;
 }
 export function CasaFiltro({casa,onChange}:{casa:boolean;onChange:(v:boolean)=>void}){
@@ -121,13 +288,33 @@ export function CalendarioFila({partido,destacado=false}:{partido:Partido;destac
     {r?<span className="calendar-score"><span className={`league-dot result-${r}`} aria-label={r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}/>{favor}–{contra}</span>:<span className={partido.esLocal?'calendar-home':'calendar-away'}>{partido.esLocal?'Casa':'Fuera'}</span>}
   </li>;
 }
-function CalendarioResumen(){
-  const db=useClubData();const [casa,setCasa]=useState(false);const [ahora]=useState(()=>new Date());
-  const lista=proximosCalendario(db.partidos,ahora,casa);
-  if(!db.partidos.length)return null;
-  return <section className="mt-6" aria-label="Calendario">
-    <div className="mb-3 flex items-center justify-between gap-3"><h2 className="club-section-title mb-0">Calendario</h2><CasaFiltro casa={casa} onChange={setCasa}/></div>
-    {lista.length?<ul className="calendar-list">{lista.map(p=><CalendarioFila key={p.id} partido={p}/>)}</ul>:<p className="py-4 text-body-sm text-muted-foreground">No quedan partidos.</p>}
-    <Button asChild variant="link" className="mt-1 h-11 px-0 text-accent font-bold"><Link to="/calendario">Ver todo el calendario <ArrowRight strokeWidth={1.75}/></Link></Button>
+/** Los siguientes partidos después del próximo, dentro de la tarjeta de temporada. */
+function ProximosEnCard({partidos,siguienteId,ahora}:{partidos:Partido[];siguienteId?:string|undefined;ahora:Date}){
+  const lista=proximosCalendario(partidos,ahora,false,4).filter(p=>p.id!==siguienteId).slice(0,3);
+  if(!lista.length)return null;
+  return <section className="sc-upcoming" aria-label="Después">
+    <p className="sc-label">Después</p>
+    <ul>{lista.map(p=><li key={p.id} className="sc-up-row">
+      <span className="sc-up-j">J{p.jornada}</span>
+      <span className="min-w-0 flex-1"><span className="sc-up-rival">{nombreCorto(p.rival)}</span><span className="sc-up-date">{fechaPartidoTexto(p)}</span></span>
+      <span className={`sc-up-where ${p.esLocal?'is-home':''}`}>{p.esLocal?'Casa':'Fuera'}</span>
+    </li>)}</ul>
   </section>;
+}
+
+/** Un partido del calendario completo, en su propia tarjeta. Los jugados enseñan el resultado. */
+export function CalendarioCard({partido,destacado=false,onVer}:{partido:Partido;destacado?:boolean;onVer?:(id:string)=>void}){
+  const r=resultadoPartido(partido);
+  const favor=partido.esLocal?partido.golesLocal:partido.golesVisitante,contra=partido.esLocal?partido.golesVisitante:partido.golesLocal;
+  const ver=r&&onVer?()=>onVer(partido.id):undefined;
+  return <li id={`jornada-${partido.jornada}`} className={`cal-card ${destacado?'is-next':''} ${r?'is-played':''} ${ver?'is-tappable':''}`} aria-current={destacado?'true':undefined} onClick={ver} onKeyDown={ver?(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();ver();}}:undefined} tabIndex={ver?0:undefined} role={ver?'button':undefined} aria-label={ver?`Ver en el marcador la jornada ${partido.jornada}`:undefined}>
+    <span className="cal-j"><span>J</span>{partido.jornada}</span>
+    <span className="min-w-0 flex-1">
+      {destacado&&<span className="cal-next-tag">Próximo partido</span>}
+      <span className="cal-rival">{nombreCorto(partido.rival)}</span>
+      <span className="cal-meta">{fechaPartidoTexto(partido)} · {partido.esLocal?'Casa':'Fuera'}</span>
+    </span>
+    {r?<span className={`cal-result is-${r}`} aria-label={`${r==='V'?'Victoria':r==='E'?'Empate':'Derrota'} ${favor} a ${contra}`}><span className="cal-result-letter">{r}</span><span className="cal-result-score">{favor}–{contra}</span></span>
+      :null}
+  </li>;
 }

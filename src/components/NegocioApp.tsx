@@ -29,7 +29,6 @@ export function NegocioApp({onExit}:{onExit?:()=>void}={}) {
         {!onExit&&<VerComo/>}<AvisosCampana quien="negocios" />
         {!onExit&&<BusinessAccountMenu/>}
       </ClubCabecera>
-      <ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} />
       <div className="club-tabs mx-4 mt-4 grid-cols-2">
         {([["registrar", "Registrar visita"], ["mes", "Tu mes con el club"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setTab(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold transition-colors duration-150 ${tab === id ? "bg-primary text-primary-foreground" : ""}`}>
@@ -38,6 +37,7 @@ export function NegocioApp({onExit}:{onExit?:()=>void}={}) {
         ))}
       </div>
       {tab === "registrar" ? <Registrar neg={neg} /> : <TuMes neg={neg} />}
+      <div className="business-contact mx-4 mt-8"><ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} /></div>
     </div>
   );
 }
@@ -99,7 +99,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
     } finally { setGuardando(false); }
   };
 
-  const big = "flex h-auto min-h-11 w-full items-center justify-center gap-2 rounded-control text-item font-black uppercase transition-transform duration-150 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
+  const big = "visit-big flex h-auto w-full items-center justify-center gap-2 rounded-control font-black transition-transform duration-150 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
 
   return (
     <section className="flex flex-1 flex-col px-4 pt-6">
@@ -111,46 +111,62 @@ function Registrar({ neg }: { neg: Patrocinador }) {
           <Button variant="ghost" onClick={() => { runAction(async () => { await dataService.anularVisita(reciente); setReciente(null); limpiar(); refrescar(); }); }} className="h-auto min-h-11 rounded-control btn-suave px-3 text-body-sm font-bold">Deshacer</Button>
         </div>
       )}
-      <Button variant="ghost" onClick={() => setScan(true)} className={`${big} bg-primary text-primary-foreground`}>
-        <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
-      </Button>
-      <label htmlFor="num-socio" className="label-club mt-6 block">Nº de soci@</label>
-      <input id="num-socio" aria-label="Número de socio o socia" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="O escríbelo aquí" className="mt-1 h-auto min-h-11 w-full rounded-panel club-input border-input px-4 text-section font-black placeholder:text-base placeholder:font-normal" />
-      {socio && !aviso && (
-        <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black text-accent">
-          <Check size={22} strokeWidth={2.5} /> {socio.nombre} · Soci@ nº {socio.numeroSocio}
-          {repite && <span className="label-club rounded-full bg-accent px-3 py-1 text-accent-foreground">Repite por el club</span>}
-        </p>
-      )}
-      {num && !socio && <p className="mt-3 text-body-sm font-bold">Ese número no está en el club. Revísalo.</p>}
-      {aviso && <p className="mt-3 rounded-control border border-accent p-3 font-bold">{aviso}</p>}
-      {sinCarnet ? (
-        <p className="mt-3 text-body-sm text-muted-foreground">Sin carnet: la visita se guarda como declarada. <Button variant="ghost" onClick={() => setSinCarnet(false)} className="font-bold underline">Cancelar</Button></p>
-      ) : (
-        <Button variant="ghost" onClick={() => { limpiar(); setSinCarnet(true); setReciente(null); }} className="mt-3 h-auto min-h-11 self-start whitespace-normal px-0 text-left text-body-sm text-muted-foreground underline">Viene de parte del club pero no tiene carnet</Button>
-      )}
-
-      <label className="mt-3 block text-body-sm">Gasto (opcional)<select className="club-input mt-2" value={gasto} onChange={e=>setGasto(e.target.value)}><option value="">Sin indicar</option><option value="lt20">Menos de 20 €</option><option value="20_50">20–50 €</option><option value="50_100">50–100 €</option><option value="gt100">Más de 100 €</option></select></label>
-      <h2 className="label-club mt-8 text-muted-foreground">Últimas visitas de hoy</h2>
-      {hoy.length === 0 ? (
-        <p className="mt-2 text-body-sm text-muted-foreground">Todavía ninguna hoy.</p>
-      ) : (
-        <ListCard label="Últimas visitas de hoy" className="mt-2">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTE'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
-      )}
-
-      <div className="business-confirmation sticky bottom-0 -mx-4 mt-auto bg-background px-4 pb-5 pt-4">
-        {repite && !sinCarnet ? (
-          <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
+      <div className="surface-card visit-step">
+        <p className="visit-step-label"><span>1</span>Identifica al soci@</p>
+        <Button variant="ghost" onClick={() => setScan(true)} className={`${big} mt-3 bg-primary text-primary-foreground`}>
+          <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
+        </Button>
+        <label htmlFor="num-socio" className="visit-or">o escribe el nº de soci@</label>
+        <input id="num-socio" aria-label="Número de socio o socia" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="Nº" className="visit-number club-input" />
+        {num && !socio && !buscando && <p className="mt-3 text-body-sm font-bold">Ese número no está en el club. Revísalo.</p>}
+        {aviso && <p className="mt-3 rounded-control border border-accent p-3 font-bold">{aviso}</p>}
+        {sinCarnet ? (
+          <p className="mt-3 text-body-sm text-muted-foreground">Sin carnet: la visita se guarda como declarada. <Button variant="ghost" onClick={() => setSinCarnet(false)} className="font-bold underline">Cancelar</Button></p>
         ) : (
-          <>
-            <p className="label-club mb-2 text-left text-accent">{listo ? "¿Ya venía antes? Pulsa para registrar la visita" : "Escanea el carnet o escribe el número"}</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Primera visita</Button>
-              <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} btn-suave text-item`}>Ya venía</Button>
-            </div>
-          </>
+          <Button variant="ghost" onClick={() => { limpiar(); setSinCarnet(true); setReciente(null); }} className="mt-2 h-auto min-h-11 self-start whitespace-normal px-0 text-left text-body-sm text-muted-foreground underline">No tiene carnet</Button>
         )}
       </div>
+
+      {((!!socio && !aviso) || sinCarnet) && (
+        <div className="surface-card visit-step animate-rise mt-3">
+          <p className="visit-step-label"><span>2</span>{sinCarnet ? "Visita sin carnet" : "Registra la visita"}</p>
+          {socio && !sinCarnet && (
+            <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black">
+              <span className="flex size-7 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={16} strokeWidth={3} /></span>
+              {socio.nombre} <span className="font-bold text-muted-foreground">· nº {socio.numeroSocio}</span>
+              {repite && <span className="visit-repeat">Repite por el club</span>}
+            </p>
+          )}
+          <div className="mt-4" role="group" aria-label="Gasto aproximado (opcional)">
+            <p className="text-body-sm text-muted-foreground">Gasto aproximado <span className="opacity-70">(opcional)</span></p>
+            <div className="visit-chips mt-2">
+              {([["lt20","< 20 €"],["20_50","20–50 €"],["50_100","50–100 €"],["gt100","> 100 €"]] as const).map(([v,l])=>(
+                <button key={v} type="button" aria-pressed={gasto===v} className={gasto===v?"is-on":""} onClick={()=>setGasto(gasto===v?"":v)}>{l}</button>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4">
+            {repite && !sinCarnet ? (
+              <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Registrar visita</Button>
+            ) : (
+              <>
+                <p className="mb-2 text-body-sm font-bold">¿Es la primera vez que viene?</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Primera vez</Button>
+                  <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} visit-secondary`}>Ya venía</Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      <h2 className="club-section-title mt-8">Últimas visitas de hoy</h2>
+      {hoy.length === 0 ? (
+        <p className="surface-card px-4 py-5 text-body-sm text-muted-foreground">Todavía ninguna visita hoy. Escanea el carnet de la primera.</p>
+      ) : (
+        <ListCard label="Últimas visitas de hoy">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTE'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
+      )}
     </section>
   );
 }
@@ -170,45 +186,37 @@ function TuMes({ neg }: { neg: Patrocinador }) {
 
   return (
     <section className="px-4 pt-6">
-      {dataService.negocioPrueba()&&<label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label>}
-      <div className="mt-4 club-tabs grid-cols-3">
+      <div className="club-tabs grid-cols-3">
         {([["mes", "Este mes"], ["90", "90 días"], ["temporada", "Temporada"]] as const).map(([id, l]) => (
           <Button variant="ghost" key={id} onClick={() => setRango(id)} className={`h-auto min-h-11 rounded-control text-body-sm font-bold ${rango === id ? "bg-primary text-primary-foreground" : ""}`}>{l}</Button>
         ))}
       </div>
 
-      <div className="mt-6 rounded-panel bg-primary p-4 text-primary-foreground">
-        <p className="label-club opacity-80">Personas nuevas</p>
-        <p className="text-heading font-black leading-none text-gold">{s.nuevas}</p>
+      <div className="month-hero mt-4">
+        <p className="month-hero-label">El club te ha traído</p>
+        <p className="month-hero-num">{s.nuevas}</p>
+        <p className="month-hero-unit">{s.nuevas === 1 ? "persona nueva" : "personas nuevas"}</p>
+        <div className="month-progress">
+          <div className="flex justify-between text-body-sm"><span>Objetivo: 5 en 90 días</span><span className="font-black">{prog.nuevas} de {prog.objetivo}</span></div>
+          <div className="month-bar"><div style={{ width: `${prog.pct}%` }} /></div>
+        </div>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2">
-        {[["Visitas por el club", s.visitas], ["Repiten por el club", s.repiten], ["% nuevas", `${s.pctNuevas}%`]].map(([l, n]) => (
-          <div key={l} className="rounded-panel bg-surface p-4">
-            <p className="text-heading font-black">{n}</p>
-            <p className="label-club mt-1 text-[11px] text-muted-foreground">{l}</p>
-          </div>
+
+      <div className="surface-card month-stats mt-3">
+        {[["Visitas", s.visitas], ["Repiten", s.repiten], ["Nuevas", `${s.pctNuevas}%`]].map(([l, n]) => (
+          <div key={l}><p className="month-stat-num">{n}</p><p className="month-stat-label">{l}</p></div>
         ))}
       </div>
 
-      <div className="mt-6">
-        <div className="flex justify-between text-body-sm font-bold">
-          <span>5 personas nuevas en 90 días</span>
-          <span>{prog.nuevas}/{prog.objetivo}</span>
-        </div>
-        <div className="mt-2 h-3 overflow-hidden rounded-full bg-suave">
-          <div className="h-full rounded-full bg-accent transition-all duration-500" style={{ width: `${prog.pct}%` }} />
-        </div>
-      </div>
-
-      <div className="mt-6 border-y border-border py-4">
-        <p className="label-club text-muted-foreground">{rango === "temporada" ? "Visitas por mes" : "Visitas por semana"}</p>
-        <div className="mt-3 flex h-32 items-end gap-1">
+      <div className="surface-card month-chart mt-3">
+        <p className="club-section-title mb-0">{rango === "temporada" ? "Visitas por mes" : "Visitas por semana"}</p>
+        <div className="month-bars">
           {sem.map((w) => (
-            <div key={w.label} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
-              <div className="flex w-full flex-col justify-end overflow-hidden rounded-md bg-primary" style={{ height: `${(w.total / max) * 100}%`, minHeight: w.total ? 4 : 0 }}>
-                <div className="w-full bg-accent" style={{ height: `${w.total ? (w.nuevas / w.total) * 100 : 0}%` }} />
+            <div key={w.label} className="month-col">
+              <div className="month-bar-v" style={{ height: `${(w.total / max) * 100}%`, minHeight: w.total ? 4 : 0 }}>
+                <div style={{ height: `${w.total ? (w.nuevas / w.total) * 100 : 0}%` }} />
               </div>
-              <span className="text-[10px] font-bold">{w.label}</span>
+              <span>{w.label}</span>
             </div>
           ))}
         </div>
@@ -216,23 +224,14 @@ function TuMes({ neg }: { neg: Patrocinador }) {
           <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-primary" /> Visitas</span>
           <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-accent" /> Nuevas</span>
         </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-panel border border-border bg-surface p-4">
-          <p className="text-heading font-black">{s.verificadas}</p>
-          <p className="label-club mt-1 text-[11px]">Verificadas (con carnet)</p>
-        </div>
-        <div className="rounded-panel border border-border bg-surface p-4">
-          <p className="text-heading font-black">{s.declaradas}</p>
-          <p className="label-club mt-1 text-[11px]">Declaradas (sin carnet)</p>
-        </div>
+        <p className="mt-3 text-body-sm text-muted-foreground">{s.verificadas} con carnet · {s.declaradas} sin carnet</p>
       </div>
 
       <p className="mt-6 text-item font-bold">{frase}</p>
-      <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-11 items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
+      <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-11 items-center justify-center gap-2 rounded-control bg-primary font-black text-primary-foreground">
         <MessageCircle size={20} strokeWidth={1.75} /> Compartir por WhatsApp
       </a>
+      {dataService.negocioPrueba()&&<div className="surface-card mt-6 px-4"><label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label></div>}
     </section>
   );
 }

@@ -31,8 +31,8 @@ export function SociaApp({ socio }: { socio: Socio }) {
   useEffect(() => { runAction(() => dataService.marcarApertura(socio.id)); }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [tab]);
   if (!db) return null;
-  const tabCls = (on: boolean) => `member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1 text-body-sm ${on ? "font-bold text-primary" : "font-normal text-muted-foreground"}`;
-  const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;
+  const tabCls = (on: boolean) => `member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1 ${on ? "is-on" : ""}`;
+  const indicador = (on: boolean) => on && <span className="member-tab-bar" aria-hidden="true" />;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -49,8 +49,8 @@ export function SociaApp({ socio }: { socio: Socio }) {
           </span>
           El Equipo
         </Button>
-        <Button variant="ghost" onClick={() => setCarnet(true)} className="member-tab flex h-auto min-h-16 flex-col items-center justify-end gap-1 pb-2 text-body-sm text-muted-foreground" aria-label="Abrir carnet">
-          <span className={`-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ${tab === "equipo" ? "ring-accent" : "ring-gold"}`}><IdCard size={26} strokeWidth={1.75} /></span>
+        <Button variant="ghost" onClick={() => setCarnet(true)} className="member-tab flex h-auto min-h-16 flex-col items-center justify-end gap-1 pb-2" aria-label="Abrir carnet">
+          <span className="member-carnet-key"><IdCard size={26} strokeWidth={2} /></span>
           Carnet
         </Button>
         <Button variant="ghost" onClick={() => setTab("ventajas")} aria-current={tab === "ventajas" ? "page" : undefined} className={tabCls(tab === "ventajas")}>
@@ -127,7 +127,7 @@ function Ventajas({ db, onCarnet }: { db: DB; onCarnet: () => void }) {
           <div className="min-w-0"><h1 className="text-section font-black leading-tight">{p.nombre}</h1><p className="label-club text-muted-foreground">{p.categoria}</p></div>
         </div>
         <h2 className="club-section-title mt-6">Qué te da</h2>
-        <div className="divide-y divide-[var(--divider)]">
+        <div className="surface-card benefit-detail divide-y divide-[var(--divider)]">
           {vs.map((v) => (
             <div key={v.id} className="py-3 first:pt-0">
               <p className="text-item font-bold">{v.titulo}</p>
@@ -142,23 +142,24 @@ function Ventajas({ db, onCarnet }: { db: DB; onCarnet: () => void }) {
             </div>
           ))}
         </div>
-        {conDireccion && <><h2 className="club-section-title mt-6">Dónde</h2><p>{dir}</p><Button asChild variant="link" className="h-11 px-0 font-bold text-accent"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.nombre} ${dir}`)}`} target="_blank" rel="noopener noreferrer">Cómo llegar →</a></Button></>}
-        <div className="member-sticky-action"><Button onClick={onCarnet} className="h-11 w-full rounded-control font-bold">Enseñar mi carnet</Button></div>
+        {conDireccion && <><h2 className="club-section-title mt-6">Dónde</h2><div className="surface-card benefit-place"><p>{dir}</p><Button asChild variant="outline" className="mt-3 h-10 rounded-control font-bold"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.nombre} ${dir}`)}`} target="_blank" rel="noopener noreferrer">Cómo llegar</a></Button></div></>}
+        <div className="member-sticky-action"><Button onClick={onCarnet} className="h-14 w-full rounded-control text-base font-black">Enseñar carnet</Button></div>
       </section>
     );
   }
 
   return (
     <section className="px-4 pt-4">
-      <ul className="divide-y divide-[var(--divider)]">
+      <h1 className="club-section-title">Negocios amigos</h1>
+      <ul className="surface-card benefit-list">
         {pats.map((pt) => {
           const v = db.ventajas.find((x) => x.patrocinadorId === pt.id && x.activa);
           return (
             <li key={pt.id}>
-              <button type="button" onClick={() => setSel(pt.id)} className="flex min-h-16 w-full items-center gap-3 py-2 text-left">
+              <button type="button" onClick={() => setSel(pt.id)} className="benefit-row">
                 <LogoNegocio p={pt} />
                 <span className="min-w-0 flex-1"><span className="block truncate text-item font-bold">{pt.nombre}</span><span className="label-club block truncate text-muted-foreground">{pt.categoria}</span></span>
-                {v?.destacado && <span className="shrink-0 text-body-sm font-bold text-muted-foreground">{v.destacado}</span>}
+                {v?.destacado && <span className="benefit-perk">{v.destacado}</span>}
                 <ChevronRight size={18} strokeWidth={1.75} className="shrink-0 text-muted-foreground" />
               </button>
             </li>
