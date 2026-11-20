@@ -225,6 +225,13 @@
       "when": 1795195344639,
       "tag": "0031_stripe_service_role_claim_compatibility",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1795196069261,
+      "tag": "0032_stripe_initial_password_logical_availability",
+      "breakpoints": true
     }
   ]
 }

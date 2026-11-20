@@ -1,0 +1,1 @@
+DO $$ DECLARE definition text; BEGIN SELECT pg_get_functiondef('public.password_alta_stripe(text,text)'::regprocedure) INTO definition; definition:=replace(definition,' OR EXISTS(SELECT 1 FROM auth.users WHERE id=c.user_id AND coalesce(encrypted_password,'''')<>'''') OR EXISTS(SELECT 1 FROM auth.identities',' OR EXISTS(SELECT 1 FROM auth.identities'); EXECUTE definition; END $$;

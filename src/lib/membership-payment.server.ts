@@ -62,6 +62,7 @@ export async function processStripeEvent(event:Stripe.Event,origin:string){
    const incoming=event.data.object;const session=await stripeClient().checkout.sessions.retrieve(incoming.id,{expand:['payment_intent.latest_charge']});
    if(session.payment_status==='paid'){
     const c=await readCheckout(session.id);if(!verifiedPaidSession(session,c)||session.metadata?.['alta_id']!==c.id||session.customer_email?.toLowerCase()!==c.email)throw new Error('Los datos del pago no coinciden con el alta.');
+    if(c.pagado_at&&!c.socio_id){const retired=await supabaseAdmin.from('stripe_eventos').update({estado:'procesado',procesado_at:new Date().toISOString(),error:'Ficha eliminada por administración; el reintento no recrea el alta.'}).eq('event_id',event.id);check(retired.error);return;}
     const intent=session.payment_intent;const ref=typeof intent==='string'?intent:intent?.id;if(!ref)throw new Error('Falta la referencia del pago.');
     const charge=typeof intent==='object'&&intent?.latest_charge&&typeof intent.latest_charge==='object'?intent.latest_charge:null;
     const type=charge?.payment_method_details?.type??'card';const method=type==='card'?'Tarjeta':type==='bizum'?'Bizum':type;
