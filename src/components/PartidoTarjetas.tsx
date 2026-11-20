@@ -6,7 +6,7 @@ import { ArrowRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
-import { directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
+import { rachaCronologica, directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
 
 function LugoSilueta() {
   return <svg className="fixture-silhouette" viewBox="0 0 260 130" aria-hidden="true" fill="currentColor">
@@ -96,11 +96,17 @@ export function Liga() {
   const db=useClubData();const [ahora,setAhora]=useState(()=>new Date());
   useEffect(()=>{const timer=setInterval(()=>setAhora(new Date()),30000);return()=>clearInterval(timer);},[]);
   const proximo=proximoPartido(db.partidos,ahora),enCurso=partidoEnCurso(db.partidos,ahora);
-  const stats=dataService.liga(),tabla=dataService.clasificacion();
+  const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha);
   return <section aria-label="Liga">
     {enCurso&&<ProximoPartido partido={enCurso}/>}
     {proximo ? <div className={enCurso?'mt-4':''}><ProximoPartido partido={proximo}/></div> : <div className="mt-4 border-y border-border py-4"><p className="label-club">Próximo partido</p><p className="font-black">Por confirmar</p></div>}
-    <div className="league-strip" aria-label="Nuestra liga"><div><p className="label-club">NUESTRA LIGA</p><p className="club-stat">{tabla?`${tabla.posicion}.º`:'—'}</p></div><div><p className="text-body-sm font-bold">{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p><div className="mt-2 flex items-center gap-2"><div className="flex gap-1" aria-label={`Racha: ${stats.racha.join(', ')||'sin resultados'}`}>{Array.from({length:5},(_,i)=><span key={i} title={stats.racha[i]==='V'?'Victoria':stats.racha[i]==='E'?'Empate':stats.racha[i]==='D'?'Derrota':'Sin resultado'} className={`league-dot ${stats.racha[i]?`result-${stats.racha[i]}`:''}`}/>)}</div><span className="league-caption">Últimos 5</span></div></div><Button asChild variant="link" className="league-link"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Clasificación ↗</a></Button></div>
+    <div className="league-strip" aria-label="Nuestra liga">
+      <p className="label-club league-heading">NUESTRA LIGA</p>
+      <p className="club-stat league-position">{tabla?`${tabla.posicion}.º`:'—'}</p>
+      <p className="league-summary">{stats.puntos} PTS · {stats.g}G {stats.e}E {stats.p}P</p>
+      <div className="league-form"><div className="league-dots" aria-label={`Racha del más antiguo al más reciente: ${racha.filter(Boolean).join(', ')||'sin resultados'}`}>{racha.map((resultado,i)=><span key={i} title={resultado==='V'?'Victoria':resultado==='E'?'Empate':resultado==='D'?'Derrota':'Sin resultado'} className={`league-dot ${resultado?`result-${resultado}`:''}`}/>)}</div><span className="league-caption">Últimos 5</span></div>
+      <Button asChild variant="link" className="league-link"><a href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer">Clasificación ↗</a></Button>
+    </div>
     <UltimoResultado partidos={db.partidos}/>
   </section>;
 }

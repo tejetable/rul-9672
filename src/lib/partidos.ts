@@ -66,3 +66,8 @@ export function calendarioPartido(partido: Partido): string | null {
   const stamp = inicio.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//RUL//Partidos//ES", "BEGIN:VEVENT", `UID:${partido.id}-2026@rul`, `DTSTAMP:${stamp}`, `DTSTART:${stamp}`, `SUMMARY:${escape(`Concello de Guntín - R.U. Lucense vs ${partido.rival}`)}`, `LOCATION:${escape(partido.lugar)}`, `DESCRIPTION:${escape(partido.competicion || "")}`, "END:VEVENT", "END:VCALENDAR", ""].join("\r\n");
 }
+/** Cloud returns newest first; presentation keeps newest at the right, with empty slots left. */
+export function rachaCronologica(recientes:readonly string[]):(string|null)[]{
+ const ultimos=recientes.slice(0,5).reverse();
+ return [...Array<null>(5-ultimos.length).fill(null),...ultimos];
+}

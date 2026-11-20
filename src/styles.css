@@ -428,17 +428,22 @@ main .gallery-refresh.club-interactive { width:36px; height:36px; min-height:36p
 .result-E { background:var(--result-draw); color:var(--primary); }
 .result-D { background:var(--result-defeat); color:var(--primary-foreground); }
 .result-chip { border-radius:999px; padding:4px 8px; font-size:10px; font-weight:700; }
-.league-strip { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:12px; padding:12px; background:var(--result-surface); border-radius:16px; }
+.league-strip { display:grid; grid-template-columns:64px minmax(0,1fr) auto; grid-template-rows:16px 28px; align-items:center; column-gap:12px; row-gap:4px; margin-top:24px; padding:16px; background:var(--result-surface); border-radius:16px; }
+.league-heading { grid-column:1; grid-row:1; white-space:nowrap; }
+.league-position { grid-column:1; grid-row:2; }
+.league-summary { grid-column:2 / 4; grid-row:1; font-size:13px; line-height:16px; font-weight:700; }
+.league-form { grid-column:2; grid-row:2; display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.league-dots { display:flex; flex-shrink:0; gap:4px; }
 .league-strip .label-club { font-size:9px; }
 .league-dot { display:block; width:10px; height:10px; border-radius:50%; background:var(--border); }
 .league-dot.result-V { background:var(--accent); }
 .league-dot.result-E { background:var(--result-draw); }
 .league-dot.result-D { background:var(--result-defeat); }
 .league-caption { font-size:10px; }
-.league-link { font-size:11px; padding:0; height:44px; white-space:normal; text-align:right; }
+.league-strip .league-link { grid-column:3; grid-row:2; justify-self:end; font-size:11px; line-height:16px; padding:0; height:28px; white-space:nowrap; text-align:right; }
 .fixture-matchup { grid-template-columns:minmax(0,1fr) 100px minmax(0,1fr); }
 .fixture-team p,.result-team p { overflow-wrap:anywhere; }
-@media(max-width:359px) { .league-strip { flex-wrap:wrap; } .league-link { margin-left:auto; } }
+@media(max-width:359px) { .league-strip { grid-template-columns:56px minmax(0,1fr) auto; column-gap:8px; padding:12px; } }
 :root { --member-pending:var(--gold); --member-off:oklch(.65 0 0); }
 .member-row { display:flex; align-items:center; gap:8px; width:100%; height:56px; padding:4px 0; border-radius:0; white-space:normal; }
 .member-number { width:32px; flex-shrink:0; color:var(--result-muted); font-weight:900; font-size:16px; }
@@ -478,8 +483,7 @@ label > .club-input, label > .access-input { margin-top:8px; }
 .result-score { font-size:32px; }
 .result-team { align-items:flex-start; text-align:left; }
 .result-chip { white-space:nowrap; }
-.league-strip { margin-top:24px; padding:16px; }
-.league-link { white-space:nowrap; }
+
 .member-navigation { padding-left:16px; padding-right:16px; }
 .access-form > label + .access-input { margin-top:-4px; }
 .member-row { min-height:56px; height:auto; }

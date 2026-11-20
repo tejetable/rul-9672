@@ -1,6 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { directoPartido,minutosHastaPartido, calendarioPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, ultimoPartido, resultadoPartido, fechaMadridISO } from "./partidos";
 import type { Partido } from "./dataService";
+import {rachaCronologica} from './partidos';
+
+describe('Racha visible de liga',()=>{
+  it('pone el partido más reciente a la derecha sin alterar los datos de Cloud',()=>{
+    const recientes=['V','D','E','V','D'];
+    expect(rachaCronologica(recientes)).toEqual(['D','V','E','D','V']);
+    expect(recientes).toEqual(['V','D','E','V','D']);
+  });
+  it('mantiene el reciente a la derecha cuando todavía hay menos de cinco partidos',()=>{
+    expect(rachaCronologica(['D','V'])).toEqual([null,null,null,'V','D']);
+    expect(rachaCronologica([])).toEqual([null,null,null,null,null]);
+  });
+});
 
 const partido: Partido = { id: "m2", rival: "Abella F.C.", fechaHora: "sábado 14/11/2026 · 19:00", lugar: "Pabellón de Guntín", competicion: "Primera Futgal", esLocal: true, jugado: false, golesLocal: null, golesVisitante: null };
 const inicio = new Date("2026-11-14T18:00:00Z");
