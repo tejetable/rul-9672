@@ -20,11 +20,12 @@ export function SwitchDos({ on, offLabel, onLabel, offIcon, onIcon, stars = fals
 }
 
 /** El mismo interruptor como control: un botón con role="switch". */
-export function BotonDos({ on, onChange, label, ...rest }: { on: boolean; onChange: (v: boolean) => void; label: string; offLabel: string; onLabel: string; offIcon: ReactNode; onIcon: ReactNode }) {
+export function BotonDos({ on, onChange, label, ...rest }: { on: boolean; onChange: (v: boolean) => void; label: string; offLabel: string; onLabel: string; offIcon: ReactNode; onIcon: ReactNode; stars?: boolean }) {
   return <button type="button" role="switch" aria-checked={on} aria-label={label} className="duo-btn" onClick={() => onChange(!on)}><SwitchDos on={on} {...rest} /></button>;
 }
 
 export const SwitchVista = ({ vista }: { vista: Vista }) => <SwitchDos on={vista === "noche"} offLabel="Light" onLabel="Strong" offIcon={<Sol />} onIcon={<Luna />} stars />;
+export const iconosVista = { off: <Sol />, on: <Luna /> };
 
 export const iconosCarnet = { off: <IdCard className="vs-icon vs-off" strokeWidth={2} />, on: <QrCode className="vs-icon vs-on" strokeWidth={2} /> };
 export const iconosCasa = { off: <CalendarDays className="vs-icon vs-off" strokeWidth={2} />, on: <House className="vs-icon vs-on" strokeWidth={2} /> };
