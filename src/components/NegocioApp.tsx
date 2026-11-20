@@ -99,7 +99,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
     } finally { setGuardando(false); }
   };
 
-  const big = "flex h-auto min-h-11 w-full items-center justify-center gap-2 rounded-control text-item font-black uppercase transition-transform duration-150 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
+  const big = "visit-big flex h-auto w-full items-center justify-center gap-2 rounded-control font-black transition-transform duration-150 active:scale-[.98] disabled:opacity-40 [&_svg]:size-6";
 
   return (
     <section className="flex flex-1 flex-col px-4 pt-6">
@@ -153,7 +153,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
                 <p className="mb-2 text-body-sm font-bold">¿Es la primera vez que viene?</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Primera vez</Button>
-                  <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} btn-suave text-item`}>Ya venía</Button>
+                  <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} visit-secondary`}>Ya venía</Button>
                 </div>
               </>
             )}
@@ -163,7 +163,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
 
       <h2 className="club-section-title mt-8">Últimas visitas de hoy</h2>
       {hoy.length === 0 ? (
-        <p className="surface-card px-4 py-5 text-body-sm text-muted-foreground">Todavía ninguna hoy.</p>
+        <p className="surface-card px-4 py-5 text-body-sm text-muted-foreground">Todavía ninguna visita hoy. Escanea el carnet de la primera.</p>
       ) : (
         <ListCard label="Últimas visitas de hoy">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTE'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
       )}
@@ -228,7 +228,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       </div>
 
       <p className="mt-6 text-item font-bold">{frase}</p>
-      <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-11 items-center justify-center gap-2 rounded-panel bg-primary font-black uppercase text-primary-foreground">
+      <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-11 items-center justify-center gap-2 rounded-control bg-primary font-black text-primary-foreground">
         <MessageCircle size={20} strokeWidth={1.75} /> Compartir por WhatsApp
       </a>
       {dataService.negocioPrueba()&&<div className="surface-card mt-6 px-4"><label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label></div>}

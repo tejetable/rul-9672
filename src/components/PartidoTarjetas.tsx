@@ -178,6 +178,7 @@ function TablaResumen(){
       <p className="sc-goals">Goles {goles.gf}–{goles.gc} · <span className={goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p>
       <div className="sc-form" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
         {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}
+        <span className="sc-form-label" aria-hidden="true">Últimos 5</span>
       </div>
     </div>
     <a className="sc-table-link" href={dataService.ajustes().url_clasificacion_futgal} target="_blank" rel="noopener noreferrer" aria-label="Ver la clasificación completa">Clasificación<ArrowUpRight size={14} strokeWidth={2} aria-hidden="true"/></a>

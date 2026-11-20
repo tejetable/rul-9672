@@ -31,8 +31,8 @@ export function SociaApp({ socio }: { socio: Socio }) {
   useEffect(() => { runAction(() => dataService.marcarApertura(socio.id)); }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [tab]);
   if (!db) return null;
-  const tabCls = (on: boolean) => `member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1 text-body-sm ${on ? "font-bold text-primary" : "font-normal text-muted-foreground"}`;
-  const indicador = (on: boolean) => on && <span className="absolute top-1 h-[3px] w-5 rounded-full bg-accent" />;
+  const tabCls = (_on: boolean) => "member-tab relative flex h-auto min-h-16 flex-col items-center justify-center gap-1";
+  const indicador = (_on: boolean) => null;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -49,8 +49,8 @@ export function SociaApp({ socio }: { socio: Socio }) {
           </span>
           El Equipo
         </Button>
-        <Button variant="ghost" onClick={() => setCarnet(true)} className="member-tab flex h-auto min-h-16 flex-col items-center justify-end gap-1 pb-2 text-body-sm text-muted-foreground" aria-label="Abrir carnet">
-          <span className={`-mt-6 flex size-16 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ${tab === "equipo" ? "ring-accent" : "ring-gold"}`}><IdCard size={26} strokeWidth={1.75} /></span>
+        <Button variant="ghost" onClick={() => setCarnet(true)} className="member-tab flex h-auto min-h-16 flex-col items-center justify-end gap-1 pb-2" aria-label="Abrir carnet">
+          <span className="member-carnet-key"><IdCard size={26} strokeWidth={1.75} /></span>
           Carnet
         </Button>
         <Button variant="ghost" onClick={() => setTab("ventajas")} aria-current={tab === "ventajas" ? "page" : undefined} className={tabCls(tab === "ventajas")}>
@@ -143,7 +143,7 @@ function Ventajas({ db, onCarnet }: { db: DB; onCarnet: () => void }) {
           ))}
         </div>
         {conDireccion && <><h2 className="club-section-title mt-6">Dónde</h2><div className="surface-card benefit-place"><p>{dir}</p><Button asChild variant="outline" className="mt-3 h-10 rounded-control font-bold"><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.nombre} ${dir}`)}`} target="_blank" rel="noopener noreferrer">Cómo llegar</a></Button></div></>}
-        <div className="member-sticky-action"><Button onClick={onCarnet} className="h-11 w-full rounded-control font-bold">Enseñar mi carnet</Button></div>
+        <div className="member-sticky-action"><Button onClick={onCarnet} className="h-14 w-full rounded-control text-base font-black">Enseñar carnet</Button></div>
       </section>
     );
   }
