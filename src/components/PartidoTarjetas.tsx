@@ -4,6 +4,7 @@ import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
+import { BotonDos, iconosCasa } from "@/components/SwitchVista";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
 import { fechaPartidoTexto, golesLiga, proximosCalendario, textoDiferencia, rachaCronologica, directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
@@ -305,7 +306,7 @@ export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:
   </section>;
 }
 export function CasaFiltro({casa,onChange}:{casa:boolean;onChange:(v:boolean)=>void}){
-  return <div className="calendar-filter" role="group" aria-label="Filtrar partidos">{[["Todos",false],["En casa",true]].map(([l,v])=><button key={String(l)} type="button" aria-pressed={casa===v} className={casa===v?'is-active':''} onClick={()=>onChange(!!v)}>{l}</button>)}</div>;
+  return <BotonDos on={casa} onChange={onChange} label="Ver solo los partidos en casa" offLabel="Todos" onLabel="En casa" offIcon={iconosCasa.off} onIcon={iconosCasa.on}/>;
 }
 export function CalendarioFila({partido,destacado=false}:{partido:Partido;destacado?:boolean}){
   const r=resultadoPartido(partido);

@@ -3,6 +3,7 @@ import { QRCodeSVG } from "qrcode.react";
 import frente from "@/assets/carne-fisico-frente.jpg.asset.json";
 import dorso from "@/assets/carne-fisico-reverso.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
+import { BotonDos, iconosCarnet } from "@/components/SwitchVista";
 
 export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDondeUsar }: { nombre: string; numero: number; temporada?: string; alCorriente?: boolean | null; onDondeUsar?: () => void }) {
   const [reverso, setReverso] = useState(false);
@@ -25,11 +26,7 @@ export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDo
           {reverso && <a href={folleto.url} target="_blank" rel="noreferrer" className="physical-card-benefits-qr rounded-md focus-visible:outline-2 focus-visible:outline-ring" aria-label="Abrir el folleto de ventajas"><QRCodeSVG value={folleto.url} size={160} className="card-qr-code h-full w-full" /></a>}
         </article>
         <div className="mt-3 flex justify-center">
-          <div className="seg-toggle" role="radiogroup" aria-label="Cara del carnet físico" data-state={reverso ? "b" : "a"}>
-            <span className="seg-thumb" aria-hidden="true" />
-            <button type="button" role="radio" aria-checked={!reverso} onClick={() => setReverso(false)}>Frente</button>
-            <button type="button" role="radio" aria-checked={reverso} onClick={() => setReverso(true)}>Reverso</button>
-          </div>
+          <BotonDos on={reverso} onChange={setReverso} label="Ver el reverso del carnet físico" offLabel="Frente" onLabel="Reverso" offIcon={iconosCarnet.off} onIcon={iconosCarnet.on} />
         </div>
       </div>
     </div>
