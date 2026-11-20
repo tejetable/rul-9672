@@ -118,8 +118,8 @@ export function TemporadaCard(){
       <TablaResumen/>
       <ResultadosCarrusel partidos={db.partidos}/>
       <ProximosEnCard partidos={db.partidos} siguienteId={partido?.id} ahora={ref}/>
+      <Link to="/calendario" className="sc-calendar-link">Calendario completo<ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></Link>
     </div>
-    <Link to="/calendario" className="sc-calendar-link">Calendario completo<ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></Link>
   </article>;
 }
 

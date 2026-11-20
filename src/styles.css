@@ -1001,8 +1001,6 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .sc-up-date { display: block; font-size: 13px; color: var(--tinta-suave); }
 .sc-up-where { flex: none; font-size: 12px; font-weight: 700; color: var(--tinta-suave); }
 .sc-up-where.is-home { color: var(--esmeralda-texto); }
-.sc-calendar-link { display: flex; min-height: 52px; align-items: center; justify-content: center; gap: 6px; border-top: 1px solid var(--surface-line); font-size: 16px; font-weight: 900; color: var(--verde); }
-.sc-calendar-link:hover { background: color-mix(in oklab, var(--verde) 4%, transparent); }
 
 /* ───────── Calendario completo: un partido por tarjeta ───────── */
 .cal-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -1157,8 +1155,6 @@ main:has(.theme-noche), main.theme-noche, body:has(.theme-noche) { background: #
 .theme-noche .sc-arrow, .theme-noche .sc-arrow:hover:not(:disabled) { background: rgba(217,183,122,.14); color: var(--oro-claro); }
 .theme-noche .sc-latest, .theme-noche .sc-photos, .theme-noche .sc-up-where.is-home { color: var(--oro-claro); }
 .theme-noche .sc-up-j { color: var(--oro-claro); }
-.theme-noche .sc-calendar-link { color: var(--oro-claro); }
-.theme-noche .sc-calendar-link:hover { background: rgba(217,183,122,.08); }
 .theme-noche .sc-result-word.is-E, .theme-noche .cal-result.is-E, .theme-noche .rul-chip--draw, .theme-noche .sc-result-bar.is-E { background: var(--result-draw); }
 .theme-noche .sc-form-dot.is-E { border-color: rgba(255,255,255,.74); color: #FFFFFF; }
 .theme-noche .court { box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
@@ -1181,11 +1177,11 @@ main:has(.theme-noche), main.theme-noche, body:has(.theme-noche) { background: #
 
 /* Carnet */
 .theme-noche.carnet-overlay { background: radial-gradient(120% 50% at 50% 0%, #0F4A33 0%, var(--noche) 60%); }
-.theme-noche .carnet-qr { position: relative; overflow: hidden; padding: 5px; border-radius: 22px; background: var(--foil); }
-.theme-noche .carnet-qr::after { content: ""; position: absolute; inset: -50%; z-index: 0; background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.6) 50%, transparent 56%); animation: carnet-brillo 3.2s ease-in-out infinite; }
-.theme-noche .carnet-qr > .qr-blanco { position: relative; z-index: 1; border-radius: 17px; }
+.carnet-qr { --foil: linear-gradient(115deg,#8E6A2F 0%,#C9A160 18%,#F3E0B2 34%,#D2A862 48%,#9C7434 64%,#E2C48A 82%,#A57B3B 100%); position: relative; overflow: hidden; padding: 5px; border-radius: 22px; background: var(--foil); }
+.carnet-qr::after { content: ""; position: absolute; inset: -50%; z-index: 0; background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.6) 50%, transparent 56%); animation: carnet-brillo 3.2s ease-in-out infinite; }
+.carnet-qr > .qr-blanco { position: relative; z-index: 1; border-radius: 17px; }
 @keyframes carnet-brillo { 0% { transform: translateX(-40%); } 60%, 100% { transform: translateX(40%); } }
-@media (prefers-reduced-motion: reduce) { .theme-noche .carnet-qr::after { animation-duration: 8s; } }
+@media (prefers-reduced-motion: reduce) { .carnet-qr::after { animation-duration: 8s; } }
 .theme-noche .card-number { background: var(--foil); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .theme-noche .card-number-pre { color: var(--oro-claro); -webkit-text-fill-color: var(--oro-claro); }
 .theme-noche .rul-chip--win { background: transparent; color: var(--oro-claro); box-shadow: inset 0 0 0 1.5px var(--oro-claro); }
@@ -1198,3 +1194,88 @@ main:has(.theme-noche), main.theme-noche, body:has(.theme-noche) { background: #
 .theme-noche .seg-thumb { background: var(--oro-claro); }
 .theme-noche .member-tab, .theme-noche .member-tab:hover, .theme-noche .member-tab:focus, .theme-noche .member-tab:active { background: transparent !important; }
 .theme-noche { --control-secondary-hover: var(--verde-2); }
+
+/* «Calendario completo»: botón a todo el ancho dentro de la tarjeta, como «Cómo llegar». */
+.sc-calendar-link { display: flex; min-height: 44px; margin: 4px 0 14px; align-items: center; justify-content: center; gap: 6px; border-radius: 12px; background: var(--verde); color: var(--oro-claro); font-size: 16px; font-weight: 900; transition: transform 120ms, opacity 150ms; }
+.sc-calendar-link:active { transform: scale(.98); }
+.sc-calendar-link:focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
+.theme-noche .sc-calendar-link { background: var(--oro-claro); color: var(--verde); }
+
+/* ═════════════════════════ Vista «Día» (app de soci@) ═════════════════════════
+   Todos los fondos en claro (arena y arena-claro). Lo que se pulsa es verde con letra oro-claro.
+   Las cifras grandes van en oro metálico oscuro (--foil-osc), el único dorado que se lee sobre claro (≥ 24 px).
+   Etiquetas y filetes en oro-texto / oro. */
+.theme-dia {
+  --foil: linear-gradient(115deg,#8E6A2F 0%,#C9A160 18%,#F3E0B2 34%,#D2A862 48%,#9C7434 64%,#E2C48A 82%,#A57B3B 100%);
+  --foil-osc: linear-gradient(115deg,#6E5122 0%,#9C7434 30%,#B98E4A 46%,#7E5D27 62%,#A57B3B 82%,#6E5122 100%);
+  --primary-foreground: var(--oro-claro);
+  --divider: rgba(185,142,74,.35); --surface-line: rgba(185,142,74,.35);
+  background: var(--background); color: var(--foreground);
+}
+.theme-dia .club-section-title, .theme-dia .sc-label { color: var(--oro-texto); }
+.theme-dia .benefit-perk { color: var(--oro-texto); }
+.theme-dia header { border-bottom-color: rgba(185,142,74,.45); }
+/* Cifras en oro metálico oscuro */
+.theme-dia .sc-time, .theme-dia .sc-pos-num, .theme-dia .sc-points strong, .theme-dia .card-number, .theme-dia .cal-j {
+  background: var(--foil-osc); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.theme-dia .sc-pos-num sup, .theme-dia .card-number-pre { -webkit-text-fill-color: var(--oro-texto); color: var(--oro-texto); }
+.theme-dia .sc-points strong { font-family: var(--font-display); font-weight: 400; font-size: 24px; }
+/* Talón del próximo partido en claro */
+.theme-dia .sc-next { background: var(--arena-claro); color: var(--verde); }
+.theme-dia .sc-next .fixture-silhouette { color: var(--verde); opacity: .05; }
+.theme-dia .sc-kicker { color: var(--oro-texto); }
+.theme-dia .sc-meta, .theme-dia .sc-date, .theme-dia .sc-place { color: var(--tinta-suave); opacity: 1; }
+.theme-dia .sc-team p { color: var(--verde); }
+.theme-dia .sc-time-tbd { color: var(--verde); }
+.theme-dia .sc-emblem-lg { border-color: color-mix(in oklab, var(--verde) 30%, transparent); background: transparent; color: var(--verde); }
+.theme-dia .sc-countdown { color: var(--oro-texto); }
+.theme-dia .sc-live-dot { background: var(--oro); }
+.theme-dia .sc-btn-light, .theme-dia .sc-btn-light:hover { background: var(--verde); color: var(--oro-claro); opacity: 1; }
+.theme-dia .sc-btn-ghost { border-color: var(--verde); color: var(--verde); }
+.theme-dia .sc-btn-ghost:hover { background: color-mix(in oklab, var(--verde) 6%, transparent); }
+.theme-dia .sc-perf { height: 3px; background: var(--foil); }
+.theme-dia .sc-perf::before, .theme-dia .sc-perf::after { background: var(--background); }
+/* Liga, flechas, pista */
+.theme-dia .sc-pos-tile { background: var(--arena); box-shadow: inset 0 0 0 2px var(--oro); }
+.theme-dia .sc-pos-go { color: var(--oro-texto); }
+.theme-dia .sc-arrow, .theme-dia .sc-arrow:hover:not(:disabled) { background: var(--verde); color: var(--oro-claro); }
+.theme-dia .court { box-shadow: 0 0 0 2px var(--oro); }
+.theme-dia .sc-up-j { color: var(--oro-texto); }
+.theme-dia .sc-latest, .theme-dia .sc-photos { color: var(--verde); }
+/* Barra inferior */
+.theme-dia .member-navigation { border-top-color: rgba(185,142,74,.45); }
+.theme-dia .member-tab-bar { background: var(--oro); }
+.theme-dia .member-carnet-key { background: var(--foil); }
+/* Calendario */
+.theme-dia .calendar-filter button.is-active { color: var(--oro-claro); }
+.theme-dia .cal-j > span { color: var(--oro-texto); -webkit-text-fill-color: var(--oro-texto); }
+.theme-dia .cal-card.is-next { background: var(--arena-claro); color: var(--verde); box-shadow: inset 0 0 0 2px var(--oro); }
+.theme-dia .cal-card.is-next .cal-meta { color: var(--tinta-suave); }
+.theme-dia .cal-next-tag { color: var(--oro-texto); }
+.theme-dia .flap { background: var(--arena-claro); }
+.theme-dia .flap-tile { --flap-bg: var(--arena); }
+.theme-dia .flap-tile.is-num { --flap-bg: var(--verde); --flap-ink: var(--oro-claro); }
+.theme-dia .flap-meta { color: var(--oro-texto); }
+/* Carnet */
+.theme-dia .rul-btn--secondary { background: var(--verde); color: var(--oro-claro); border-color: transparent; }
+.theme-dia .seg-toggle button[aria-checked="true"] { color: var(--oro-claro); }
+
+/* Vista Día: los botones dejan de ser verdes y adoptan el estilo de la ficha del 4º:
+   fondo arena, filete de oro por dentro y letra en oro oscuro. Filete en --oro-borde (#9C7434): 3:1 sobre arena,
+   el mínimo para el borde de un control; la letra en oro-texto da 5,2:1. */
+.theme-dia { --oro-borde: #9C7434; }
+.theme-dia .sc-pos-tile { box-shadow: inset 0 0 0 2px var(--oro-borde); }
+.theme-dia .sc-btn-light, .theme-dia .sc-btn-light:hover,
+.theme-dia .sc-arrow, .theme-dia .sc-arrow:hover:not(:disabled),
+.theme-dia .sc-calendar-link,
+.theme-dia .rul-btn--secondary,
+.theme-dia .bg-primary, .theme-dia .bg-primary:hover,
+.theme-dia .calendar-filter button.is-active {
+  background: var(--arena); color: var(--oro-texto); box-shadow: inset 0 0 0 2px var(--oro-borde); border-color: transparent;
+}
+.theme-dia .sc-btn-ghost { border: 1.5px solid color-mix(in oklab, var(--verde) 35%, transparent); color: var(--verde); }
+.theme-dia .seg-toggle { background: var(--arena-claro); }
+.theme-dia .seg-thumb { background: var(--arena); box-shadow: inset 0 0 0 2px var(--oro-borde); }
+.theme-dia .seg-toggle button[aria-checked="true"] { color: var(--oro-texto); }
+.theme-dia .sc-arrow:disabled { opacity: .45; }
