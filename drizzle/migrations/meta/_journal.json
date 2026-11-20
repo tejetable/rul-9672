@@ -239,6 +239,13 @@
       "when": 1795198678103,
       "tag": "0033_calendario_completo_temporada",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1795210294400,
+      "tag": "0034_restringir_identificar_socio",
+      "breakpoints": true
     }
   ]
 }
