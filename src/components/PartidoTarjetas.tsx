@@ -342,7 +342,7 @@ export function CalendarioCard({partido,destacado=false,onVer}:{partido:Partido;
       <span className="cal-rival">{nombreCorto(partido.rival)}</span>
       <span className="cal-meta">{fechaPartidoTexto(partido)} · {partido.esLocal?'Casa':'Fuera'}</span>
     </span>
-    {r?<span className={`cal-result is-${r}`} aria-label={`${r==='V'?'Victoria':r==='E'?'Empate':'Derrota'} ${favor} a ${contra}`}><span className="cal-result-letter">{r}</span><span className="cal-result-score">{favor}–{contra}</span></span>
+    {r?<span className={`cal-result is-${r}`} aria-label={`${r==='V'?'Victoria':r==='E'?'Empate':'Derrota'} ${favor} a ${contra}`}><span className="cal-result-letter">{r}</span><span className="cal-result-score" aria-hidden="true"><span className="is-f">{favor}</span><span className="is-sep">–</span><span className="is-c">{contra}</span></span></span>
       :null}
   </li>;
 }

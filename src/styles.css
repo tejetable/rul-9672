@@ -1100,3 +1100,14 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .court-half { padding-bottom: 10px; }
 .flap-meta .sc-result-word { font-family: var(--font-lato); letter-spacing: 0; text-transform: none; }
 .court-side { bottom: 18px; }
+/* Resultado del calendario con ancho fijo: cada marcador admite dos cifras por lado (p. ej. 12–12), así todas las cajas miden lo mismo. */
+.cal-result { width: 106px; }
+.cal-result-score { display: grid; flex: 1; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 3px; padding: 0 8px; }
+.cal-result-score .is-f { text-align: right; }
+.cal-result-score .is-c { text-align: left; }
+.cal-result-score > span { min-width: 2ch; }
+.cal-result { width: 94px; }
+.cal-result-score { padding: 0 6px; gap: 2px; }
+.cal-result-score > .is-sep { min-width: 0; }
+.cal-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-card > .min-w-0 { min-width: 0; }
