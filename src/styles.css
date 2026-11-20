@@ -809,9 +809,12 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .sc-results { padding: 14px 0 14px; touch-action: pan-y; }
 .sc-results-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
 .sc-pager { display: flex; align-items: center; gap: 4px; }
-.sc-arrow { display: inline-flex; width: 32px; height: 32px; align-items: center; justify-content: center; border-radius: 10px; color: var(--verde); background: color-mix(in oklab, var(--verde) 6%, transparent); transition: background-color 150ms; }
-.sc-arrow:hover:not(:disabled) { background: color-mix(in oklab, var(--verde) 11%, transparent); }
-.sc-arrow:disabled { opacity: .3; }
+/* Flechas de jornada: solo dos estados, normal (blanco) y deshabilitado. Sin tinte al pasar ni al pulsar. */
+.sc-arrow { display: inline-flex; width: 56px; height: 44px; align-items: center; justify-content: center; border-radius: 12px; color: var(--verde); background: var(--blanco); transition: opacity 150ms, transform 120ms; -webkit-tap-highlight-color: transparent; }
+.sc-arrow:hover:not(:disabled), .sc-arrow:focus:not(:focus-visible) { background: var(--blanco); color: var(--verde); }
+.sc-arrow:active:not(:disabled) { transform: scale(.96); }
+.sc-arrow:disabled { opacity: .4; cursor: default; }
+.sc-pager { gap: 6px; }
 .sc-latest { height: 32px; padding: 0 8px; font-size: 12px; font-weight: 800; color: var(--win-ink); }
 .sc-score { position: relative; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding: 12px 14px 12px 18px; border-radius: 14px; background: color-mix(in oklab, var(--verde) 4%, transparent); }
 .sc-score-row { display: grid; grid-template-columns: 26px minmax(0,1fr) auto; align-items: center; gap: 10px; }
@@ -914,7 +917,6 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .sc-btn-ghost { border: 2px solid var(--blanco); }
 .sc-btn:focus-visible, .rul-btn:focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
 .sc-table-link, .sc-photos, .sc-latest { font-size: 13px; }
-.sc-arrow { width: 44px; height: 44px; border-radius: 12px; background: var(--blanco); }
 .sc-latest { height: 44px; }
 .sc-emblem-sm { width: 28px; height: 28px; font-size: 9px; }
 .sc-crest-sm { width: 28px; height: 28px; }
@@ -1064,15 +1066,31 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .flap-tile.is-name { flex: 1; min-width: 0; padding: 0 12px; font-size: 19px; }
 .flap-tile.is-num { width: 48px; flex: none; justify-content: center; font-size: 30px; background: var(--verde); color: var(--oro-claro); }
 .flap-tile.is-num::after { background: rgba(0,0,0,.35); }
-.flap-face { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; transform-origin: 50% 50%; animation: flap-in 420ms cubic-bezier(.3,1.3,.5,1) both; }
-@keyframes flap-in { 0% { transform: rotateX(-90deg); opacity: .2; } 60% { transform: rotateX(12deg); opacity: 1; } 100% { transform: rotateX(0); } }
-.flap-row.is-loser .flap-tile.is-name { color: color-mix(in oklab, var(--verde) 50%, transparent); }
-.flap-row.is-loser .flap-tile.is-num { background: var(--tinta-suave); color: var(--blanco); }
+/* Paleta mecánica: dos mitades fijas y dos hojas que giran sobre la bisagra central. */
+.flap-tile { --flap-bg: var(--arena-claro); --flap-ink: var(--verde); --flap-step: 150ms; padding: 0 !important; background: transparent !important; perspective: 260px; }
+.flap-tile.is-num { --flap-bg: var(--verde); --flap-ink: var(--oro-claro); }
+.flap-row.is-loser .flap-tile.is-num { --flap-bg: var(--tinta-suave); --flap-ink: var(--blanco); background: transparent !important; }
+.flap-row.is-loser .flap-tile.is-name { --flap-ink: color-mix(in oklab, var(--verde) 50%, var(--arena-claro)); }
+.flap-tile::after { z-index: 3; }
+.flap-half { position: absolute; left: 0; right: 0; height: 50%; overflow: hidden; background: var(--flap-bg); color: var(--flap-ink); backface-visibility: hidden; }
+.flap-half.is-top { top: 0; border-radius: 6px 6px 0 0; }
+.flap-half.is-bottom { bottom: 0; border-radius: 0 0 6px 6px; }
+.flap-text { position: absolute; left: 0; right: 0; height: 200%; display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.flap-half.is-bottom .flap-text { top: -100%; }
+.flap-tile.is-name .flap-text { padding: 0 12px; justify-content: flex-start; }
+.flap-tile.is-num .flap-text { justify-content: center; }
+.flap-leaf-top { z-index: 2; transform-origin: 50% 100%; animation: flap-fall calc(var(--flap-step) * .55) ease-in both; }
+.flap-leaf-bottom { z-index: 2; transform-origin: 50% 0; transform: rotateX(90deg); animation: flap-land calc(var(--flap-step) * .55) ease-out calc(var(--flap-step) * .45) both; }
+.flap-leaf-top::before, .flap-leaf-bottom::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.flap-leaf-top::before { background: linear-gradient(to bottom, transparent, rgba(0,0,0,.18)); }
+.flap-leaf-bottom::before { background: linear-gradient(to top, transparent, rgba(0,0,0,.12)); }
+@keyframes flap-fall { from { transform: rotateX(0); } to { transform: rotateX(-90deg); } }
+@keyframes flap-land { from { transform: rotateX(90deg); } to { transform: rotateX(0); } }
+@media (prefers-reduced-motion: reduce) { .flap-leaf-top, .flap-leaf-bottom { display: none; } }
 .flap-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
 .cal-card.is-tappable { cursor: pointer; transition: transform 120ms; }
 .cal-card.is-tappable:active { transform: scale(.985); }
 .cal-card.is-tappable:focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .flap-face { animation: none; } }
 /* Ajuste óptico: la altura de mayúscula de «15» arranca en el borde superior de la ficha y los puntos acaban en su borde inferior; el aire entre filas es el mismo (12,5 px). */
 .sc-league-body .sc-points { transform: translateY(-3px); }
 .sc-league-body .sc-goals { transform: translateY(-1.5px); }
