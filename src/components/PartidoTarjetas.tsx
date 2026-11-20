@@ -1,7 +1,7 @@
 import {Link} from "@tanstack/react-router";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { Button } from "@/components/ui/button";
@@ -256,9 +256,34 @@ function ResultadosCarrusel({partidos}:{partidos:Partido[]}){
   </section>;
 }
 
-/** Marcador de paletas (calendario completo): al cambiar de partido, las paletas giran. */
-function Paleta({texto,clase='',delay=0}:{texto:string|number;clase?:string;delay?:number}){
-  return <span className={`flap-tile ${clase}`}><span key={String(texto)} className="flap-face" style={{animationDelay:`${delay}ms`}}>{texto}</span></span>;
+/** Marcador de paletas (calendario completo). Se mueve la paleta, no el texto: la mitad de arriba cae y la de abajo
+ *  aparece, como en un marcador mecánico. Los goles pasan por todos los números intermedios y los nombres por varios
+ *  carteles antes de quedarse en el bueno. */
+const PASO_MS=150;
+function reduceMotion(){return typeof window!=='undefined'&&window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;}
+function pasosNumero(desde:number,hasta:number){const out:number[]=[];const d=hasta>desde?1:-1;for(let n=desde+d;d>0?n<=hasta:n>=hasta;n+=d)out.push(n);return out;}
+function pasosNombre(hasta:string,pool:string[],desde:string){const otros=pool.filter(n=>n!==hasta&&n!==desde);const out:string[]=[];for(let k=0;k<3&&otros.length;k++){out.push(otros.splice(Math.floor(Math.random()*otros.length),1)[0]!);}out.push(hasta);return out;}
+function Paleta({valor,pasos,clase='',retraso=0}:{valor:string|number;pasos:(desde:string|number)=>(string|number)[];clase?:string;retraso?:number}){
+  const [actual,setActual]=useState<string|number>(valor);
+  const [anterior,setAnterior]=useState<string|number>(valor);
+  const [vuelta,setVuelta]=useState(0);
+  const actualRef=useRef(valor);
+  useEffect(()=>{
+    if(valor===actualRef.current)return;
+    if(reduceMotion()){actualRef.current=valor;setAnterior(valor);setActual(valor);return;}
+    const cola=pasos(actualRef.current);
+    const timers:number[]=[];
+    cola.forEach((v,k)=>{timers.push(window.setTimeout(()=>{setAnterior(actualRef.current);actualRef.current=v;setActual(v);setVuelta(n=>n+1);},retraso+k*PASO_MS));});
+    timers.push(window.setTimeout(()=>setAnterior(actualRef.current),retraso+cola.length*PASO_MS));
+    return()=>timers.forEach(clearTimeout);
+  },[valor]); // eslint-disable-line react-hooks/exhaustive-deps
+  const cayendo=anterior!==actual;
+  return <span className={`flap-tile ${clase}`}>
+    <span className="flap-half is-top"><span className="flap-text">{actual}</span></span>
+    <span className="flap-half is-bottom"><span className="flap-text">{cayendo?anterior:actual}</span></span>
+    {cayendo&&<span key={`t${vuelta}`} className="flap-half is-top flap-leaf-top"><span className="flap-text">{anterior}</span></span>}
+    {cayendo&&<span key={`b${vuelta}`} className="flap-half is-bottom flap-leaf-bottom"><span className="flap-text">{actual}</span></span>}
+  </span>;
 }
 export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:{id:string;n:number}|null}){
   const nav=useNavegadorResultados(partidos);
@@ -267,11 +292,14 @@ export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:
   if(!partido)return null;
   const {local,visit,gl,gv,pierdeLocal,pierdeVisit}=equipos(partido);
   const r=resultadoPartido(partido);
+  const pool=[...new Set(['R.U. Lucense',...partidos.map(p=>nombreCorto(p.rival))])];
+  const num=(hasta:number)=>(desde:string|number)=>pasosNumero(Number(desde),hasta);
+  const nom=(hasta:string)=>(desde:string|number)=>pasosNombre(hasta,pool,String(desde));
   return <section className="flap-board surface-card" aria-label="Resultados" {...nav.swipe}>
     <NavFlechas nav={nav} etiqueta="Último resultado"/>
     <div className="flap" role="img" aria-label={`Jornada ${partido.jornada}: ${local} ${gl}, ${visit} ${gv}`}>
-      <div className={`flap-row ${pierdeLocal?'is-loser':''}`} aria-hidden="true"><Paleta texto={local} clase="is-name"/><Paleta texto={gl} clase="is-num" delay={90}/></div>
-      <div className={`flap-row ${pierdeVisit?'is-loser':''}`} aria-hidden="true"><Paleta texto={visit} clase="is-name" delay={60}/><Paleta texto={gv} clase="is-num" delay={150}/></div>
+      <div className={`flap-row ${pierdeLocal?'is-loser':''}`} aria-hidden="true"><Paleta valor={local} pasos={nom(local)} clase="is-name"/><Paleta valor={gl} pasos={num(gl)} clase="is-num" retraso={60}/></div>
+      <div className={`flap-row ${pierdeVisit?'is-loser':''}`} aria-hidden="true"><Paleta valor={visit} pasos={nom(visit)} clase="is-name" retraso={90}/><Paleta valor={gv} pasos={num(gv)} clase="is-num" retraso={150}/></div>
       <div className="flap-meta"><span>J{partido.jornada} · {fechaCorta(partido)}</span>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}</div>
     </div>
   </section>;
