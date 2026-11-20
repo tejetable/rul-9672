@@ -1,0 +1,18 @@
+import {describe,it,expect} from 'vitest';
+import {membershipSchema,feeCents,accessWithinWeek,verifiedPaidSession,canSetPaymentPassword,PAYMENT_POLL_MS,PAYMENT_POLL_LIMIT_MS,PAYMENT_ACCESS_DAYS} from './membership-payment';
+import {listaSocios} from './socios-management';
+import type {Socio} from './dataService';
+const form={nombre:'Persona Prueba',email:'persona@example.test',telefono:'',mayor:true,consentimiento:true};
+const session={mode:'payment',payment_status:'paid',currency:'eur',amount_total:1500,livemode:false};
+const checkout={importe_centimos:1500,es_prueba:true};
+describe('Paid membership rules',()=>{
+ it('15 euros is exactly 1500 cents',()=>expect(feeCents(15)).toBe(1500));
+ it('editable server fees cannot be zero or fractional cents',()=>{expect(()=>feeCents(0)).toThrow();expect(()=>feeCents(15.001)).toThrow();expect(feeCents(20)).toBe(2000);});
+ it('both age and RGPD are mandatory',()=>{expect(membershipSchema.safeParse(form).success).toBe(true);expect(membershipSchema.safeParse({...form,mayor:false}).success).toBe(false);expect(membershipSchema.safeParse({...form,consentimiento:false}).success).toBe(false);});
+ it('email is normalized and phone is optional',()=>{expect(membershipSchema.parse({...form,email:' PERSONA@EXAMPLE.TEST '}).email).toBe('persona@example.test');expect(membershipSchema.parse(form).telefono).toBe('');expect(membershipSchema.safeParse({...form,telefono:'javascript:alert(1)'}).success).toBe(false);});
+ it('a paid EUR session must match server amount and environment',()=>{expect(verifiedPaidSession(session,checkout)).toBe(true);expect(verifiedPaidSession({...session,amount_total:100},checkout)).toBe(false);expect(verifiedPaidSession({...session,payment_status:'unpaid'},checkout)).toBe(false);expect(verifiedPaidSession({...session,livemode:true},checkout)).toBe(false);expect(verifiedPaidSession({...session,currency:'usd'},checkout)).toBe(false);expect(verifiedPaidSession({...session,mode:'subscription'},checkout)).toBe(false);});
+ it('access lasts seven days and not one moment more',()=>{const paid='2026-11-20T17:00:00Z',now=Date.parse(paid);expect(PAYMENT_ACCESS_DAYS).toBe(7);expect(accessWithinWeek(paid,now+7*86400000-1)).toBe(true);expect(accessWithinWeek(paid,now+7*86400000)).toBe(false);});
+ it('the initial password cannot replace an existing password or claim other roles',()=>{const c={auth_nuevo:true,password_saved_at:null,pagado_at:'2026-11-20T17:00:00Z'},now=Date.parse('2026-11-21T17:00:00Z');expect(canSetPaymentPassword(c,false,false,now)).toBe(true);expect(canSetPaymentPassword(c,true,false,now)).toBe(false);expect(canSetPaymentPassword(c,false,true,now)).toBe(false);expect(canSetPaymentPassword({...c,auth_nuevo:false},false,false,now)).toBe(false);expect(canSetPaymentPassword({...c,password_saved_at:c.pagado_at},false,false,now)).toBe(false);});
+ it('status retries every two seconds for at most twenty seconds',()=>{expect(PAYMENT_POLL_MS).toBe(2000);expect(PAYMENT_POLL_LIMIT_MS).toBe(20000);});
+ it('physical-card pending filter excludes delivered cards',()=>{const member={id:'one',nombre:'Persona',numeroSocio:1,telefono:'',email:'persona@example.test',estado:'activa',fechaAlta:'2026-11-20'} as Socio;const rows=listaSocios([{...member,carnetFisico:'pendiente'},{...member,id:'two',carnetFisico:'entregado'}],'','carnet_pendiente','numero',{},[],'2026/27');expect(rows.map(s=>s.id)).toEqual(['one']);});
+});

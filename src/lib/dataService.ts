@@ -1,3 +1,4 @@
+import {getMembershipConfig} from './membership-payment.functions';
 import {textoMiembros} from './member-language';
 import {normalizarEmail} from './email-validation';
 import { useSyncExternalStore } from "react";
@@ -31,6 +32,9 @@ export interface Socio {
   ultimaApertura?: string | undefined;
   fechaBaja?: string | null;
   motivoBaja?: string | null;
+  carnetFisico?: "pendiente" | "entregado";
+  fechaEntrega?: string | null;
+  esPrueba?: boolean;
 }
 export interface Patrocinador {
   id: string;
@@ -123,6 +127,7 @@ let channel: ReturnType<typeof supabase.channel> | null = null;
 const notify = () => { version++; listeners.forEach((fn) => fn()); };
 const check = (error: { message: string } | null) => { if (error) throw new Error(textoMiembros(error.message)); };
 const socioFrom = (s: Record<string, unknown>): Socio => ({
+  carnetFisico:s['carnet_fisico']==='entregado'?'entregado':'pendiente',fechaEntrega:s['fecha_entrega']?String(s['fecha_entrega']):null,esPrueba:s['es_prueba']===true,
   email:String(s['email']??''),id: String(s['id']), nombre: String(s['nombre']), telefono: String(s['telefono'] ?? ''), numeroSocio: Number(s['numero_socio']),
   temporada: String(s['temporada'] ?? '2026/27'), fechaAlta: String(s['fecha_alta'] ?? ''),
   consentimientoRGPD: { aceptado: !!s['consentimiento_at'], fecha: s['consentimiento_at'] ? String(s['consentimiento_at']) : null },
@@ -136,6 +141,8 @@ async function allRows<T>(query: (start: number, end: number) => PromiseLike<{ d
   for (let start = 0; ; start += 500) { const result = await query(start, start + 499); check(result.error); rows.push(...(result.data ?? [])); if ((result.data?.length ?? 0) < 500) return rows; }
 }
 export const dataService = {
+  configPago:()=>getMembershipConfig(),
+  async entregarCarnet(id:string,entregado:boolean){const r=await supabase.rpc('entregar_carnet_fisico',{p_socio:id,p_entregado:entregado});check(r.error);await this.refresh();},
   subscribe(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn); }; },
   snapshot: () => version,
   get: () => db,
@@ -160,14 +167,14 @@ export const dataService = {
       whatsapp_club:r.data?.whatsapp_club??defaultSettings.whatsapp_club,
       nombre_club:r.data?.nombre_club??defaultSettings.nombre_club,
       temporada_actual:r.data?.temporada_actual??defaultSettings.temporada_actual,
-      email_club:'',
+      email_club:'',email_avisos:'',
       url_twitch:r.data?.url_twitch??defaultSettings.url_twitch,
       cuota_socio:r.data?.cuota_socio==null?null:Number(r.data.cuota_socio),
       url_clasificacion_futgal:r.data?.url_clasificacion_futgal??defaultSettings.url_clasificacion_futgal,
     };
     if(this.esSuper()){
-      const privateSettings=await supabase.from("ajustes_club").select("email_club").maybeSingle();
-      check(privateSettings.error);settings.email_club=privateSettings.data?.email_club??'';
+      const privateSettings=await supabase.from("ajustes_club").select("email_club,email_avisos").maybeSingle();
+      check(privateSettings.error);settings.email_club=privateSettings.data?.email_club??'';settings.email_avisos=privateSettings.data?.email_avisos??'';
     }
     notify();
   },

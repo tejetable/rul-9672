@@ -604,3 +604,9 @@ body:has(.member-navigation) { --bottom-navigation:76px; }
 .result-dots { display:flex; justify-content:center; gap:6px; margin-top:8px; }
 .result-dots span { width:6px; height:6px; border-radius:999px; background:color-mix(in srgb, var(--primary) 20%, transparent); }
 .result-dots span.is-active { background:var(--primary); }
+
+/* Payment test warnings are an explicit operational exception to result-only amber. */
+:root { --payment-test:var(--result-draw); }
+.payment-test-banner { position:fixed; top:0; left:50%; transform:translateX(-50%); z-index:55; width:min(100%,430px); min-height:32px; padding:calc(6px + env(safe-area-inset-top)) 12px 6px; background:var(--payment-test); color:var(--primary); font:700 12px var(--font-lato); text-align:center; }
+.payment-test-content { padding-top:calc(32px + env(safe-area-inset-top)); }
+.payment-test-content .club-header { top:calc(32px + env(safe-area-inset-top)); }

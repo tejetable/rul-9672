@@ -3,13 +3,14 @@ import {GoogleAcceso} from '@/components/GoogleAcceso';
 import {ClubAdmin,ClubAdminMenu} from "@/components/ClubAdmin";
 import {DEMO_MODE} from "@/lib/club-settings";
 import {EmailAcceso} from "@/components/EmailAcceso";
-import {UNETE_DESTINO,UNETE_MENSAJE} from '@/lib/socios-management';
+import {UNETE_DESTINO} from '@/lib/socios-management';
 import {VerComo} from "@/components/VerComo";
 import {AccesoVisual} from "@/components/AccesoVisual";
 import {EleccionRol} from "@/components/EleccionRol";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { Button } from "@/components/ui/button";
-import { createFileRoute } from "@tanstack/react-router";
+import {z} from "zod";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
 import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
@@ -24,6 +25,7 @@ import { dataService, useClubData, runAction } from "@/lib/dataService";
 
 
 export const Route = createFileRoute("/")({
+  validateSearch:(value:Record<string,unknown>)=>z.object({socio:z.string().uuid().optional().catch(undefined)}).parse(value),
   head: () => ({
     meta: [
       { title: "R.U. Lucense · Carnet de la afición" },
@@ -67,7 +69,7 @@ export function AppFrame({ children, crema = false }: { children: React.ReactNod
   );
 }
 
-function UneteFamilia(){const href=UNETE_DESTINO==='whatsapp'?dataService.whatsapp(UNETE_MENSAJE):null;return <div className="text-center text-body-sm">¿Aún no eres soci@? <Button asChild variant="link" className="h-auto p-0 text-body-sm underline"><a href={href??undefined} aria-disabled={!href} onClick={e=>{if(!href){e.preventDefault();runAction(async()=>{throw new Error('El WhatsApp del club está pendiente de configurar.');});}}} target="_blank" rel="noreferrer">¡Únete a la familia!</a></Button></div>;}
+function UneteFamilia(){return <div className="text-center text-body-sm">¿Aún no eres soci@? <Button asChild variant="link" className="h-auto p-0 text-body-sm underline"><Link to={UNETE_DESTINO}>¡Únete a la familia!</Link></Button></div>;}
 function Bienvenida({onEnter}:{onEnter:()=>void}) {
  return <AccesoVisual><GoogleAcceso/><Button variant="outline" onClick={onEnter} className="access-button access-button-secondary">ENTRAR CON EMAIL</Button><UneteFamilia/><p className="access-season">Temporada {dataService.ajustes().temporada_actual}</p></AccesoVisual>;
 }

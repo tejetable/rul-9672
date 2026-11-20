@@ -10,15 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BienvenidaRouteImport } from './routes/bienvenida'
 import { Route as CreatePasswordRouteImport } from './routes/create-password'
 import { Route as GaleriaRouteImport } from './routes/galeria'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as UneteRouteImport } from './routes/unete'
 import { Route as GaleriaFolderIdRouteImport } from './routes/galeria_.$folderId'
+import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BienvenidaRoute = BienvenidaRouteImport.update({
+  id: '/bienvenida',
+  path: '/bienvenida',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreatePasswordRoute = CreatePasswordRouteImport.update({
@@ -41,71 +49,102 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UneteRoute = UneteRouteImport.update({
+  id: '/unete',
+  path: '/unete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GaleriaFolderIdRoute = GaleriaFolderIdRouteImport.update({
   id: '/galeria_/$folderId',
   path: '/galeria/$folderId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bienvenida': typeof BienvenidaRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unete': typeof UneteRoute
   '/galeria/$folderId': typeof GaleriaFolderIdRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bienvenida': typeof BienvenidaRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unete': typeof UneteRoute
   '/galeria/$folderId': typeof GaleriaFolderIdRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bienvenida': typeof BienvenidaRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/unete': typeof UneteRoute
   '/galeria_/$folderId': typeof GaleriaFolderIdRoute
+  '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/bienvenida'
     | '/create-password'
     | '/galeria'
     | '/privacidad'
     | '/reset-password'
+    | '/unete'
     | '/galeria/$folderId'
+    | '/api/public/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/bienvenida'
     | '/create-password'
     | '/galeria'
     | '/privacidad'
     | '/reset-password'
+    | '/unete'
     | '/galeria/$folderId'
+    | '/api/public/stripe-webhook'
   id:
     | '__root__'
     | '/'
+    | '/bienvenida'
     | '/create-password'
     | '/galeria'
     | '/privacidad'
     | '/reset-password'
+    | '/unete'
     | '/galeria_/$folderId'
+    | '/api/public/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BienvenidaRoute: typeof BienvenidaRoute
   CreatePasswordRoute: typeof CreatePasswordRoute
   GaleriaRoute: typeof GaleriaRoute
   PrivacidadRoute: typeof PrivacidadRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  UneteRoute: typeof UneteRoute
   GaleriaFolderIdRoute: typeof GaleriaFolderIdRoute
+  ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -115,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bienvenida': {
+      id: '/bienvenida'
+      path: '/bienvenida'
+      fullPath: '/bienvenida'
+      preLoaderRoute: typeof BienvenidaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/create-password': {
@@ -145,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/unete': {
+      id: '/unete'
+      path: '/unete'
+      fullPath: '/unete'
+      preLoaderRoute: typeof UneteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/galeria_/$folderId': {
       id: '/galeria_/$folderId'
       path: '/galeria/$folderId'
@@ -152,16 +205,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GaleriaFolderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/stripe-webhook': {
+      id: '/api/public/stripe-webhook'
+      path: '/api/public/stripe-webhook'
+      fullPath: '/api/public/stripe-webhook'
+      preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BienvenidaRoute: BienvenidaRoute,
   CreatePasswordRoute: CreatePasswordRoute,
   GaleriaRoute: GaleriaRoute,
   PrivacidadRoute: PrivacidadRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  UneteRoute: UneteRoute,
   GaleriaFolderIdRoute: GaleriaFolderIdRoute,
+  ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
