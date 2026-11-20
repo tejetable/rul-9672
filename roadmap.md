@@ -49,7 +49,7 @@
 - [x] Sustituir solicitudes por altas manuales con pago obligatorio y preparar creación desde pago verificado; solicitudes vaciadas y retiradas de uso.
 - [x] Listas paginadas, fichas de socios, pagos y cuota editable; probar 60 registros sin introducir personas ficticias en Cloud.
 - [x] Equipo directivo compacto, búsqueda de personas y roles protegidos; verificar alta con pago y chip Directiva con Super admin y rechazos sin autorización.
-- [ ] Configurar cuota real del club (falta importe).
+- [ ] Configurar cuota real del club: 15,00 € para 2026/27 (importe confirmado; pendiente aplicar con el alta Stripe).
 - [x] Limpiar socios de prueba, conservar Diego nº 11 y permitir numeración manual única desde el primer hueco.
 - [x] Cargar ocho jornadas reales, automatizar jugado y verificar LIGA y último resultado.
 - [x] Compactar filtros en una fila desplazable.
@@ -76,3 +76,9 @@
 - [x] Corregir alturas dinámicas, zonas seguras, hojas con cabecera fija, teclado, avisos y toasts.
 - [x] Verificar partido normal/directo, canal vacío, edición de Twitch, campana con diez avisos, campo enfocado y botones flotantes en 360/390/430 y escritorio con Chromium.
 - [ ] Verificar Safari iPhone y Chrome Android con barra real y teclado (requiere dispositivos físicos; tamaños variables y campos enfocados comprobados en Chromium).
+- [ ] Habilitar Stripe en pruebas (pendiente confirmar Stripe integrado o cuenta propia con claves).
+- [ ] Alta pública con Checkout: importe del servidor, duplicados bloqueados, webhook firmado e idempotente, reembolsos y errores registrados (depende de habilitar Stripe).
+- [ ] Bienvenida tras pago con carnet y acceso Google/contraseña de un solo uso durante siete días (depende de Checkout verificado).
+- [ ] Conectar Resend y avisos al club con registro de envíos (falta conexión; onboarding solo entrega al titular de Resend).
+- [ ] Estado de carnet físico, filtro pendiente y gestión protegida de soci@s de prueba.
+- [ ] Verificar pago de prueba → alta → acceso → carnet, correo, duplicados y cancelación (depende de pagos y correo conectados).
