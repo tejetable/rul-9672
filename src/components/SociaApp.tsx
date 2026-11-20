@@ -11,6 +11,7 @@ import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
 import { dataService, type DB, type Patrocinador, type Socio, useClubData, runAction } from "@/lib/dataService";
+import { claseVista, useVista } from "@/lib/vista";
 
 type Tab = "equipo" | "ventajas";
 
@@ -28,6 +29,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
   const [tab, setTab] = useState<Tab>("equipo");
   const db = useClubData();
   const [carnet, setCarnet] = useState(false);
+  const vista = useVista();
   useEffect(() => { runAction(() => dataService.marcarApertura(socio.id)); }, []);
   useEffect(() => { window.scrollTo(0, 0); }, [tab]);
   if (!db) return null;
@@ -35,7 +37,7 @@ export function SociaApp({ socio }: { socio: Socio }) {
   const indicador = (on: boolean) => on && <span className="member-tab-bar" aria-hidden="true" />;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className={`${claseVista(vista)} flex flex-1 flex-col`}>
       <SociaCabecera />
       <div className="flex-1 pb-24">
         {tab === "equipo" && <Equipo db={db} />}
@@ -69,11 +71,12 @@ function CarnetSheet({ socio, onClose, onDondeUsar }: { socio: Socio; onClose: (
   const [dy, setDy] = useState(0);
   const [y0, setY0] = useState<number | null>(null);
   const [alCorriente, setAlCorriente] = useState<boolean | null>(null);
+  const vista = useVista();
   useEffect(() => { let vivo = true; dataService.pagoTemporada(socio.id, socio.temporada).then((v) => { if (vivo) setAlCorriente(v); }).catch(() => {}); return () => { vivo = false; }; }, [socio.id, socio.temporada]);
   return (
     <Dialog.Root open onOpenChange={(open) => { if (!open) onClose(); }}><Dialog.Portal>
     <Dialog.Overlay className="fixed inset-0 z-50 bg-primary/60" />
-    <Dialog.Content aria-describedby={undefined} className="animate-sheet carnet-overlay fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8"
+    <Dialog.Content aria-describedby={undefined} className={`${claseVista(vista)} animate-sheet carnet-overlay fixed inset-0 z-50 mx-auto flex w-full max-w-[430px] flex-col overflow-y-auto bg-background px-4 pb-8`}
       style={{ transform: dy ? `translateY(${dy}px)` : undefined, transition: y0 === null ? "transform .2s" : "none" }}
       onTouchStart={(e) => setY0((e.touches[0]?.clientY ?? 0))}
       onTouchMove={(e) => y0 !== null && setDy(Math.max(0, (e.touches[0]?.clientY ?? 0) - y0))}

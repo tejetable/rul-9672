@@ -3,15 +3,16 @@ import { QRCodeSVG } from "qrcode.react";
 import frente from "@/assets/carne-fisico-frente.jpg.asset.json";
 import dorso from "@/assets/carne-fisico-reverso.jpg.asset.json";
 import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
+import { BotonDos, iconosCarnet } from "@/components/SwitchVista";
 
 export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDondeUsar }: { nombre: string; numero: number; temporada?: string; alCorriente?: boolean | null; onDondeUsar?: () => void }) {
   const [reverso, setReverso] = useState(false);
   return (
     <div className="mx-auto w-full max-w-[390px]">
       <div className="flex flex-col items-center text-center">
-        <div className="qr-blanco self-center w-full max-w-[280px] rounded-tile p-4">
+        <div className="carnet-qr self-center w-full max-w-[280px]"><div className="qr-blanco rounded-tile p-4">
           <QRCodeSVG value={`RUL:${numero}`} size={240} marginSize={2} bgColor="#FFFFFF" fgColor="#0D4631" className="aspect-square h-auto w-full" aria-label={`Identificación de socio o socia ${numero}`} />
-        </div>
+        </div></div>
         <p className="card-member-name mt-4">{nombre}</p>
         <p className="card-number" aria-label={`Número de socio o socia ${numero}`}><span className="card-number-pre">Nº</span>{String(numero).padStart(4, "0")}</p>
         <p aria-label={`Socio o socia de la temporada ${temporada}`} className="mt-2 text-body-sm text-muted-foreground">Soci@ de la temporada {temporada}</p>
@@ -25,11 +26,7 @@ export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDo
           {reverso && <a href={folleto.url} target="_blank" rel="noreferrer" className="physical-card-benefits-qr rounded-md focus-visible:outline-2 focus-visible:outline-ring" aria-label="Abrir el folleto de ventajas"><QRCodeSVG value={folleto.url} size={160} className="card-qr-code h-full w-full" /></a>}
         </article>
         <div className="mt-3 flex justify-center">
-          <div className="seg-toggle" role="radiogroup" aria-label="Cara del carnet físico" data-state={reverso ? "b" : "a"}>
-            <span className="seg-thumb" aria-hidden="true" />
-            <button type="button" role="radio" aria-checked={!reverso} onClick={() => setReverso(false)}>Frente</button>
-            <button type="button" role="radio" aria-checked={reverso} onClick={() => setReverso(true)}>Reverso</button>
-          </div>
+          <BotonDos on={reverso} onChange={setReverso} label="Ver el reverso del carnet físico" offLabel="Frente" onLabel="Reverso" offIcon={iconosCarnet.off} onIcon={iconosCarnet.on} />
         </div>
       </div>
     </div>

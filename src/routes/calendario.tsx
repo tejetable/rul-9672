@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarioCard, CasaFiltro, MarcadorPaletas } from "@/components/PartidoTarjetas";
 import { useClubData } from "@/lib/dataService";
 import { proximoPartido } from "@/lib/partidos";
+import { claseVista, useVista } from "@/lib/vista";
 
 export const Route = createFileRoute("/calendario")({
   head: () => ({ meta: [
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/calendario")({
 });
 
 function Calendario() {
+  const vista = useVista();
   const db = useClubData();
   const [casa, setCasa] = useState(false);
   const [elegido, setElegido] = useState<{ id: string; n: number } | null>(null);
@@ -28,7 +30,7 @@ function Calendario() {
   const proximo = proximoPartido(db.partidos, ahora);
   
   const vueltas: [string, typeof partidos][] = [["Primera vuelta", partidos.filter((p) => (p.jornada ?? 0) <= 15)], ["Segunda vuelta", partidos.filter((p) => (p.jornada ?? 0) > 15)]];
-  return <div className="min-h-dvh bg-primary"><main className="mx-auto min-h-dvh max-w-[430px] bg-background pb-8">
+  return <div className="min-h-dvh bg-primary"><main className={`${claseVista(vista)} mx-auto min-h-dvh max-w-[430px] bg-background pb-8`}>
     <header className="club-header"><Button asChild variant="ghost" size="icon"><Link to="/" aria-label="Volver a El Equipo"><ArrowLeft /></Link></Button><h1 className="club-section-title mb-0 flex-1">Calendario</h1><CasaFiltro casa={casa} onChange={setCasa} /></header>
     <div className="px-4">
       {!db.partidos.length && <p className="py-8 text-muted-foreground">Cargando partidos…</p>}

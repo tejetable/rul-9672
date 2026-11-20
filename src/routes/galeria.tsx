@@ -7,6 +7,7 @@ import { GaleriaFoto } from "@/components/GaleriaFoto";
 import { GaleriaVisor } from "@/components/GaleriaVisor";
 import { dataService } from "@/lib/dataService";
 import type { AlbumGaleria } from "@/lib/galeria";
+import { claseVista, useVista } from "@/lib/vista";
 
 export const Route = createFileRoute("/galeria")({
   validateSearch: (search: Record<string, unknown>) => ({ partido: typeof search["partido"] === "string" ? search["partido"] : "todos" }),
@@ -22,9 +23,10 @@ export const Route = createFileRoute("/galeria")({
 });
 
 function GaleriaCompleta() {
+  const vista = useVista();
   const {data,isPending}=useDriveGallery();
   const albumes=data?.albumes??[];
-  return <div className="min-h-dvh bg-primary"><main className="mx-auto min-h-dvh max-w-[430px] bg-background pb-8">
+  return <div className="min-h-dvh bg-primary"><main className={`${claseVista(vista)} mx-auto min-h-dvh max-w-[430px] bg-background pb-8`}>
     <header className="club-header"><Button asChild variant="ghost" size="icon"><Link to="/" aria-label="Volver a El Equipo"><ArrowLeft/></Link></Button><h1 className="club-section-title">Fotos</h1></header>
     <section className="space-y-3 px-4 py-6">
       {isPending && <div className="gallery-image is-loading aspect-[16/10]"/>}
