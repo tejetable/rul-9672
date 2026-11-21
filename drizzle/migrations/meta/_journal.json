@@ -260,6 +260,13 @@
       "when": 1795267080253,
       "tag": "0036_pieza_resultado",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795267247608,
+      "tag": "0037_convocatorias",
+      "breakpoints": true
     }
   ]
 }

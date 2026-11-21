@@ -155,6 +155,38 @@ export type Database = {
         }
         Relationships: []
       }
+      convocatorias: {
+        Row: {
+          imagen_url: string | null
+          jugadores: string[]
+          partido_id: string
+          publicada: boolean
+          updated_at: string
+        }
+        Insert: {
+          imagen_url?: string | null
+          jugadores?: string[]
+          partido_id: string
+          publicada?: boolean
+          updated_at?: string
+        }
+        Update: {
+          imagen_url?: string | null
+          jugadores?: string[]
+          partido_id?: string
+          publicada?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convocatorias_partido_id_fkey"
+            columns: ["partido_id"]
+            isOneToOne: true
+            referencedRelation: "partidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emails_log: {
         Row: {
           asunto: string
