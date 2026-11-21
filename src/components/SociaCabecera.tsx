@@ -3,7 +3,7 @@ import {VerComoItems} from "@/components/VerComo";
 import { Instagram, LogOut, MessageCircle, MoreHorizontal, Twitch } from "lucide-react";
 import { BotonDos, iconosVista } from "@/components/SwitchVista";
 import { guardarVista, useVista } from "@/lib/vista";
-import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
+import { escudo } from "@/assets/recursos";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";

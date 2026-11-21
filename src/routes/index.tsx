@@ -13,8 +13,8 @@ import {z} from "zod";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MessageCircle, Smartphone } from "lucide-react";
-import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
-import escudoTransparente from "@/assets/escudo-rul-transparente.png.asset.json";
+import { escudo } from "@/assets/recursos";
+import { escudo as escudoTransparente } from "@/assets/recursos";
 
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";

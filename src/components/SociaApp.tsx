@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronDown, ChevronLeft, ChevronRight, FileText, Gift, IdCard } from "lucide-react";
-import frente from "@/assets/carne-fisico-frente.jpg.asset.json";
-import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
+import { carnetFrente as frente } from "@/assets/recursos";
+import { escudo } from "@/assets/recursos";
 import { fechaPartidoTexto, proximoPartido } from "@/lib/partidos";
 import { Liga } from "@/components/PartidoTarjetas";
 import { Galeria } from "@/components/Galeria";
 import { SociaCabecera } from "@/components/SociaCabecera";
-import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
+import { ventajasPdf as folleto } from "@/assets/recursos";
 import { Carne } from "@/components/Carne";
 import { Button } from "@/components/ui/button";
 import { dataService, type DB, type Patrocinador, type Socio, useClubData, runAction } from "@/lib/dataService";
