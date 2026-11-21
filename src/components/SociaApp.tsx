@@ -133,6 +133,7 @@ function Ventajas({ db, onCarnet }: { db: DB; onCarnet: () => void }) {
         <div className="surface-card benefit-detail divide-y divide-[var(--divider)]">
           {vs.map((v) => (
             <div key={v.id} className="py-3 first:pt-0">
+              {v.destacado && <p className="benefit-deal">{v.destacado}</p>}
               <p className="text-item font-bold">{v.titulo}</p>
               <p className="mt-1">{v.descripcion}</p>
               {v.tarifas && (

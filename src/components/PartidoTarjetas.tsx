@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Twitch, MapPin, Navigation } from "lucide-react";
 import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
 import { BotonDos, iconosCasa } from "@/components/SwitchVista";
+import { fechaHumana } from "@/lib/fechas";
 import { Button } from "@/components/ui/button";
 import type { Partido } from "@/lib/dataService";
 import { fechaPartidoTexto, golesLiga, proximosCalendario, textoDiferencia, rachaCronologica, directoPartido,minutosHastaPartido, cuentaPartido, inicioPartido, proximoPartido, partidoEnCurso, resultadoPartido } from "@/lib/partidos";
@@ -130,8 +131,7 @@ function SiguienteTalon({partido,ahora}:{partido:Partido;ahora:Date|null}){
   const live=!!ahora&&directoPartido(partido,ahora);
   const sinHora=partido.horaConfirmada===false||partido.fechaConfirmada===false;
   const hora=sinHora?null:inicio?.toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'});
-  const dia=inicio?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';
-  const fecha=partido.fechaConfirmada===false?fechaPartidoTexto(partido):dia.charAt(0).toUpperCase()+dia.slice(1);
+  const fecha=partido.fechaConfirmada===false?fechaPartidoTexto(partido):inicio?fechaHumana(inicio):'';
   const twitch=dataService.ajustes().url_twitch;
   const lugar=partido.lugar.trim();
   const min=inicio&&ahora?minutosHastaPartido(inicio,ahora):0;
@@ -211,7 +211,7 @@ function NavFlechas({nav,etiqueta}:{nav:Nav;etiqueta:string}){
     </div>
   </div>;
 }
-function fechaCorta(p:Partido){const d=inicioPartido(p)?.toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',weekday:'short',day:'numeric',month:'short'}).replace(/[.,]/g,'')??'';return d.charAt(0).toUpperCase()+d.slice(1);}
+function fechaCorta(p:Partido){const d=inicioPartido(p);return d?fechaHumana(d):'';}
 function equipos(p:Partido){
   const local=p.esLocal?'R.U. Lucense':nombreCorto(p.rival),visit=p.esLocal?nombreCorto(p.rival):'R.U. Lucense';
   const gl=p.golesLocal??0,gv=p.golesVisitante??0;
@@ -296,7 +296,7 @@ export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:
   const pool=[...new Set(['R.U. Lucense',...partidos.map(p=>nombreCorto(p.rival))])];
   const num=(hasta:number)=>(desde:string|number)=>pasosNumero(Number(desde),hasta);
   const nom=(hasta:string)=>(desde:string|number)=>pasosNombre(hasta,pool,String(desde));
-  return <section className="flap-board surface-card" aria-label="Resultados" {...nav.swipe}>
+  return <section id="marcador-paletas" className="flap-board surface-card" aria-label="Resultados" {...nav.swipe}>
     <NavFlechas nav={nav} etiqueta="Último resultado"/>
     <div className="flap" role="img" aria-label={`Jornada ${partido.jornada}: ${local} ${gl}, ${visit} ${gv}`}>
       <div className={`flap-row ${pierdeLocal?'is-loser':''}`} aria-hidden="true"><Paleta valor={local} pasos={nom(local)} clase="is-name"/><Paleta valor={gl} pasos={num(gl)} clase="is-num" retraso={60}/></div>
@@ -332,11 +332,11 @@ function ProximosEnCard({partidos,siguienteId,ahora}:{partidos:Partido[];siguien
 }
 
 /** Un partido del calendario completo, en su propia tarjeta. Los jugados enseñan el resultado. */
-export function CalendarioCard({partido,destacado=false,onVer}:{partido:Partido;destacado?:boolean;onVer?:(id:string)=>void}){
+export function CalendarioCard({partido,destacado=false,onVer,seleccionado=false}:{partido:Partido;destacado?:boolean;onVer?:(id:string)=>void;seleccionado?:boolean}){
   const r=resultadoPartido(partido);
   const favor=partido.esLocal?partido.golesLocal:partido.golesVisitante,contra=partido.esLocal?partido.golesVisitante:partido.golesLocal;
   const ver=r&&onVer?()=>onVer(partido.id):undefined;
-  return <li id={`jornada-${partido.jornada}`} className={`cal-card ${destacado?'is-next':''} ${r?'is-played':''} ${ver?'is-tappable':''}`} aria-current={destacado?'true':undefined} onClick={ver} onKeyDown={ver?(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();ver();}}:undefined} tabIndex={ver?0:undefined} role={ver?'button':undefined} aria-label={ver?`Ver en el marcador la jornada ${partido.jornada}`:undefined}>
+  return <li id={`jornada-${partido.jornada}`} className={`cal-card ${destacado?'is-next':''} ${r?'is-played':''} ${ver?'is-tappable':''} ${seleccionado?'is-selected':''}`} aria-pressed={ver?seleccionado:undefined} aria-current={destacado?'true':undefined} onClick={ver} onKeyDown={ver?(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();ver();}}:undefined} tabIndex={ver?0:undefined} role={ver?'button':undefined} aria-label={ver?`Ver en el marcador la jornada ${partido.jornada}`:undefined}>
     <span className="cal-j"><span>J</span>{partido.jornada}</span>
     <span className="min-w-0 flex-1">
       {destacado&&<span className="cal-next-tag">Próximo partido</span>}

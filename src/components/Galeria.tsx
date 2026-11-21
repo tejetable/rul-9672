@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { GaleriaFoto } from "@/components/GaleriaFoto";
 import { useDriveGallery } from '@/hooks/use-drive-gallery';
 import {randomHighlights,type HighlightPhoto} from '@/lib/drive-gallery';
+import { fechaHumana } from '@/lib/fechas';
 
 async function preloadPhotos(photos:HighlightPhoto[]):Promise<HighlightPhoto[]> {
   const loaded=await Promise.all(photos.map(async item=>{
@@ -47,7 +48,7 @@ export function Galeria() {
     }finally{lock.current=false;if(alive.current)setBusy(false);}
   };
   const recienteAlbum=[...albumes].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
-  const ultimo=recienteAlbum?[recienteAlbum.titulo,recienteAlbum.resultado,recienteAlbum.fecha?new Date(`${recienteAlbum.fecha}T12:00:00`).toLocaleDateString('es-ES',{day:'numeric',month:'short'}).replace('.',''):''].filter(Boolean).join(' · '):'';
+  const ultimo=recienteAlbum?[recienteAlbum.titulo,recienteAlbum.resultado,recienteAlbum.fecha?fechaHumana(recienteAlbum.fecha):''].filter(Boolean).join(' · '):'';
   const mosaic=(selection:HighlightPhoto[],outgoing=false)=><div className={`gallery-mosaic gallery-highlight-layer ${outgoing?'is-outgoing':''}`}>{selection.map(({foto,albumId},index)=>{
     const album=albumes.find(a=>a.id===albumId);if(!album)return null;
     return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded/></Link></Button>;

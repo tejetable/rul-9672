@@ -1,3 +1,4 @@
+import { fechaHumana } from './fechas';
 import type { AlbumGaleria, FotoGaleria } from './galeria';
 import type { Partido } from './dataService';
 export interface DriveFile { id:string;name:string;createdTime:string;mimeType?:string;imageMediaMetadata?:{time?:string;width?:number;height?:number} }
@@ -24,7 +25,8 @@ export function buildAlbum(folder:DriveFile,files:DriveFile[],partidos:Partido[]
   const rival=folder.name.replace(/^vs\.?\s*/i,'').trim();
   const date=albumDate(folder,files); const partido=linkMatch(folder.id,rival,date,partidos);
   const resultado=partido?.jugado && partido.golesLocal!==null && partido.golesVisitante!==null ? `${partido.esLocal?partido.golesLocal:partido.golesVisitante}-${partido.esLocal?partido.golesVisitante:partido.golesLocal}` : undefined;
-  const fecha=date.slice(0,10);const day=new Date(date).toLocaleDateString('es-ES',{timeZone:'Europe/Madrid',day:'2-digit',month:'short'}).replaceAll('.','').toUpperCase();
+  // Si el álbum está enlazado a un partido, manda la fecha del partido (las fotos de un partido de noche pueden ser del día siguiente).
+  const base=partido?.fechaHora||date;const fecha=new Date(base).toLocaleDateString('en-CA',{timeZone:'Europe/Madrid'});const day=fechaHumana(base);
   return {id:folder.id,rival,titulo:`vs. ${rival}`,fecha,detalle:[resultado,day].filter(Boolean).join(' · '),...(partido?{partidoId:partido.id}:{}),...(resultado?{resultado}:{}),fotos:files.filter(f=>f.mimeType?.startsWith('image/')||f.mimeType?.startsWith('video/')).sort((a,b)=>captureDate(a).localeCompare(captureDate(b))).map(f=>({id:f.id,src:`https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w1600`,thumb:`https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w600`,pos:'50% 50%',...(f.mimeType?.startsWith('video/')?{video:true}: {})}))};
 }
 export interface HighlightPhoto {albumId:string;foto:FotoGaleria}

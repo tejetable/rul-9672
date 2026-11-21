@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { QrScanner } from "@/components/QrScanner";
 import { dataService, type Patrocinador, type Socio, type Visita, useClubData, runAction } from "@/lib/dataService";
-import { fraseMes } from "@/lib/visitas";
+import { categoriasVisitas, fraseMes } from "@/lib/visitas";
 import { adaptarStats, emptyStats, type ClubStats } from "@/lib/club-stats";
 import { waLink } from "@/lib/whatsapp";
 
@@ -40,6 +40,13 @@ export function NegocioApp({onExit}:{onExit?:()=>void}={}) {
       <div className="business-contact mx-4 mt-8"><ContactarClub texto={`Hola, os escribo desde ${neg.nombre} (negocio amigo del club).`} /></div>
     </div>
   );
+}
+
+/** En el mostrador basta el nombre y la inicial del apellido para comprobar quién es. */
+export function nombreDiscreto(nombre: string) {
+  const partes = nombre.trim().split(/\s+/).filter(Boolean);
+  if (partes.length < 2) return nombre.trim();
+  return `${partes[0]} ${partes[1]!.charAt(0).toUpperCase()}.`;
 }
 
 function Registrar({ neg }: { neg: Patrocinador }) {
@@ -117,7 +124,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
           <QrCode size={28} strokeWidth={1.75} /> Escanear carnet
         </Button>
         <label htmlFor="num-socio" className="visit-or">o escribe el nº de soci@</label>
-        <input id="num-socio" aria-label="Número de socio o socia" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="Nº" className="visit-number club-input" />
+        <input id="num-socio" aria-label="Número de socio o socia" value={num} onChange={(e) => runAction(() => buscar(e.target.value.replace(/\D/g, "")))} inputMode="numeric" placeholder="Ej.: 11" className="visit-number club-input" />
         {num && !socio && !buscando && <p className="mt-3 text-body-sm font-bold">Ese número no está en el club. Revísalo.</p>}
         {aviso && <p className="mt-3 rounded-control border border-accent p-3 font-bold">{aviso}</p>}
         {sinCarnet ? (
@@ -133,7 +140,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
           {socio && !sinCarnet && (
             <p className="mt-3 flex flex-wrap items-center gap-2 text-item font-black">
               <span className="flex size-7 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check size={16} strokeWidth={3} /></span>
-              {socio.nombre} <span className="font-bold text-muted-foreground">· nº {socio.numeroSocio}</span>
+              {nombreDiscreto(socio.nombre)} <span className="font-bold text-muted-foreground">· nº {socio.numeroSocio}</span>
               {repite && <span className="visit-repeat">Repite por el club</span>}
             </p>
           )}
@@ -152,8 +159,8 @@ function Registrar({ neg }: { neg: Patrocinador }) {
               <>
                 <p className="mb-2 text-body-sm font-bold">¿Es la primera vez que viene?</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} bg-primary text-primary-foreground`}>Primera vez</Button>
-                  <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} visit-secondary`}>Ya venía</Button>
+                  <Button variant="ghost" onClick={() => runAction(() => guardar("nueva"))} disabled={!listo} className={`${big} visit-choice`}>Primera vez</Button>
+                  <Button variant="ghost" onClick={() => runAction(() => guardar("ya_era_clienta"))} disabled={!listo} className={`${big} visit-choice`}>Ya venía</Button>
                 </div>
               </>
             )}
@@ -165,7 +172,7 @@ function Registrar({ neg }: { neg: Patrocinador }) {
       {hoy.length === 0 ? (
         <p className="surface-card px-4 py-5 text-body-sm text-muted-foreground">Todavía ninguna visita hoy. Escanea el carnet de la primera.</p>
       ) : (
-        <ListCard label="Últimas visitas de hoy">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):'Sin carnet')} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTE'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
+        <ListCard label="Últimas visitas de hoy">{hoy.map(v=>{const s=v.socioId?db.socios.find(x=>x.id===v.socioId):null;return <ListRow key={v.id} leading={v.numeroSocio??'—'} name={nombreDiscreto(s?.nombre||(v.socioId?dataService.nombreVisita(v.socioId):''))||'Sin carnet'} chip={v.repiteViaClub?'REPITE':v.tipoCliente==='nueva'?'NUEVA':'YA CLIENTE'} subtitle={v.anulada?'Anulada':v.verificada?'Verificada · con carnet':'Declarada · sin carnet'} date={new Date(v.fechaHora).toLocaleTimeString('es-ES',{timeZone:'Europe/Madrid',hour:'2-digit',minute:'2-digit'})} dateTime={v.fechaHora} status={v.anulada?'off':v.verificada?'active':'pending'} statusLabel={v.anulada?'Anulada':v.verificada?'Verificada':'Declarada'}/>;})}</ListCard>
       )}
     </section>
   );
@@ -182,7 +189,8 @@ function TuMes({ neg }: { neg: Patrocinador }) {
   const sem = stats.serie;
   const max = Math.max(1, ...sem.map((w) => w.total));
   const frase = fraseMes(s, rango);
-  const share = `${frase}\n\nVisitas por el club: ${s.visitas} · Personas nuevas: ${s.nuevas} · Repiten: ${s.repiten}\n— Real Unión Lucense F.S.`;
+  const cat = categoriasVisitas(s);
+  const share = `${frase}\n\nNuevas con carnet: ${cat.nuevas} · Ya clientes con carnet: ${cat.yaClientes} · Sin carnet: ${cat.sinCarnet}\n— Real Unión Lucense F.S.`;
 
   return (
     <section className="px-4 pt-6">
@@ -194,19 +202,20 @@ function TuMes({ neg }: { neg: Patrocinador }) {
 
       <div className="month-hero mt-4">
         <p className="month-hero-label">El club te ha traído</p>
-        <p className="month-hero-num">{s.nuevas}</p>
-        <p className="month-hero-unit">{s.nuevas === 1 ? "persona nueva" : "personas nuevas"}</p>
+        <p className="month-hero-num">{cat.nuevas}</p>
+        <p className="month-hero-unit">{cat.nuevas === 1 ? "persona nueva con carnet" : "personas nuevas con carnet"}</p>
         <div className="month-progress">
-          <div className="flex justify-between text-body-sm"><span>Objetivo: 5 en 90 días</span><span className="font-black">{prog.nuevas} de {prog.objetivo}</span></div>
+          <div className="flex justify-between text-body-sm"><span>Objetivo · últimos 90 días</span><span className="font-black">{prog.nuevas} de {prog.objetivo}</span></div>
           <div className="month-bar"><div style={{ width: `${prog.pct}%` }} /></div>
         </div>
       </div>
 
-      <div className="surface-card month-stats mt-3">
-        {[["Visitas", s.visitas], ["Repiten", s.repiten], ["Nuevas", `${s.pctNuevas}%`]].map(([l, n]) => (
-          <div key={l}><p className="month-stat-num">{n}</p><p className="month-stat-label">{l}</p></div>
+      <div className="surface-card month-stats mt-3" aria-label={`${cat.total} visitas en total`}>
+        {([["Nuevas", "con carnet", cat.nuevas], ["Ya clientes", "con carnet", cat.yaClientes], ["Sin carnet", "declaradas", cat.sinCarnet]] as const).map(([l, sub, n]) => (
+          <div key={l}><p className="month-stat-num">{n}</p><p className="month-stat-label">{l}</p><p className="month-stat-sub">{sub}</p></div>
         ))}
       </div>
+      <p className="month-total">{cat.total} {cat.total === 1 ? "visita" : "visitas"} en total</p>
 
       <div className="surface-card month-chart mt-3">
         <p className="club-section-title mb-0">{rango === "temporada" ? "Visitas por mes" : "Visitas por semana"}</p>
@@ -216,6 +225,7 @@ function TuMes({ neg }: { neg: Patrocinador }) {
               <div className="month-bar-v" style={{ height: `${(w.total / max) * 100}%`, minHeight: w.total ? 4 : 0 }}>
                 <div style={{ height: `${w.total ? (w.nuevas / w.total) * 100 : 0}%` }} />
               </div>
+              <b className="month-col-n">{w.total || ""}</b>
               <span>{w.label}</span>
             </div>
           ))}
@@ -224,7 +234,6 @@ function TuMes({ neg }: { neg: Patrocinador }) {
           <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-primary" /> Visitas</span>
           <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-accent" /> Nuevas</span>
         </div>
-        <p className="mt-3 text-body-sm text-muted-foreground">{s.verificadas} con carnet · {s.declaradas} sin carnet</p>
       </div>
 
       <p className="mt-6 text-item font-bold">{frase}</p>
