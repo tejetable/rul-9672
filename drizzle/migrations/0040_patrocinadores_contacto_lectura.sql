@@ -1,0 +1,1 @@
+GRANT SELECT (telefono, horario, web) ON public.patrocinadores TO authenticated;

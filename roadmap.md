@@ -1,3 +1,5 @@
+- [x] Corregir permisos de lectura de teléfono, horario y web de patrocinadores sin exponer pin_hash; cuatro comprobaciones contra Cloud pasan.
+- [x] Revisar permisos generales de tablas, columnas y funciones usadas por los tres roles; entrada real comprobada con nueve soci@s, cinco patrocinadores, Club, plantilla, ventajas y vista de negocio protegida, sin registrar visitas. Restricciones intencionadas de solicitudes retiradas y operaciones de servicio conservadas.
 - [x] Añadir refresco local de Fotos: grupo de hasta 30 de los 3 últimos álbumes, selección aleatoria sin repetir, precarga y fundido; 8 pruebas y fotos reales verificadas en 390/430px, cinco nuevas sin repeticiones ni llamadas de servidor por pulsación.
 - [x] Retirar variantes oscuras, fijar «only light» y beige exacto del navegador/manifest; colores idénticos con preferencia clara/oscura emulada.
 - [x] Reiniciar filtros en scroll 0 al cargar/volver y mantener «+» a 16px sobre barras inferiores y zona segura; acceso real comprobado en 360/390/430px y con barra inferior añadida para la prueba.

@@ -281,6 +281,13 @@
       "when": 1795267500579,
       "tag": "0039_rival_corto_patrocinador_contacto_aviso_publico",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1795270508044,
+      "tag": "0040_patrocinadores_contacto_lectura",
+      "breakpoints": true
     }
   ]
 }
