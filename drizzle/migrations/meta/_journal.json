@@ -246,6 +246,13 @@
       "when": 1795210294400,
       "tag": "0034_restringir_identificar_socio",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1795266798407,
+      "tag": "0035_jugadores_estadisticas",
+      "breakpoints": true
     }
   ]
 }

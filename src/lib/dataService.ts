@@ -94,6 +94,8 @@ export interface Aviso {
   /** A quién va dirigido; sin valor = todos */
   para?: "todos" | "socias" | "negocios";
 }
+export interface Jugador {id:string;nombre:string;apodo:string;dorsal:number|null;activo:boolean}
+export interface EstadisticaJugador {jugadorId:string;goles:number;asistencias:number;amarillas:number;rojas:number}
 export interface DB {
   socios: Socio[];
   patrocinadores: Patrocinador[];
@@ -206,6 +208,11 @@ export const dataService = {
     const r=input.id?await supabase.from('partidos').update(row).eq('id',input.id).select('id').single():await supabase.from('partidos').insert(row).select('id').single();check(r.error);await this.refresh();
   },
   async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);await this.refresh();},
+  async jugadores(){const r=await supabase.from('jugadores').select('id,nombre,apodo,dorsal,activo').order('dorsal');check(r.error);return (r.data??[]).map(j=>({id:j.id,nombre:j.nombre,apodo:j.apodo,dorsal:j.dorsal,activo:j.activo})) as Jugador[];},
+  async crearJugador(input:{nombre:string;apodo:string;dorsal:number|null}){const r=await supabase.from('jugadores').insert({nombre:input.nombre.trim(),apodo:input.apodo.trim(),dorsal:input.dorsal});check(r.error);},
+  async estadisticasPartido(partidoId:string){const r=await supabase.from('estadisticas_partido').select('jugador_id,goles,asistencias,amarillas,rojas').eq('partido_id',partidoId);check(r.error);return (r.data??[]).map(e=>({jugadorId:e.jugador_id,goles:e.goles,asistencias:e.asistencias,amarillas:e.amarillas,rojas:e.rojas})) as EstadisticaJugador[];},
+  async guardarEstadisticas(partidoId:string,filas:EstadisticaJugador[]){const r=await supabase.rpc('guardar_estadisticas',{p_partido:partidoId,p_filas:filas as unknown as never});check(r.error);},
+  async maximosGoleadores(){const r=await supabase.from('maximos_goleadores').select('*');check(r.error);return (r.data??[]).map(m=>({jugadorId:m.jugador_id!,apodo:m.apodo!,dorsal:m.dorsal,goles:m.goles??0,asistencias:m.asistencias??0}));},
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {
     acceso={tiene_password:false,debe_cambiar_password:false,ha_accedido:false};

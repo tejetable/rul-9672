@@ -134,6 +134,27 @@ export type Database = {
         }
         Relationships: []
       }
+      clubes: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       emails_log: {
         Row: {
           asunto: string
@@ -211,6 +232,68 @@ export type Database = {
           },
         ]
       }
+      estadisticas_partido: {
+        Row: {
+          amarillas: number
+          asistencias: number
+          club_id: string
+          goles: number
+          id: string
+          jugador_id: string
+          partido_id: string
+          rojas: number
+        }
+        Insert: {
+          amarillas?: number
+          asistencias?: number
+          club_id?: string
+          goles?: number
+          id?: string
+          jugador_id: string
+          partido_id: string
+          rojas?: number
+        }
+        Update: {
+          amarillas?: number
+          asistencias?: number
+          club_id?: string
+          goles?: number
+          id?: string
+          jugador_id?: string
+          partido_id?: string
+          rojas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estadisticas_partido_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estadisticas_partido_jugador_id_fkey"
+            columns: ["jugador_id"]
+            isOneToOne: false
+            referencedRelation: "jugadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estadisticas_partido_jugador_id_fkey"
+            columns: ["jugador_id"]
+            isOneToOne: false
+            referencedRelation: "maximos_goleadores"
+            referencedColumns: ["jugador_id"]
+          },
+          {
+            foreignKeyName: "estadisticas_partido_partido_id_fkey"
+            columns: ["partido_id"]
+            isOneToOne: false
+            referencedRelation: "partidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gallery_cache: {
         Row: {
           id: string
@@ -228,6 +311,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      jugadores: {
+        Row: {
+          activo: boolean
+          apodo: string
+          club_id: string
+          created_at: string
+          dorsal: number | null
+          id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          apodo: string
+          club_id?: string
+          created_at?: string
+          dorsal?: number | null
+          id?: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          apodo?: string
+          club_id?: string
+          created_at?: string
+          dorsal?: number | null
+          id?: string
+          nombre?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jugadores_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pagos: {
         Row: {
@@ -1015,6 +1136,16 @@ export type Database = {
         }
         Relationships: []
       }
+      maximos_goleadores: {
+        Row: {
+          apodo: string | null
+          asistencias: number | null
+          dorsal: number | null
+          goles: number | null
+          jugador_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       acceder_como_negocio: { Args: { p_id: string }; Returns: undefined }
@@ -1043,6 +1174,7 @@ export type Database = {
         Returns: undefined
       }
       borrar_visitas_prueba: { Args: { p_negocio: string }; Returns: undefined }
+      club_principal: { Args: never; Returns: string }
       completar_cambio_password: { Args: never; Returns: undefined }
       crear_negocio_email: {
         Args: {
@@ -1121,6 +1253,10 @@ export type Database = {
           p_patrocinador?: string
           p_rol: Database["public"]["Enums"]["club_role"]
         }
+        Returns: undefined
+      }
+      guardar_estadisticas: {
+        Args: { p_filas: Json; p_partido: string }
         Returns: undefined
       }
       guardar_resultado_partido: {
