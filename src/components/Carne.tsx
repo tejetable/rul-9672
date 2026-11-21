@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import frente from "@/assets/carne-fisico-frente.jpg.asset.json";
-import dorso from "@/assets/carne-fisico-reverso.jpg.asset.json";
-import folleto from "@/assets/ventajas-socios-2026-27.pdf.asset.json";
+import { carnetFrente as frente } from "@/assets/recursos";
+import { carnetReverso as dorso } from "@/assets/recursos";
+import { ventajasPdf as folleto } from "@/assets/recursos";
 import { BotonDos, iconosCarnet } from "@/components/SwitchVista";
 
 export function Carne({ nombre, numero, temporada = "2026/27", alCorriente, onDondeUsar }: { nombre: string; numero: number; temporada?: string; alCorriente?: boolean | null; onDondeUsar?: () => void }) {

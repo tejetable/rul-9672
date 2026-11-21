@@ -8,7 +8,7 @@ import {ClubCabecera} from './ClubCabecera';
 import {PasswordField} from './PasswordField';
 import {GoogleAcceso} from './GoogleAcceso';
 import {Carne} from './Carne';
-import crest from '@/assets/escudo-rul-transparente.png.asset.json';
+import { escudo as crest } from '@/assets/recursos';
 import {dataService} from '@/lib/dataService';
 import {supabase} from '@/integrations/supabase/client';
 import {createMembershipCheckout,createPaidMemberPassword,getMembershipStatus} from '@/lib/membership-payment.functions';

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import escudo from "@/assets/escudo-ru-lucense.png.asset.json";
+import { escudo } from "@/assets/recursos";
 
 export function ClubCabecera({ titulo = "R.U. LUCENSE", etiqueta, children }: { titulo?: string; etiqueta?: string; children?: ReactNode }) {
   return <header className="club-header">

@@ -1,0 +1,12 @@
+CREATE TABLE public.convocatorias (partido_id uuid PRIMARY KEY REFERENCES public.partidos(id) ON DELETE CASCADE, jugadores uuid[] NOT NULL DEFAULT '{}', imagen_url text, publicada boolean NOT NULL DEFAULT false, updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.convocatorias TO authenticated;
+GRANT ALL ON public.convocatorias TO service_role;
+ALTER TABLE public.convocatorias ENABLE ROW LEVEL SECURITY;
+CREATE POLICY convocatorias_leer ON public.convocatorias FOR SELECT TO authenticated USING (publicada OR public.has_club_role('directiva'));
+CREATE POLICY convocatorias_escribir ON public.convocatorias FOR ALL TO authenticated USING (public.has_club_role('directiva')) WITH CHECK (public.has_club_role('directiva'));
+CREATE OR REPLACE FUNCTION public.touch_convocatoria() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.updated_at=now(); RETURN NEW; END $$;
+CREATE TRIGGER convocatoria_updated BEFORE UPDATE ON public.convocatorias FOR EACH ROW EXECUTE FUNCTION public.touch_convocatoria();
+CREATE POLICY convocatoria_img_leer ON storage.objects FOR SELECT TO authenticated USING (bucket_id='piezas-convocatoria' AND (public.has_club_role('directiva') OR EXISTS (SELECT 1 FROM public.convocatorias c WHERE c.publicada AND c.imagen_url=storage.objects.name)));
+CREATE POLICY convocatoria_img_subir ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id='piezas-convocatoria' AND public.has_club_role('directiva'));
+CREATE POLICY convocatoria_img_cambiar ON storage.objects FOR UPDATE TO authenticated USING (bucket_id='piezas-convocatoria' AND public.has_club_role('directiva'));
+CREATE POLICY convocatoria_img_borrar ON storage.objects FOR DELETE TO authenticated USING (bucket_id='piezas-convocatoria' AND public.has_club_role('directiva'));

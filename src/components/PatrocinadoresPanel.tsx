@@ -94,7 +94,7 @@ export function PatrocinadoresPanel() {
         <div className="sponsor-cats">{([["Nuevas","con carnet",cat.nuevas],["Ya clientes","con carnet",cat.yaClientes],["Sin carnet","declaradas",cat.sinCarnet]] as const).map(([l,sub,n])=><div key={l}><p className="month-stat-num">{n}</p><p className="month-stat-label">{l}</p><p className="month-stat-sub">{sub}</p></div>)}</div>
         <p className="month-total">{cat.total} {cat.total===1?'visita':'visitas'} en el periodo elegido</p>
         <h3 className="club-section-title mt-6">Acceso del negocio</h3>
-        <EmailNegocio id={pat.id} email={pat.emailAcceso??''}/><PersonPassword email={pat.emailAcceso??''}/>
+        <EmailNegocio id={pat.id} email={pat.emailAcceso??''}/><ContactoNegocio key={pat.id} pat={pat}/><PersonPassword email={pat.emailAcceso??''}/>
         {dataService.esSuper()&&<><h3 className="club-section-title mt-6">Pruebas</h3><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p className="text-body-sm text-muted-foreground">{pruebas} {pruebas===1?'visita':'visitas'} de prueba (no cuentan en ninguna cifra)</p>{pruebas>0&&<Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button>}</>}
         {pat.activo&&<><h3 className="club-section-title mt-6">Zona de riesgo</h3><Button variant="outline" className="sponsor-danger" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Dar de baja este negocio</Button></>}
       </>;})()}</GestionSheet>
@@ -108,7 +108,7 @@ export function PatrocinadoresPanel() {
 
 function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
  const savePassword=useServerFn(setClubUserPassword);const [initial,setInitial]=useState('');
-  const [f, setF] = useState({ importe: "", nombre: "", categoria: "", direccion: "", emailAcceso: "", logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
+  const [f, setF] = useState({ importe: "", nombre: "", categoria: "", direccion: "", emailAcceso: "", telefono: "", horario: "", web: "", logoUrl: "", titulo: "", descripcion: "", condiciones: "Enseña tu carnet en el mostrador." });
   const [err, setErr] = useState("");
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setF({ ...f, [k]: e.target.value });
   const logo = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +122,7 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
     if (!f.nombre.trim() || !f.titulo.trim()) return setErr("Pon al menos el nombre y la ventaja.");
     const checked=emailSchema.safeParse(f.emailAcceso);if(!checked.success)return setErr("Dirección de email no válida.");if(initial&&!passwordSchema.safeParse(initial).success)return setErr("Usa al menos 8 caracteres.");
     const r = await dataService.crearPatrocinador(
-      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", emailAcceso: checked.data, logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
+      { nombre: f.nombre.trim(), categoria: f.categoria.trim(), direccion: f.direccion.trim() || "[Dirección pendiente]", emailAcceso: checked.data, telefono: f.telefono.trim(), horario: f.horario.trim(), web: f.web.trim(), logoUrl: f.logoUrl, importePatrocinio:Number(f.importe)||0 },
       { titulo: f.titulo.trim(), descripcion: f.descripcion.trim(), condiciones: f.condiciones.trim() },
     );
     if (r === "pin_usado") return setErr("No se pudo guardar.");
@@ -140,6 +140,9 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
       <label className="mt-3 block"><span className="label-club">Logo</span><input type="file" accept="image/*" onChange={logo} className="mt-1 block w-full text-body-sm" /></label>
       {f.logoUrl && <img src={f.logoUrl} alt="Logo del patrocinador" className="mt-2 h-14 w-auto object-contain" />}
       {campo("direccion", "Dirección")}
+      {campo("telefono", "Teléfono (opcional)", {type:"tel",maxLength:30})}
+      {campo("horario", "Horario (opcional)", {maxLength:300})}
+      {campo("web", "Web (opcional)", {type:"url",maxLength:300,placeholder:"https://"})}
       {campo("emailAcceso", "Email de acceso del negocio", {type:"email",required:true})}
       <InitialPassword email={f.emailAcceso} value={initial} onChange={setInitial}/>{campo("importe", "Importe patrocinio (€)", {type:"number",min:0,step:"0.01"})}
       <p className="label-club mt-6 text-accent">Ventaja</p>
@@ -156,3 +159,5 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
 }
 
 function EmailNegocio({id,email}:{id:string;email:string}){const [value,setValue]=useState(email);return <form className="mt-3 space-y-2" onSubmit={e=>{e.preventDefault();runAction(()=>dataService.emailNegocio(id,value));}}><label className="block label-club">Email de acceso del negocio<input required type="email" value={value} onChange={e=>setValue(e.target.value)} className="club-input mt-2 w-full p-3"/></label><Button type="submit" variant="outline">Guardar acceso</Button></form>;}
+
+function ContactoNegocio({pat}:{pat:{id:string;telefono?:string|null;horario?:string|null;web?:string|null}}){const [c,setC]=useState({telefono:pat.telefono??'',horario:pat.horario??'',web:pat.web??''});return <form className="mt-3 space-y-2" onSubmit={e=>{e.preventDefault();runAction(()=>dataService.contactoPatrocinador(pat.id,c));}}><label className="block label-club">Teléfono<input type="tel" maxLength={30} value={c.telefono} onChange={e=>setC({...c,telefono:e.target.value})} className="club-input mt-2 w-full p-3"/></label><label className="block label-club">Horario<input maxLength={300} value={c.horario} onChange={e=>setC({...c,horario:e.target.value})} className="club-input mt-2 w-full p-3"/></label><label className="block label-club">Web<input type="url" maxLength={300} placeholder="https://" value={c.web} onChange={e=>setC({...c,web:e.target.value})} className="club-input mt-2 w-full p-3"/></label><Button type="submit" variant="outline">Guardar contacto</Button></form>;}

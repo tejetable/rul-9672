@@ -3,7 +3,7 @@ import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Twitch, MapPin, Navigation } from "lucide-react";
-import escudo from "@/assets/escudo-rul-transparente.png.asset.json";
+import { escudo } from "@/assets/recursos";
 import { BotonDos, iconosCasa } from "@/components/SwitchVista";
 import { fechaHumana } from "@/lib/fechas";
 import { Button } from "@/components/ui/button";

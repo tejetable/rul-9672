@@ -55,6 +55,7 @@ export type Database = {
           destinatarios: string
           id: string
           publicado_at: string
+          publico: string
           texto: string
           tipo: string
           titulo: string
@@ -63,6 +64,7 @@ export type Database = {
           destinatarios?: string
           id?: string
           publicado_at?: string
+          publico?: string
           texto: string
           tipo: string
           titulo: string
@@ -71,6 +73,7 @@ export type Database = {
           destinatarios?: string
           id?: string
           publicado_at?: string
+          publico?: string
           texto?: string
           tipo?: string
           titulo?: string
@@ -133,6 +136,107 @@ export type Database = {
           posicion?: number
         }
         Relationships: []
+      }
+      clasificacion_equipos: {
+        Row: {
+          e: number
+          equipo: string
+          es_nuestro: boolean
+          g: number
+          gc: number
+          gf: number
+          id: string
+          jornada: number
+          p: number
+          pj: number
+          posicion: number
+          puntos: number
+          updated_at: string
+        }
+        Insert: {
+          e?: number
+          equipo: string
+          es_nuestro?: boolean
+          g?: number
+          gc?: number
+          gf?: number
+          id?: string
+          jornada: number
+          p?: number
+          pj?: number
+          posicion: number
+          puntos?: number
+          updated_at?: string
+        }
+        Update: {
+          e?: number
+          equipo?: string
+          es_nuestro?: boolean
+          g?: number
+          gc?: number
+          gf?: number
+          id?: string
+          jornada?: number
+          p?: number
+          pj?: number
+          posicion?: number
+          puntos?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clubes: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      convocatorias: {
+        Row: {
+          imagen_url: string | null
+          jugadores: string[]
+          partido_id: string
+          publicada: boolean
+          updated_at: string
+        }
+        Insert: {
+          imagen_url?: string | null
+          jugadores?: string[]
+          partido_id: string
+          publicada?: boolean
+          updated_at?: string
+        }
+        Update: {
+          imagen_url?: string | null
+          jugadores?: string[]
+          partido_id?: string
+          publicada?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "convocatorias_partido_id_fkey"
+            columns: ["partido_id"]
+            isOneToOne: true
+            referencedRelation: "partidos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       emails_log: {
         Row: {
@@ -211,6 +315,68 @@ export type Database = {
           },
         ]
       }
+      estadisticas_partido: {
+        Row: {
+          amarillas: number
+          asistencias: number
+          club_id: string
+          goles: number
+          id: string
+          jugador_id: string
+          partido_id: string
+          rojas: number
+        }
+        Insert: {
+          amarillas?: number
+          asistencias?: number
+          club_id?: string
+          goles?: number
+          id?: string
+          jugador_id: string
+          partido_id: string
+          rojas?: number
+        }
+        Update: {
+          amarillas?: number
+          asistencias?: number
+          club_id?: string
+          goles?: number
+          id?: string
+          jugador_id?: string
+          partido_id?: string
+          rojas?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estadisticas_partido_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estadisticas_partido_jugador_id_fkey"
+            columns: ["jugador_id"]
+            isOneToOne: false
+            referencedRelation: "jugadores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estadisticas_partido_jugador_id_fkey"
+            columns: ["jugador_id"]
+            isOneToOne: false
+            referencedRelation: "maximos_goleadores"
+            referencedColumns: ["jugador_id"]
+          },
+          {
+            foreignKeyName: "estadisticas_partido_partido_id_fkey"
+            columns: ["partido_id"]
+            isOneToOne: false
+            referencedRelation: "partidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gallery_cache: {
         Row: {
           id: string
@@ -228,6 +394,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      jugadores: {
+        Row: {
+          activo: boolean
+          apodo: string
+          club_id: string
+          created_at: string
+          dorsal: number | null
+          id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          apodo: string
+          club_id?: string
+          created_at?: string
+          dorsal?: number | null
+          id?: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          apodo?: string
+          club_id?: string
+          created_at?: string
+          dorsal?: number | null
+          id?: string
+          nombre?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jugadores_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pagos: {
         Row: {
@@ -293,12 +497,14 @@ export type Database = {
           goles_favor: number | null
           hora_confirmada: boolean
           id: string
+          imagen_resultado_url: string | null
           jornada: number | null
           jugado: boolean
           lugar: string
           pabellon: string
           resultado: string | null
           rival: string
+          rival_corto: string | null
         }
         Insert: {
           competicion?: string | null
@@ -310,12 +516,14 @@ export type Database = {
           goles_favor?: number | null
           hora_confirmada?: boolean
           id?: string
+          imagen_resultado_url?: string | null
           jornada?: number | null
           jugado?: boolean
           lugar?: string
           pabellon?: string
           resultado?: string | null
           rival: string
+          rival_corto?: string | null
         }
         Update: {
           competicion?: string | null
@@ -327,12 +535,14 @@ export type Database = {
           goles_favor?: number | null
           hora_confirmada?: boolean
           id?: string
+          imagen_resultado_url?: string | null
           jornada?: number | null
           jugado?: boolean
           lugar?: string
           pabellon?: string
           resultado?: string | null
           rival?: string
+          rival_corto?: string | null
         }
         Relationships: []
       }
@@ -368,12 +578,15 @@ export type Database = {
           email_acceso: string | null
           fecha_alta: string
           fecha_baja: string | null
+          horario: string | null
           id: string
           importe_patrocinio: number
           logo_url: string
           motivo_baja: string | null
           nombre: string
           pin_hash: string
+          telefono: string | null
+          web: string | null
         }
         Insert: {
           activo?: boolean
@@ -383,12 +596,15 @@ export type Database = {
           email_acceso?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
+          horario?: string | null
           id?: string
           importe_patrocinio?: number
           logo_url?: string
           motivo_baja?: string | null
           nombre: string
           pin_hash: string
+          telefono?: string | null
+          web?: string | null
         }
         Update: {
           activo?: boolean
@@ -398,12 +614,15 @@ export type Database = {
           email_acceso?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
+          horario?: string | null
           id?: string
           importe_patrocinio?: number
           logo_url?: string
           motivo_baja?: string | null
           nombre?: string
           pin_hash?: string
+          telefono?: string | null
+          web?: string | null
         }
         Relationships: []
       }
@@ -1015,6 +1234,16 @@ export type Database = {
         }
         Relationships: []
       }
+      maximos_goleadores: {
+        Row: {
+          apodo: string | null
+          asistencias: number | null
+          dorsal: number | null
+          goles: number | null
+          jugador_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       acceder_como_negocio: { Args: { p_id: string }; Returns: undefined }
@@ -1043,6 +1272,7 @@ export type Database = {
         Returns: undefined
       }
       borrar_visitas_prueba: { Args: { p_negocio: string }; Returns: undefined }
+      club_principal: { Args: never; Returns: string }
       completar_cambio_password: { Args: never; Returns: undefined }
       crear_negocio_email: {
         Args: {
@@ -1121,6 +1351,14 @@ export type Database = {
           p_patrocinador?: string
           p_rol: Database["public"]["Enums"]["club_role"]
         }
+        Returns: undefined
+      }
+      guardar_clasificacion: {
+        Args: { p_filas: Json; p_jornada: number }
+        Returns: undefined
+      }
+      guardar_estadisticas: {
+        Args: { p_filas: Json; p_partido: string }
         Returns: undefined
       }
       guardar_resultado_partido: {

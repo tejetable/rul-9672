@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import {supabaseAdmin} from '@/integrations/supabase/client.server';
 import {emailSchema,formatoImporte} from './email-validation';
 import {feeCents,verifiedPaidSession,escapeEmailHtml,accessWithinWeek,canSetPaymentPassword} from './membership-payment';
-import crest from '@/assets/escudo-rul-transparente.png.asset.json';
+import { escudo as crest } from '@/assets/recursos';
 import type {Database} from '@/integrations/supabase/types';
 type Checkout=Database['public']['Tables']['stripe_checkouts']['Row'];
 const INITIAL_PRICE='price_1UdvH3HuiZ2SMGQDrUVobtWo';
@@ -50,7 +50,7 @@ async function sendClubEmail(clave:string,subject:string,html:string){
 export async function sendMembershipEmail(c:Checkout,session:Stripe.Checkout.Session,method:string,origin:string){
  if(!c.socio_id)return;const s=await supabaseAdmin.from('socios').select('nombre,numero_socio').eq('id',c.socio_id).single();check(s.error);if(!s.data)throw new Error('Ficha no disponible.');
  const esc=escapeEmailHtml,number=s.data.numero_socio;
- const html=`<img src="${esc(crest.url)}" width="80" alt="Real Unión Lucense F.S."><h1>Soci@ nº ${number}</h1><p>${esc(s.data.nombre)}</p><p>Email: ${esc(c.email)}<br>Teléfono: ${esc(c.telefono||'—')}</p><p>Temporada ${esc(c.temporada)} · ${esc(formatoImporte(c.importe_centimos/100))} · ${esc(method)}</p><p>${esc(new Date((session.created)*1000).toLocaleString('es-ES',{timeZone:'Europe/Madrid'}))}<br>Referencia: ${esc(typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id??'')}</p><p>Hay que preparar y entregar su carnet físico.</p><a style="background:#0D4631;color:white;padding:12px 18px;text-decoration:none" href="${esc(origin)}/?socio=${encodeURIComponent(c.socio_id)}">Ver ficha en la app</a>`;
+ const html=`<img src="${esc(new URL(crest.url,origin).href)}" width="80" alt="Real Unión Lucense F.S."><h1>Soci@ nº ${number}</h1><p>${esc(s.data.nombre)}</p><p>Email: ${esc(c.email)}<br>Teléfono: ${esc(c.telefono||'—')}</p><p>Temporada ${esc(c.temporada)} · ${esc(formatoImporte(c.importe_centimos/100))} · ${esc(method)}</p><p>${esc(new Date((session.created)*1000).toLocaleString('es-ES',{timeZone:'Europe/Madrid'}))}<br>Referencia: ${esc(typeof session.payment_intent==='string'?session.payment_intent:session.payment_intent?.id??'')}</p><p>Hay que preparar y entregar su carnet físico.</p><a style="background:#0D4631;color:white;padding:12px 18px;text-decoration:none" href="${esc(origin)}/?socio=${encodeURIComponent(c.socio_id)}">Ver ficha en la app</a>`;
  await sendClubEmail(`alta-${session.id}`,`Nuevo soci@ nº ${number} · ${s.data.nombre} · Carnet físico pendiente`,html);
 }
 function safeFailure(error:unknown){if(error instanceof Stripe.errors.StripeError)return `Stripe: ${error.type} (${error.code??'sin código'})`;return error instanceof Error?error.message:'Error al procesar el pago.';}

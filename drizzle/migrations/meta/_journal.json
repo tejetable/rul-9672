@@ -246,6 +246,41 @@
       "when": 1795210294400,
       "tag": "0034_restringir_identificar_socio",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1795266798407,
+      "tag": "0035_jugadores_estadisticas",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795267080253,
+      "tag": "0036_pieza_resultado",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1795267247608,
+      "tag": "0037_convocatorias",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1795267376045,
+      "tag": "0038_clasificacion_equipos",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1795267500579,
+      "tag": "0039_rival_corto_patrocinador_contacto_aviso_publico",
+      "breakpoints": true
     }
   ]
 }
