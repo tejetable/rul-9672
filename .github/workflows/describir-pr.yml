@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# DESCRIBIR EL PR · rellena la descripción a partir de los commits
+#
+# Cuándo: al abrir un Pull Request.
+# Qué hace: si la descripción está vacía o es la plantilla sin rellenar, la
+#           sustituye por el cuerpo de los commits de la rama que siguen la
+#           plantilla (los que llevan "## Qué cambia"). Si hay varios, los pone
+#           uno detrás de otro con su título. Ignora los commits de merge.
+#           Si ya escribiste una descripción, no la toca.
+# Qué necesita: nada. Usa el token del propio workflow.
+# ─────────────────────────────────────────────────────────────────────────────
+name: Describir el PR
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  describir:
+    name: Describir el PR
+    # En un fork el token no puede escribir en el PR: no se ejecuta.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rellenar la descripción con los commits
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const actual = (pr.body || '').trim();
+            const esPlantilla = actual === '' || actual.includes('<!-- En una o dos frases');
+            if (!esPlantilla) {
+              core.info('El PR ya tiene descripción: no se toca.');
+              return;
+            }
+            const { owner, repo } = context.repo;
+            const commits = await github.paginate(github.rest.pulls.listCommits, { owner, repo, pull_number: pr.number });
+            const conPlantilla = commits
+              .filter((c) => c.parents.length === 1)
+              .map((c) => c.commit.message.replace(/\r\n/g, '\n'))
+              .filter((m) => m.includes('## Qué cambia'))
+              .map((m) => {
+                const [titulo, ...resto] = m.split('\n');
+                const cuerpo = resto.join('\n').trim()
+                  .replace(/\n+Co-Authored-By:.*$/gim, '')
+                  .replace(/\n+Claude-Session:.*$/gim, '')
+                  .trim();
+                return { titulo, cuerpo };
+              });
+            if (conPlantilla.length === 0) {
+              core.info('Ningún commit sigue la plantilla: se deja como está.');
+              return;
+            }
+            const body = conPlantilla.length === 1
+              ? conPlantilla[0].cuerpo
+              : conPlantilla.map((c) => `# ${c.titulo}\n\n${c.cuerpo}`).join('\n\n---\n\n');
+            await github.rest.pulls.update({ owner, repo, pull_number: pr.number, body });
+            core.info(`Descripción rellenada con ${conPlantilla.length} commit(s).`);
