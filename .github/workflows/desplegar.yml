@@ -107,11 +107,11 @@ jobs:
           done
           if [ "$MODO" = "produccion" ]; then
             # Producción: publica la nueva versión para todos los usuarios
-            npx --yes wrangler@4.151.3 deploy "${VARS[@]}" | tee salida.txt
+            npx --yes wrangler@4.151.3 deploy --name rul-9672 "${VARS[@]}" | tee salida.txt
             url=$(grep -oE 'https://[^ ]+\.workers\.dev' salida.txt | head -1)
           else
             # Staging / preview: sube una versión SIN tocar producción, con su propia URL
-            npx --yes wrangler@4.151.3 versions upload --preview-alias "$ALIAS" "${VARS[@]}" | tee salida.txt
+            npx --yes wrangler@4.151.3 versions upload --name rul-9672 --preview-alias "$ALIAS" "${VARS[@]}" | tee salida.txt
             url=$(grep -oE 'Version Preview Alias URL: https://[^ ]+' salida.txt | sed 's/.*: //' || true)
             if [ -z "$url" ]; then
               url=$(grep -oE 'Version Preview URL: https://[^ ]+' salida.txt | sed 's/.*: //')
