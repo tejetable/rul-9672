@@ -1451,9 +1451,11 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
   .club-frame-ancho { padding: 0; background: var(--background); }
   .club-frame-ancho > main { max-width: none; border-radius: 0; overflow: visible; }
 
-  .club-frame-movil { display: flex; align-items: flex-start; justify-content: center; gap: 64px; padding: 48px 32px; background: var(--background); }
-  .club-frame-movil > main { flex: 0 0 430px; margin: 0; min-height: calc(100dvh - 96px); box-shadow: 0 0 0 1px rgba(185, 142, 74, .45); }
-  .club-marca-escritorio { display: flex; flex-direction: column; gap: 16px; flex: 0 1 380px; padding-top: 48px; color: var(--foreground); }
+  /* La columna va centrada en la pantalla: la barra de abajo, el botón + y las hojas son fixed y se centran respecto a la ventana. */
+  .club-frame-movil { display: block; padding: 48px 0; background: var(--background); }
+  .club-frame-movil > main { margin: 0 auto; min-height: calc(100dvh - 96px); box-shadow: 0 0 0 1px rgba(185, 142, 74, .45); }
+  /* La marca va a la izquierda de la columna, solo si cabe (≥ 1280 px). */
+  .club-marca-escritorio { display: none; }
   .club-marca-escudo { width: 120px; height: auto; margin-bottom: 16px; }
   .club-marca-label { font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--oro-texto, #6E5122); }
   .club-marca-lema { font-size: 40px; line-height: 1.05; font-weight: 900; text-transform: uppercase; }
@@ -1470,6 +1472,8 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
   .dir-nav-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .dir-nav-extra { display: flex; align-items: center; gap: 4px; padding-top: 12px; border-top: 1px solid rgba(185, 142, 74, .35); }
   .dir-main { flex: 1 1 auto; min-width: 0; max-width: 1040px; padding: 32px 24px 64px; }
+  /* El botón + de gestión (fixed, en portal) se alinea con el borde derecho de la lista, no con la columna de móvil. */
+  :root:has(.dir-escritorio) .directiva-fab { right: max(32px, calc(100vw - 1248px)); }
   /* Listas como tabla: nombre y segunda línea (email, fecha…) en columnas, y la cabecera de orden alineada. */
   .dir-main .member-list-tools { top: 0; padding-top: 4px; }
   .dir-main .club-list-row, .dir-main .member-columns { grid-template-columns: 64px minmax(0, 1fr) 140px; column-gap: 16px; padding-inline: 20px; }
@@ -1482,4 +1486,8 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
   .dir-main .member-filters { flex-wrap: wrap; overflow: visible; }
   /* Ficha a la derecha (GestionSheet en escritorio). */
   .club-side-panel { width: 480px; max-width: 480px; height: 100dvh; overflow-y: auto; padding: 0; border-left: 1px solid rgba(185, 142, 74, .45); }
+}
+
+@media (min-width: 1280px) {
+  .club-marca-escritorio { position: fixed; top: 96px; left: calc(50% - 215px - 56px - 360px); width: 360px; display: flex; flex-direction: column; gap: 16px; color: var(--foreground); }
 }
