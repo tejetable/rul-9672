@@ -1,9 +1,18 @@
 {
+  "id": "/",
   "name": "Real Unión Lucense F.S.",
   "short_name": "R.U. Lucense",
-  "start_url": "/",
+  "description": "El equipo, tu carnet de soci@ y las ventajas en los negocios amigos.",
+  "lang": "es",
+  "start_url": "/?fuente=app",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#E7D7C3",
   "theme_color": "#E7D7C3",
-  "icons": [{ "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }]
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
 }
