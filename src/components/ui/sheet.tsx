@@ -61,9 +61,9 @@ const SheetContent = React.forwardRef<
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content ref={ref} data-sheet-side={side} className={cn(sheetVariants({ side }), side==='bottom'&&'club-bottom-sheet', className)} {...props}>
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background cursor-pointer transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
+      <SheetPrimitive.Close className="club-sheet-close absolute right-2 top-1.5 z-[3] flex size-11 items-center justify-center rounded-control cursor-pointer transition-opacity hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none">
+        <X className="h-5 w-5" />
+        <span className="sr-only">Cerrar</span>
       </SheetPrimitive.Close>
       {side==='bottom'?<div className="club-sheet-scroll">{children}</div>:children}
     </SheetPrimitive.Content>

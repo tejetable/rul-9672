@@ -24,7 +24,7 @@ function Calendario() {
   const db = useClubData();
   const [casa, setCasa] = useState(false);
   const [elegido, setElegido] = useState<{ id: string; n: number } | null>(null);
-  const ver = (id: string) => { setElegido((e) => ({ id, n: (e?.n ?? 0) + 1 })); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const ver = (id: string) => { setElegido((e) => ({ id, n: (e?.n ?? 0) + 1 })); document.getElementById("marcador-paletas")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
   const [ahora] = useState(() => new Date());
   const partidos = [...db.partidos].sort((a, b) => (a.jornada ?? 0) - (b.jornada ?? 0)).filter((p) => !casa || p.esLocal);
   const proximo = proximoPartido(db.partidos, ahora);
@@ -35,7 +35,7 @@ function Calendario() {
     <div className="px-4">
       {!db.partidos.length && <p className="py-8 text-muted-foreground">Cargando partidos…</p>}
       <div className="mt-4"><MarcadorPaletas partidos={db.partidos} elegido={elegido} /></div>
-      {vueltas.map(([titulo, lista]) => lista.length > 0 && <section key={titulo} className="mt-6"><h2 className="club-section-title">{titulo}</h2><ul className="cal-list">{lista.map((p) => <CalendarioCard key={p.id} partido={p} destacado={p.id === proximo?.id} onVer={ver} />)}</ul></section>)}
+      {vueltas.map(([titulo, lista]) => lista.length > 0 && <section key={titulo} className="mt-6"><h2 className="club-section-title">{titulo}</h2><ul className="cal-list">{lista.map((p) => <CalendarioCard key={p.id} partido={p} destacado={p.id === proximo?.id} onVer={ver} seleccionado={p.id === elegido?.id} />)}</ul></section>)}
     </div>
   </main></div>;
 }

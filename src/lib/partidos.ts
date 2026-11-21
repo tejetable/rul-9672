@@ -74,7 +74,7 @@ export function rachaCronologica(recientes:readonly string[]):(string|null)[]{
 
 const madridParts=(d:Date)=>{const tz={timeZone:"Europe/Madrid"} as const;return {
   dia:d.toLocaleDateString("es-ES",{...tz,weekday:"short"}).replace(".",""),num:d.toLocaleDateString("es-ES",{...tz,day:"numeric"}),
-  mes:d.toLocaleDateString("es-ES",{...tz,month:"short"}).replace(".",""),hora:d.toLocaleTimeString("es-ES",{...tz,hour:"2-digit",minute:"2-digit"})};};
+  mes:d.toLocaleDateString("es-ES",{...tz,month:"short"}).replace(".","").replace(/^sept$/,"sep"),hora:d.toLocaleTimeString("es-ES",{...tz,hour:"2-digit",minute:"2-digit"})};};
 /** "Fin de semana del 29 nov" when the date is a reference; otherwise "Sáb 28 nov · 18:30" (time only if confirmed). */
 export function fechaPartidoTexto(partido:Partido):string{
   const d=inicioPartido(partido);if(!d)return "Fecha por confirmar";

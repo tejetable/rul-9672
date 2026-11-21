@@ -3,6 +3,7 @@ import {useEffect,useState} from 'react';
 import {ArrowLeft,ChevronLeft,ChevronRight} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import { claseVista, useVista } from "@/lib/vista";
+import { fechaHumana } from "@/lib/fechas";
 import {GaleriaFoto} from '@/components/GaleriaFoto';
 import {GaleriaVisor} from '@/components/GaleriaVisor';
 import {useDriveGallery} from '@/hooks/use-drive-gallery';
@@ -23,11 +24,11 @@ function AlbumPage(){
     <header className="sticky top-0 z-20 bg-background px-4 py-2" onTouchStart={e=>setStart(e.touches[0]?.clientX??null)} onTouchEnd={e=>{const end=e.changedTouches[0]?.clientX;if(start!==null&&end!==undefined){if(end-start>70&&prev)void go(prev.id);if(start-end>70&&next)void go(next.id);}setStart(null);}}>
       <div className="flex min-h-14 items-center gap-2"><Button asChild variant="ghost" size="icon"><Link to="/galeria" search={{partido:'todos'}} aria-label="Volver a álbumes"><ArrowLeft/></Link></Button><div><h1 className="club-section-title">{album?.titulo??'Fotos'}</h1>{album&&<p className="text-body-sm">{album.detalle} · {album.fotos.length} fotos/vídeos</p>}</div></div>
       <div className="grid grid-cols-2 gap-2"><Button disabled={!prev} variant="ghost" onClick={()=>prev&&go(prev.id)} className="h-auto whitespace-normal text-body-sm"><ChevronLeft/>Anterior {prev?.rival}</Button><Button disabled={!next} variant="ghost" onClick={()=>next&&go(next.id)} className="h-auto whitespace-normal text-body-sm">Siguiente {next?.rival}<ChevronRight/></Button></div>
-      <div className="gallery-filters">{albums.map(a=><Button key={a.id} variant="ghost" className={`gallery-filter ${a.id===folderId?'gallery-filter-active':''}`} onClick={()=>go(a.id)}>{a.titulo} · {new Date(`${a.fecha}T12:00:00`).toLocaleDateString('es-ES',{day:'2-digit',month:'short'})}</Button>)}</div>
+      <div className="gallery-filters">{albums.map(a=><Button key={a.id} variant="ghost" className={`gallery-filter ${a.id===folderId?'gallery-filter-active':''}`} onClick={()=>go(a.id)}>{a.titulo} · {fechaHumana(a.fecha)}</Button>)}</div>
     </header>
     {isPending&&<div className="gallery-image is-loading aspect-square"/>}
     {!isPending&&!album&&<p className="px-4 py-8 text-muted-foreground">No hay fotos disponibles en este álbum.</p>}
     <div className="gallery-complete-grid">{album?.fotos.map((f,i)=><Button key={f.id} variant="ghost" className="gallery-tile gallery-square" aria-label={`Ver foto ${i+1}`} onClick={()=>setVisor(i)}><GaleriaFoto foto={f} alt={album.titulo}/></Button>)}</div>
     {album&&visor!==null&&<GaleriaVisor album={album} inicial={visor} siguiente={next} onClose={()=>{setVisor(null);void navigate({to:'/galeria/$folderId',params:{folderId},search:{foto:''},replace:true});}}/>}
   </main></div>;
-}
+}

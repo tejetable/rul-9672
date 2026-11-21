@@ -6,6 +6,7 @@ import {setClubUserPassword} from '@/lib/password.functions';
 import {passwordSchema} from '@/lib/password-access';
 import { BajaForm } from "@/components/BajaForm";
 import { adaptarStats, emptyStats, type ClubSummary } from "@/lib/club-stats";
+import { categoriasVisitas } from "@/lib/visitas";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Download, LogIn, Store } from "lucide-react";
@@ -80,9 +81,23 @@ export function PatrocinadoresPanel() {
       {!form&&!selected&&!baja&&<DirectivaFab label="Nuevo patrocinador" onClick={()=>setForm(true)}/>}
       {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
       <h2 className="club-section-title mt-6">Negocios</h2>
-      <ListCard label="Patrocinadores">{db.patrocinadores.map(p=>{const stats=adaptarStats(summary.patrocinadores[p.id]??emptyStats);return <ListRow key={p.id} leading={<Store/>} name={p.nombre} subtitle={`${stats.nuevasVerificadas} ${stats.nuevasVerificadas===1?"nueva":"nuevas"} · ${p.categoria}`} date={`${stats.visitas} ${stats.visitas===1?"visita":"visitas"}`} status={p.activo?'active':'off'} onClick={()=>setSelected(p.id)}/>;})}</ListCard>
+      <p className="sponsor-list-note">Ordenados por el que va más lejos del objetivo: 5 personas nuevas con carnet en 90 días.</p>
+      <ul className="surface-card sponsor-list" aria-label="Patrocinadores">{[...db.patrocinadores].sort((x,y)=>Number(y.activo)-Number(x.activo)||((summary.patrocinadores[x.id]?.objetivo_nuevas_90d??0)-(summary.patrocinadores[y.id]?.objetivo_nuevas_90d??0))||x.nombre.localeCompare(y.nombre)).map(p=>{const raw=summary.patrocinadores[p.id]??emptyStats;const prog=Math.min(5,raw.objetivo_nuevas_90d);return <li key={p.id}><button type="button" className={`sponsor-row ${p.activo?'':'is-off'}`} onClick={()=>setSelected(p.id)}>
+        <span className="min-w-0 flex-1"><span className="sponsor-name">{p.nombre}</span><span className="sponsor-meta">{p.activo?p.categoria:'De baja'} · {raw.visitas} {raw.visitas===1?'visita':'visitas'}</span>
+          <span className="sponsor-bar" role="img" aria-label={`${prog} de 5 personas nuevas con carnet en 90 días`}><span style={{width:`${prog*20}%`}}/></span></span>
+        <span className="sponsor-goal"><b>{prog}</b>/5</span>
+      </button></li>;})}</ul>
       <details className="surface-card fold-card mt-6"><summary>Bajas ({["no ve retorno","precio","cierre del negocio","otro"].reduce((t,m)=>t+(summary.bajas[m]??0),0)})</summary><div className="grid grid-cols-2 gap-2 px-4 pb-4">{["no ve retorno","precio","cierre del negocio","otro"].map(m => <div key={m} className="rounded-control bg-[color-mix(in_oklab,var(--verde)_5%,transparent)] p-3"><p className="font-black">{summary.bajas[m] ?? 0}</p><p className="text-body-sm">{m}</p></div>)}</div></details>
-      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&<><p>{pat.categoria}</p><p>{pat.direccion}</p><div className="grid grid-cols-2 gap-3">{(()=>{const raw=summary.patrocinadores[pat.id]??emptyStats;const stats=adaptarStats(raw);return [["Visitas",stats.visitas],["Personas nuevas (con carnet)",stats.nuevasVerificadas],["Personas nuevas (sin carnet)",stats.nuevasDeclaradas],["Repiten",stats.repiten],["% de nuevas",`${stats.pctNuevas}%`],["Progreso 90 días",`${raw.objetivo_nuevas_90d} de 5`]].map(([label,value])=><div key={label} className="py-2"><p className="font-black">{value}</p><p className="label-club">{label}</p></div>);})()}</div><EmailNegocio id={pat.id} email={pat.emailAcceso??''}/>{pat.activo&&<Button variant="outline" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Desactivar</Button>}<PersonPassword email={pat.emailAcceso??''}/>{dataService.esSuper()&&<><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p>{db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length} visitas de prueba</p><Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button></>}</>}</GestionSheet>
+      <GestionSheet title={pat?.nombre??'Negocio'} open={!!pat} onClose={()=>setSelected(null)}>{pat&&(()=>{const raw=summary.patrocinadores[pat.id]??emptyStats;const cat=categoriasVisitas(raw);const dir=pat.direccion?.trim();const sinDir=!dir||/pendiente/i.test(dir);const pruebas=db.visitas.filter(v=>v.patrocinadorId===pat.id&&v.esPrueba).length;return <>
+        <p className="sponsor-sheet-meta">{pat.categoria}{sinDir?<span className="sponsor-missing"> · Falta la dirección</span>:<> · {dir}</>}</p>
+        <div className="sponsor-goal-card"><p className="sponsor-goal-title">Objetivo · últimos 90 días</p><p className="sponsor-goal-big"><b>{Math.min(5,raw.objetivo_nuevas_90d)}</b> de 5 personas nuevas con carnet</p><span className="sponsor-bar"><span style={{width:`${Math.min(5,raw.objetivo_nuevas_90d)*20}%`}}/></span></div>
+        <div className="sponsor-cats">{([["Nuevas","con carnet",cat.nuevas],["Ya clientes","con carnet",cat.yaClientes],["Sin carnet","declaradas",cat.sinCarnet]] as const).map(([l,sub,n])=><div key={l}><p className="month-stat-num">{n}</p><p className="month-stat-label">{l}</p><p className="month-stat-sub">{sub}</p></div>)}</div>
+        <p className="month-total">{cat.total} {cat.total===1?'visita':'visitas'} en el periodo elegido</p>
+        <h3 className="club-section-title mt-6">Acceso del negocio</h3>
+        <EmailNegocio id={pat.id} email={pat.emailAcceso??''}/><PersonPassword email={pat.emailAcceso??''}/>
+        {dataService.esSuper()&&<><h3 className="club-section-title mt-6">Pruebas</h3><Button disabled={!pat.activo} onClick={()=>enter(pat.id)}><LogIn/>Acceder como este negocio</Button><p className="text-body-sm text-muted-foreground">{pruebas} {pruebas===1?'visita':'visitas'} de prueba (no cuentan en ninguna cifra)</p>{pruebas>0&&<Button variant="outline" onClick={()=>{if(window.confirm('¿Borrar todas las visitas de prueba de este negocio?'))runAction(()=>dataService.borrarVisitasPrueba(pat.id));}}>Borrar visitas de prueba</Button>}</>}
+        {pat.activo&&<><h3 className="club-section-title mt-6">Zona de riesgo</h3><Button variant="outline" className="sponsor-danger" onClick={()=>{setBaja(pat.id);setSelected(null);}}>Dar de baja este negocio</Button></>}
+      </>;})()}</GestionSheet>
       <Button variant="outline" onClick={exportarCSV} className="mt-6 flex h-auto min-h-11 w-full items-center justify-center gap-2 rounded-control font-bold">
         <Download size={18} strokeWidth={1.75} /> Exportar CSV
       </Button>
@@ -120,7 +135,6 @@ function NuevoPatrocinador({ onDone }: { onDone: () => void }) {
   );
   return (
     <div className="mt-4 border-y border-border py-4">
-      <p className="font-black">Nuevo patrocinador</p>
       {campo("nombre", "Nombre")}
       {campo("categoria", "Categoría")}
       <label className="mt-3 block"><span className="label-club">Logo</span><input type="file" accept="image/*" onChange={logo} className="mt-1 block w-full text-body-sm" /></label>

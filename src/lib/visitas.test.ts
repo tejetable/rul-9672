@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estadisticas, fraseMes, progresoObjetivo, repiteViaClub, serieGrafico, yaRegistradaHoy, type Visita } from "./visitas";
+import { categoriasVisitas, estadisticas, fraseMes, progresoObjetivo, repiteViaClub, serieGrafico, yaRegistradaHoy, type Visita } from "./visitas";
 
 const v = (p: Partial<Visita>): Visita => ({
   id: Math.random().toString(),
@@ -58,5 +58,18 @@ describe("gráfico y frase según el filtro", () => {
   it("la frase cambia con el periodo", () => {
     expect(fraseMes({ visitas: 3, nuevas: 1, repiten: 1 }, "90").startsWith("En los últimos 90 días,")).toBe(true);
     expect(fraseMes({ visitas: 3, nuevas: 1, repiten: 1 }, "temporada").startsWith("Esta temporada,")).toBe(true);
+  });
+});
+
+describe("categorías de visita", () => {
+  it("siempre suman el total", () => {
+    const c = categoriasVisitas({ visitas: 6, verificadas: 0, declaradas: 6, nuevas_verificadas: 0 });
+    expect(c.nuevas + c.yaClientes + c.sinCarnet).toBe(6);
+    expect(c.sinCarnet).toBe(6);
+  });
+  it("frase con singular, plural y sin carnet aparte", () => {
+    expect(fraseMes({ visitas: 1, nuevas: 1, repiten: 0, verificadas: 1, declaradas: 0, nuevas_verificadas: 1 })).toBe("Este mes, el club te ha traído 1 visita con carnet: 1 persona nueva.");
+    expect(fraseMes({ visitas: 6, nuevas: 0, repiten: 0, verificadas: 0, declaradas: 6, nuevas_verificadas: 0 }, "90")).toBe("En los últimos 90 días, todavía ninguna visita con carnet. Además, 6 visitas sin carnet.");
+    expect(fraseMes({ visitas: 0, nuevas: 0, repiten: 0 })).toBe("Este mes, todavía no hay visitas registradas.");
   });
 });

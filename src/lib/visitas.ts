@@ -109,6 +109,28 @@ export function serieGrafico(vs: Visita[], patId: string | null, rango: Rango, a
 
 const PREFIJO: Record<Rango, string> = { mes: "Este mes", "90": "En los últimos 90 días", temporada: "Esta temporada" };
 
-export function fraseMes(s: { visitas: number; nuevas: number; repiten: number }, rango: Rango = "mes") {
-  return `${PREFIJO[rango]}, ${s.visitas} personas de nuestra familia han pasado por tu casa. ${s.nuevas} por primera vez, y ${s.repiten} ya han vuelto.`;
+const cuenta = (n: number, uno: string, varios: string) => `${n} ${n === 1 ? uno : varios}`;
+
+/** Las tres categorías de visita, que siempre suman el total: nuevas con carnet, ya clientes con carnet y sin carnet. */
+export function categoriasVisitas(s: { visitas: number; verificadas?: number; declaradas?: number; nuevas_verificadas?: number; nuevas?: number }) {
+  const conCarnet = s.verificadas ?? s.visitas;
+  const sinCarnet = s.declaradas ?? Math.max(0, s.visitas - conCarnet);
+  const nuevas = Math.min(conCarnet, s.nuevas_verificadas ?? s.nuevas ?? 0);
+  return { nuevas, yaClientes: Math.max(0, conCarnet - nuevas), sinCarnet, total: conCarnet + sinCarnet };
+}
+
+/** Frase del periodo para el negocio. Solo cuenta como «del club» lo verificado con carnet. */
+export function fraseMes(s: { visitas: number; nuevas: number; repiten: number; verificadas?: number; declaradas?: number; nuevas_verificadas?: number }, rango: Rango = "mes") {
+  const c = categoriasVisitas(s);
+  if (!c.total) return `${PREFIJO[rango]}, todavía no hay visitas registradas.`;
+  const conCarnet = c.nuevas + c.yaClientes;
+  let frase = conCarnet
+    ? `${PREFIJO[rango]}, el club te ha traído ${cuenta(conCarnet, "visita", "visitas")} con carnet`
+    : `${PREFIJO[rango]}, todavía ninguna visita con carnet`;
+  if (conCarnet) {
+    const partes = [c.nuevas ? cuenta(c.nuevas, "persona nueva", "personas nuevas") : "", c.yaClientes ? cuenta(c.yaClientes, "que ya era cliente", "que ya eran clientes") : ""].filter(Boolean);
+    frase += partes.length ? `: ${partes.join(" y ")}.` : ".";
+  } else frase += ".";
+  if (c.sinCarnet) frase += ` Además, ${cuenta(c.sinCarnet, "visita", "visitas")} sin carnet.`;
+  return frase;
 }

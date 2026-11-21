@@ -14,7 +14,7 @@ export function SociaCabecera() {
   const vista=useVista();
   const member=dataService.sesion()?.socio;
   const contact=dataService.whatsapp(`¡Hola! Soy ${member?.nombre??""}, soci@ nº ${member?.numeroSocio??""}.`);
-  return <header className="socia-header sticky top-0 z-30 grid h-16 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border bg-background px-4">
+  return <header className="socia-header sticky top-0 z-30 grid h-14 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border bg-background px-4">
     <span className="flex items-center"><img src={escudo.url} alt="Escudo del R.U. Lucense" className="socia-crest" /></span>
     <BotonDos on={vista==="noche"} onChange={(v)=>guardarVista(v?"noche":"dia")} label="Vista Strong (noche de partido)" offLabel="Light" onLabel="Strong" offIcon={iconosVista.off} onIcon={iconosVista.on} stars />
     <span className="flex items-center justify-end"><AvisosCampana quien="socias" />
