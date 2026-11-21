@@ -274,6 +274,13 @@
       "when": 1795267376045,
       "tag": "0038_clasificacion_equipos",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1795267500579,
+      "tag": "0039_rival_corto_patrocinador_contacto_aviso_publico",
+      "breakpoints": true
     }
   ]
 }

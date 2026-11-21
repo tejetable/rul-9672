@@ -55,6 +55,7 @@ export type Database = {
           destinatarios: string
           id: string
           publicado_at: string
+          publico: string
           texto: string
           tipo: string
           titulo: string
@@ -63,6 +64,7 @@ export type Database = {
           destinatarios?: string
           id?: string
           publicado_at?: string
+          publico?: string
           texto: string
           tipo: string
           titulo: string
@@ -71,6 +73,7 @@ export type Database = {
           destinatarios?: string
           id?: string
           publicado_at?: string
+          publico?: string
           texto?: string
           tipo?: string
           titulo?: string
@@ -501,6 +504,7 @@ export type Database = {
           pabellon: string
           resultado: string | null
           rival: string
+          rival_corto: string | null
         }
         Insert: {
           competicion?: string | null
@@ -519,6 +523,7 @@ export type Database = {
           pabellon?: string
           resultado?: string | null
           rival: string
+          rival_corto?: string | null
         }
         Update: {
           competicion?: string | null
@@ -537,6 +542,7 @@ export type Database = {
           pabellon?: string
           resultado?: string | null
           rival?: string
+          rival_corto?: string | null
         }
         Relationships: []
       }
@@ -572,12 +578,15 @@ export type Database = {
           email_acceso: string | null
           fecha_alta: string
           fecha_baja: string | null
+          horario: string | null
           id: string
           importe_patrocinio: number
           logo_url: string
           motivo_baja: string | null
           nombre: string
           pin_hash: string
+          telefono: string | null
+          web: string | null
         }
         Insert: {
           activo?: boolean
@@ -587,12 +596,15 @@ export type Database = {
           email_acceso?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
+          horario?: string | null
           id?: string
           importe_patrocinio?: number
           logo_url?: string
           motivo_baja?: string | null
           nombre: string
           pin_hash: string
+          telefono?: string | null
+          web?: string | null
         }
         Update: {
           activo?: boolean
@@ -602,12 +614,15 @@ export type Database = {
           email_acceso?: string | null
           fecha_alta?: string
           fecha_baja?: string | null
+          horario?: string | null
           id?: string
           importe_patrocinio?: number
           logo_url?: string
           motivo_baja?: string | null
           nombre?: string
           pin_hash?: string
+          telefono?: string | null
+          web?: string | null
         }
         Relationships: []
       }

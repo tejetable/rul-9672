@@ -48,6 +48,9 @@ export interface Patrocinador {
   fechaBaja?: string | null;
   motivoBaja?: string | null;
   activo: boolean;
+  telefono?: string | null;
+  horario?: string | null;
+  web?: string | null;
 }
 export interface Ventaja {
   id: string;
@@ -84,6 +87,7 @@ export interface Partido {
   horaConfirmada?: boolean;
   fechaConfirmada?: boolean;
   driveFolderId?: string | null;
+  rivalCorto?: string | null;
 }
 export interface Aviso {
   id: string;
@@ -91,8 +95,8 @@ export interface Aviso {
   texto: string;
   fecha: string;
   tipo: "otro" | "ventaja" | "club";
-  /** A quién va dirigido; sin valor = todos */
-  para?: "todos" | "socias" | "negocios";
+  /** A quién va dirigido */
+  publico: "socios" | "negocios" | "todos";
 }
 export interface Jugador {id:string;nombre:string;apodo:string;dorsal:number|null;activo:boolean}
 export interface EstadisticaJugador {jugadorId:string;goles:number;asistencias:number;amarillas:number;rojas:number}
@@ -202,9 +206,9 @@ export const dataService = {
   async emailNegocio(id:string,email:string){const r=await supabase.rpc('asignar_negocio_email',{p_id:id,p_email:normalizarEmail(email)});check(r.error);await this.refresh();},
   async elegirRol(id:string){const chosen=roles.find(r=>r.id===id);if(!chosen)throw new Error('Rol no autorizado');const r=await supabase.rpc('elegir_vista',{p_role:id});check(r.error);selectedRole=id;role=chosen.rol;linkedSocio=chosen.socio_id;sessionState=role==='socia'?'ok':null;window.localStorage.setItem('rul-last-email-role',id);await this.refresh();},
   async albumes(){return (await getDriveGallery()).albumes;},
-  async guardarPartido(input:{id?:string;jornada:number;rival:string;fechaHora:string;esLocal:boolean;lugar:string;competicion:string;driveUrl:string;horaConfirmada?:boolean}){
+  async guardarPartido(input:{id?:string;jornada:number;rival:string;fechaHora:string;esLocal:boolean;lugar:string;competicion:string;driveUrl:string;horaConfirmada?:boolean;rivalCorto?:string}){
     const folder=folderIdFromUrl(input.driveUrl);if(input.driveUrl.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');
-    const row={fecha_confirmada:true,hora_confirmada:input.horaConfirmada??true,jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder};
+    const row={fecha_confirmada:true,hora_confirmada:input.horaConfirmada??true,jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder,rival_corto:input.rivalCorto?.trim()||null};
     const r=input.id?await supabase.from('partidos').update(row).eq('id',input.id).select('id').single():await supabase.from('partidos').insert(row).select('id').single();check(r.error);await this.refresh();
   },
   async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);await this.refresh();},
@@ -244,7 +248,7 @@ export const dataService = {
     if (!userId || !role) { db = emptyDB(); notify(); return; }
     const [socios, pats, ventajas, visitas, partidos, avisos, leidos, stats, tabla] = await Promise.all([
       allRows((a,b) => supabase.from('socios').select('*').order('numero_socio').range(a,b)),
-      allRows((a,b) => supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,importe_patrocinio,fecha_baja,motivo_baja,email_acceso').order('fecha_alta').range(a,b)),
+      allRows((a,b) => supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,importe_patrocinio,fecha_baja,motivo_baja,email_acceso,telefono,horario,web').order('fecha_alta').range(a,b)),
       allRows((a,b) => supabase.from('ventajas').select('*').order('id').range(a,b)),
       role === 'socia' ? Promise.resolve([]) : allRows((a,b) => {
         const q=supabase.from('visitas').select('*').order('fecha_hora');
@@ -258,11 +262,11 @@ export const dataService = {
     ]);
     check(stats.error);check(tabla.error);
     liga={pj:stats.data?.pj??0,g:stats.data?.g??0,e:stats.data?.e??0,p:stats.data?.p??0,puntos:stats.data?.puntos??0,goles_favor:stats.data?.goles_favor??0,goles_contra:stats.data?.goles_contra??0,racha:stats.data?.racha??[]};clasificacion=tabla.data;
-    db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja })),
+    db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja,telefono:p.telefono,horario:p.horario,web:p.web })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:textoMiembros(v.titulo),descripcion:textoMiembros(v.descripcion),condiciones:textoMiembros(v.condiciones),activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,esPrueba:v.es_prueba,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
-      partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,fechaConfirmada:p.fecha_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id})),
-      avisos:avisos.map(a=>({id:a.id,titulo:textoMiembros(a.titulo),texto:textoMiembros(a.texto),fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],para:a.destinatarios as NonNullable<Aviso['para']>})),canjes:[],socioActualId:linkedSocio };
+      partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,fechaConfirmada:p.fecha_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id,rivalCorto:p.rival_corto})),
+      avisos:avisos.map(a=>({id:a.id,titulo:textoMiembros(a.titulo),texto:textoMiembros(a.texto),fecha:a.publicado_at,tipo:a.tipo as Aviso['tipo'],publico:a.publico as Aviso['publico']})),canjes:[],socioActualId:linkedSocio };
     if(role==='socia'){const status=await supabase.rpc('estado_sesion_socia');sessionState=status.data as typeof sessionState;}
     if(role==='negocio'){const names=await supabase.rpc('visit_names_today');visitNames=(names.data??{}) as unknown as typeof visitNames;}
     roles=roles.map(r=>({...r,numero_socio:db.socios.find(s=>s.id===r.socio_id)?.numeroSocio??r.numero_socio}));
@@ -275,7 +279,7 @@ export const dataService = {
   sesion(): {socio:Socio;estado:'ok'|'movido'|'desactivada'} | null {const s=db.socios.find(s=>s.id===linkedSocio);return s?{socio:s,estado:s.estado==='activa'?'ok':'desactivada'}:null;},
   async cerrarSesion(){ loginPassword='';acceso={tiene_password:false,debe_cambiar_password:false,ha_accedido:false};if(channel){await supabase.removeChannel(channel);channel=null;} db=emptyDB();reads=[];roles=[];selectedRole=null;settings={...defaultSettings,email_club:''};role=null;userId=null;linkedSocio=null;sessionState=null;visitNames={};notify();const r=await supabase.auth.signOut();check(r.error); },
   async marcarApertura(_id:string){const r=await supabase.rpc('marcar_apertura');check(r.error);},
-  async crearPatrocinador(p:Omit<Patrocinador,'id'|'activo'>,v:{titulo:string;descripcion:string;condiciones:string}):Promise<Patrocinador|'pin_usado'> {const r=await supabase.rpc('crear_negocio_email',{p_nombre:p.nombre,p_categoria:p.categoria,p_direccion:p.direccion,p_logo:p.logoUrl,p_email:normalizarEmail(p.emailAcceso??''),p_titulo:v.titulo,p_descripcion:v.descripcion,p_condiciones:v.condiciones,p_importe:p.importePatrocinio??0});check(r.error);await this.refresh();const pat=db.patrocinadores.find(x=>x.id===r.data);if(!pat)throw new Error('No se pudo leer el patrocinador.');return pat;},
+  async crearPatrocinador(p:Omit<Patrocinador,'id'|'activo'>,v:{titulo:string;descripcion:string;condiciones:string}):Promise<Patrocinador|'pin_usado'> {const r=await supabase.rpc('crear_negocio_email',{p_nombre:p.nombre,p_categoria:p.categoria,p_direccion:p.direccion,p_logo:p.logoUrl,p_email:normalizarEmail(p.emailAcceso??''),p_titulo:v.titulo,p_descripcion:v.descripcion,p_condiciones:v.condiciones,p_importe:p.importePatrocinio??0});check(r.error);await this.refresh();if(p.telefono||p.horario||p.web)await this.contactoPatrocinador(r.data as string,{telefono:p.telefono??'',horario:p.horario??'',web:p.web??''});const pat=db.patrocinadores.find(x=>x.id===r.data);if(!pat)throw new Error('No se pudo leer el patrocinador.');return pat;},
   negocioSesion(){const id=negocioPrueba??roles.find(r=>r.id===selectedRole)?.patrocinador_id;return role==='negocio'||negocioPrueba?db.patrocinadores.find(p=>p.id===id)??null:null;},
   abrirNegocio(_id:string){},
   cerrarNegocio(){return this.cerrarSesion();},
@@ -284,10 +288,12 @@ export const dataService = {
     if(negocioPrueba){const r=await supabase.rpc('guardar_visita_prueba',{p_negocio:input.patrocinadorId,...(input.socio?{p_socio:input.socio.id}:{}),p_origen:input.origen==='sin_carne'?'sin_carnet':input.origen,p_tipo:input.tipoCliente,...(input.gasto?{p_gasto:input.gasto}:{})});if(r.error?.code==='23505')return 'duplicada';check(r.error);await this.refresh();const v=db.visitas.find(v=>v.id===r.data);if(!v)throw new Error('No se pudo leer la visita.');return v;}
     const r=await supabase.from('visitas').insert({patrocinador_id:input.patrocinadorId,socio_id:input.socio?.id ?? null,origen:input.origen==='sin_carne'?'sin_carnet':input.origen,tipo_cliente:input.tipoCliente,tramo_gasto:input.gasto||null}).select().single();if(r.error?.code==='23505')return 'duplicada';check(r.error);await this.refresh();const v=db.visitas.find(v=>v.id===r.data?.id);if(!v)throw new Error('No se pudo leer la visita.');return v;},
   async anularVisita(id:string){if(negocioPrueba){const r=await supabase.rpc('anular_visita_prueba',{p_id:id});check(r.error);await this.refresh();return;}const r=await supabase.from('visitas').update({anulada:true}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('Solo puedes anular visitas de los últimos 10 minutos.');await this.refresh();},
-  async crearAviso(a:{titulo:string;texto:string;tipo:Aviso['tipo'];para:NonNullable<Aviso['para']>}){const r=await supabase.from('avisos').insert({titulo:a.titulo,texto:a.texto,tipo:a.tipo,destinatarios:a.para});check(r.error);await this.refresh();},
+  async crearAviso(a:{titulo:string;texto:string;tipo:Aviso['tipo'];publico:Aviso['publico']}){const r=await supabase.from('avisos').insert({titulo:a.titulo,texto:a.texto,tipo:a.tipo,publico:a.publico});check(r.error);await this.refresh();},
+  async editarAviso(id:string,a:{titulo:string;texto:string;tipo:Aviso['tipo'];publico:Aviso['publico']}){const r=await supabase.from('avisos').update({titulo:a.titulo,texto:a.texto,tipo:a.tipo,publico:a.publico}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('No autorizado');await this.refresh();},
+  async contactoPatrocinador(id:string,c:{telefono:string;horario:string;web:string}){const r=await supabase.from('patrocinadores').update({telefono:c.telefono.trim()||null,horario:c.horario.trim()||null,web:c.web.trim()||null}).eq('id',id).select('id');check(r.error);if(!r.data?.length)throw new Error('No autorizado');await this.refresh();},
   async borrarAviso(id:string){const r=await supabase.from('avisos').delete().eq('id',id);check(r.error);await this.refresh();},
   avisosLeidos:()=>reads,
-  avisosPara(quien:'socias'|'negocios'){return db.avisos.filter(a=>!a.para||a.para==='todos'||a.para===quien);},
+  avisosPara(quien:'socias'|'negocios'){const p=quien==='socias'?'socios':'negocios';return db.avisos.filter(a=>a.publico==='todos'||a.publico===p);},
   async marcarAvisosLeidos(quien:'socias'|'negocios'){if(!userId)return;const rows=this.avisosPara(quien).filter(a=>!reads.includes(a.id)).map(a=>({aviso_id:a.id,user_id:userId ?? '',socio_id:linkedSocio}));if(!rows.length)return;const r=await supabase.from('avisos_leidos').insert(rows);if(r.error?.code!=='23505')check(r.error);await this.refresh();},
   async statsPatrocinador(id:string,rango:Rango,incluirPrueba=false){const r=await supabase.rpc(incluirPrueba?'stats_negocio_prueba':'stats_patrocinador',{p_patrocinador_id:id,p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubStats;},
   async statsClub(rango:Rango){const r=await supabase.rpc('stats_club',{p_periodo:rango==='90'?'90d':rango});check(r.error);return r.data as unknown as ClubSummary;},
