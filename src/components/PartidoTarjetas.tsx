@@ -1,4 +1,5 @@
 import {Link} from "@tanstack/react-router";
+import { GoleadoresPartido } from "./GoleadoresPartido";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useRef, useState } from "react";
@@ -254,6 +255,7 @@ function ResultadosCarrusel({partidos}:{partidos:Partido[]}){
       <p>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}<span>{fechaCorta(partido)}{partido.jornada?` · J${partido.jornada}`:''}</span></p>
       {folder&&<Link className="sc-photos" to="/galeria/$folderId" params={{folderId:folder}} search={{foto:''}}>Fotos<ArrowRight size={14} strokeWidth={2} aria-hidden="true"/></Link>}
     </div>
+    <GoleadoresPartido partidoId={partido.id}/>
   </section>;
 }
 
@@ -303,6 +305,7 @@ export function MarcadorPaletas({partidos,elegido}:{partidos:Partido[];elegido?:
       <div className={`flap-row ${pierdeVisit?'is-loser':''}`} aria-hidden="true"><Paleta valor={visit} pasos={nom(visit)} clase="is-name" retraso={90}/><Paleta valor={gv} pasos={num(gv)} clase="is-num" retraso={150}/></div>
       <div className="flap-meta"><span>J{partido.jornada} · {fechaCorta(partido)}</span>{r&&<span className={`sc-result-word is-${r}`}>{r==='V'?'Victoria':r==='E'?'Empate':'Derrota'}</span>}</div>
     </div>
+    <GoleadoresPartido partidoId={partido.id}/>
   </section>;
 }
 export function CasaFiltro({casa,onChange}:{casa:boolean;onChange:(v:boolean)=>void}){
