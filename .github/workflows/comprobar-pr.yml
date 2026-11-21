@@ -1,8 +1,8 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # COMPROBAR EL PR · el control de calidad automático (CI)
 #
-# Cuándo: cada vez que se abre o actualiza un Pull Request, y en cada push
-#         a una rama que no sea main (incluidas las ramas de Lovable).
+# Cuándo: cada vez que se abre o actualiza un Pull Request (también los de
+#         las ramas de Lovable). Sin PR no se comprueba: abre el PR para verlo.
 # Qué hace: instala, pasa las pruebas y comprueba que el proyecto compila.
 # Qué necesita: nada. No usa ningún secreto.
 #
@@ -12,8 +12,6 @@ name: Comprobar el PR
 
 on:
   pull_request:
-  push:
-    branches-ignore: [main]
 
 permissions:
   contents: read
