@@ -253,6 +253,13 @@
       "when": 1795266798407,
       "tag": "0035_jugadores_estadisticas",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1795267080253,
+      "tag": "0036_pieza_resultado",
+      "breakpoints": true
     }
   ]
 }

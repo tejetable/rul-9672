@@ -414,6 +414,7 @@ export type Database = {
           goles_favor: number | null
           hora_confirmada: boolean
           id: string
+          imagen_resultado_url: string | null
           jornada: number | null
           jugado: boolean
           lugar: string
@@ -431,6 +432,7 @@ export type Database = {
           goles_favor?: number | null
           hora_confirmada?: boolean
           id?: string
+          imagen_resultado_url?: string | null
           jornada?: number | null
           jugado?: boolean
           lugar?: string
@@ -448,6 +450,7 @@ export type Database = {
           goles_favor?: number | null
           hora_confirmada?: boolean
           id?: string
+          imagen_resultado_url?: string | null
           jornada?: number | null
           jugado?: boolean
           lugar?: string
