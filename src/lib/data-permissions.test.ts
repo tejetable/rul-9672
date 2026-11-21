@@ -12,9 +12,9 @@ describe.skipIf(!sessionFile)('Cloud sponsor column permissions', () => {
   });
 
   async function readColumns(columns: string) {
-    return fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/patrocinadores?select=${columns}&limit=1`, {
+    return fetch(`${import.meta.env['VITE_SUPABASE_URL']}/rest/v1/patrocinadores?select=${columns}&limit=1`, {
       headers: {
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        apikey: import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'],
         Authorization: `Bearer ${token}`,
       },
     });
