@@ -832,6 +832,12 @@ main [class*="shadow-lg"],main [class*="shadow-md"],main [class*="shadow-xl"],[d
 .sc-result-bar.is-D { background: var(--rojo); }
 .sc-score-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; min-height: 32px; }
 .sc-score-foot p { display: flex; min-width: 0; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+/* Goleadores (balón) y asistentes (bota) bajo el último resultado y el marcador de paletas. */
+.match-scorers { display: grid; gap: 6px; margin-top: 12px; font-size: 14px; line-height: 1.35; color: var(--foreground); }
+.match-scorers p { display: flex; align-items: center; gap: 10px; margin: 0; }
+.match-scorers svg { flex: none; width: 28px; height: 28px; }
+.match-scorers-list > span:not(.sr-only) + span::before { content: " · "; opacity: .6; }
+.match-scorers b { font-weight: 900; }
 /* Chip de resultado (componente Chips): pill, 12/700, sin mayúsculas. */
 .sc-result-word { display: inline-flex; height: 24px; align-items: center; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--blanco); }
 .sc-result-word.is-E { background: var(--tinta-suave); }
