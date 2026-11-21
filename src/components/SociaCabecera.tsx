@@ -1,6 +1,8 @@
 import {PasswordMenuItem} from './PasswordManagement';
 import {VerComoItems} from "@/components/VerComo";
-import { Instagram, LogOut, MessageCircle, MoreHorizontal, Twitch } from "lucide-react";
+import { Download, Instagram, LogOut, MessageCircle, MoreHorizontal, Twitch } from "lucide-react";
+import { toast } from "sonner";
+import { useInstalarApp } from "@/lib/pwa";
 import { BotonDos, iconosVista } from "@/components/SwitchVista";
 import { guardarVista, useVista } from "@/lib/vista";
 import { escudo } from "@/assets/recursos";
@@ -12,6 +14,7 @@ import { dataService, runAction } from "@/lib/dataService";
 
 export function SociaCabecera() {
   const vista=useVista();
+  const app=useInstalarApp();
   const member=dataService.sesion()?.socio;
   const contact=dataService.whatsapp(`¡Hola! Soy ${member?.nombre??""}, soci@ nº ${member?.numeroSocio??""}.`);
   return <header className="socia-header sticky top-0 z-30 grid h-14 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-border bg-background px-4">
@@ -23,6 +26,7 @@ export function SociaCabecera() {
       <DropdownMenuContent align="end" collisionPadding={12} className="w-56 max-w-[calc(100vw-24px)] rounded-tile bg-background">
         <VerComoItems/>
         {contact&&<DropdownMenuItem asChild><a href={contact} target="_blank" rel="noopener noreferrer" className="min-h-11"><MessageCircle strokeWidth={1.75} />Contactar con el club</a></DropdownMenuItem>}
+        {app.disponible&&<DropdownMenuItem onSelect={()=>{if(app.ios)toast("Instala la app en tu iPhone",{description:"Pulsa Compartir (el cuadrado con la flecha) y luego «Añadir a pantalla de inicio».",duration:10000});else void app.instalar();}} className="min-h-11"><Download strokeWidth={1.75} />Instalar la app</DropdownMenuItem>}
         <DropdownMenuItem asChild><a href="https://www.instagram.com/realunionlucense/" target="_blank" rel="noopener noreferrer" className="min-h-11"><Instagram strokeWidth={1.75} />Instagram</a></DropdownMenuItem>
         <DropdownMenuItem asChild><a href="https://www.twitch.tv/adrifdez_10" target="_blank" rel="noopener noreferrer" className="min-h-11"><Twitch strokeWidth={1.75} />Twitch</a></DropdownMenuItem>
         <DropdownMenuSeparator /><PasswordMenuItem/>
