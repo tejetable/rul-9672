@@ -134,6 +134,54 @@ export type Database = {
         }
         Relationships: []
       }
+      clasificacion_equipos: {
+        Row: {
+          e: number
+          equipo: string
+          es_nuestro: boolean
+          g: number
+          gc: number
+          gf: number
+          id: string
+          jornada: number
+          p: number
+          pj: number
+          posicion: number
+          puntos: number
+          updated_at: string
+        }
+        Insert: {
+          e?: number
+          equipo: string
+          es_nuestro?: boolean
+          g?: number
+          gc?: number
+          gf?: number
+          id?: string
+          jornada: number
+          p?: number
+          pj?: number
+          posicion: number
+          puntos?: number
+          updated_at?: string
+        }
+        Update: {
+          e?: number
+          equipo?: string
+          es_nuestro?: boolean
+          g?: number
+          gc?: number
+          gf?: number
+          id?: string
+          jornada?: number
+          p?: number
+          pj?: number
+          posicion?: number
+          puntos?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clubes: {
         Row: {
           created_at: string
@@ -1288,6 +1336,10 @@ export type Database = {
           p_patrocinador?: string
           p_rol: Database["public"]["Enums"]["club_role"]
         }
+        Returns: undefined
+      }
+      guardar_clasificacion: {
+        Args: { p_filas: Json; p_jornada: number }
         Returns: undefined
       }
       guardar_estadisticas: {

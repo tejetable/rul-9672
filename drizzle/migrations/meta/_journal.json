@@ -267,6 +267,13 @@
       "when": 1795267247608,
       "tag": "0037_convocatorias",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1795267376045,
+      "tag": "0038_clasificacion_equipos",
+      "breakpoints": true
     }
   ]
 }
