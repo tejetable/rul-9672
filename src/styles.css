@@ -1442,3 +1442,44 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 #marcador-paletas { scroll-margin-top: 72px; }
 .cal-card { gap: 12px; padding: 12px 16px; }
 .cal-list { gap: 8px; }
+
+/* ── Escritorio (≥ 1024 px) ─────────────────────────────────────────────
+   Gestión del club a pantalla completa con menú lateral.
+   Soci@, negocio y acceso: la columna de móvil, con la marca del club al lado. */
+.club-marca-escritorio { display: none; }
+@media (min-width: 1024px) {
+  .club-frame-ancho { padding: 0; background: var(--background); }
+  .club-frame-ancho > main { max-width: none; border-radius: 0; overflow: visible; }
+
+  .club-frame-movil { display: flex; align-items: flex-start; justify-content: center; gap: 64px; padding: 48px 32px; background: var(--background); }
+  .club-frame-movil > main { flex: 0 0 430px; margin: 0; min-height: calc(100dvh - 96px); box-shadow: 0 0 0 1px rgba(185, 142, 74, .45); }
+  .club-marca-escritorio { display: flex; flex-direction: column; gap: 16px; flex: 0 1 380px; padding-top: 48px; color: var(--foreground); }
+  .club-marca-escudo { width: 120px; height: auto; margin-bottom: 16px; }
+  .club-marca-label { font-size: 12px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--oro-texto, #6E5122); }
+  .club-marca-lema { font-size: 40px; line-height: 1.05; font-weight: 900; text-transform: uppercase; }
+  .club-marca-filete { display: block; width: 48px; height: 3px; background: #B98E4A; }
+  .club-marca-movil { display: flex; align-items: center; gap: 20px; margin-top: 16px; padding: 20px; border-radius: 16px; background: var(--card); }
+  .club-marca-movil svg { flex: none; border-radius: 12px; box-shadow: inset 0 0 0 2px #9C7434; }
+
+  .dir-escritorio { display: flex; width: 100%; min-height: 100dvh; }
+  .dir-nav { position: sticky; top: 0; align-self: flex-start; display: flex; flex-direction: column; gap: 4px; flex: 0 0 248px; box-sizing: border-box; height: 100dvh; padding: 24px 16px; background: var(--card); border-right: 1px solid rgba(185, 142, 74, .45); }
+  .dir-nav-club { display: flex; align-items: center; gap: 12px; padding: 0 8px 24px; }
+  .dir-nav-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 0 12px; border-radius: var(--radius-control); background: transparent; color: var(--foreground); font-size: 15px; font-weight: 700; text-align: left; cursor: pointer; }
+  .dir-nav-item:hover { background: var(--background); }
+  .dir-nav-item[aria-current="page"] { background: var(--primary); color: var(--primary-foreground); }
+  .dir-nav-item:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .dir-nav-extra { display: flex; align-items: center; gap: 4px; padding-top: 12px; border-top: 1px solid rgba(185, 142, 74, .35); }
+  .dir-main { flex: 1 1 auto; min-width: 0; max-width: 1040px; padding: 32px 24px 64px; }
+  /* Listas como tabla: nombre y segunda línea (email, fecha…) en columnas, y la cabecera de orden alineada. */
+  .dir-main .member-list-tools { top: 0; padding-top: 4px; }
+  .dir-main .club-list-row, .dir-main .member-columns { grid-template-columns: 64px minmax(0, 1fr) 140px; column-gap: 16px; padding-inline: 20px; }
+  .dir-main .club-list-row { min-height: 56px; }
+  .dir-main .list-row-text { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px; align-items: center; }
+  .dir-main .list-row-subtitle { margin-top: 0; }
+  .dir-main .list-row-leading { font-family: var(--font-display); font-size: 20px; color: var(--oro-texto); }
+  .dir-main .member-columns .member-column { justify-self: start; }
+  .dir-main .member-columns .member-column:nth-child(3) { width: auto; }
+  .dir-main .member-filters { flex-wrap: wrap; overflow: visible; }
+  /* Ficha a la derecha (GestionSheet en escritorio). */
+  .club-side-panel { width: 480px; max-width: 480px; height: 100dvh; overflow-y: auto; padding: 0; border-left: 1px solid rgba(185, 142, 74, .45); }
+}

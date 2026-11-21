@@ -19,6 +19,12 @@ import { escudo as escudoTransparente } from "@/assets/recursos";
 import { RoleSwitcher, type Role } from "@/components/RoleSwitcher";
 import { SociaApp } from "@/components/SociaApp";
 import { ClubPanel } from "@/components/ClubPanel";
+import { PartidosPanel } from "@/components/PartidosPanel";
+import { AvisosPanel } from "@/components/Avisos";
+import { PlantillaPanel } from "@/components/PlantillaPanel";
+import { useEscritorio } from "@/hooks/use-escritorio";
+import { QRCodeSVG } from "qrcode.react";
+import { Bell, CalendarDays, Shirt, Store, Users } from "lucide-react";
 import { SociasPanel } from "@/components/SociasPanel";
 import { PatrocinadoresPanel } from "@/components/PatrocinadoresPanel";
 import { NegocioApp } from "@/components/NegocioApp";
@@ -48,7 +54,8 @@ function Index() {
  const role=dataService.rol(),sesion=dataService.sesion(),roles=dataService.roles();
  const unknown=dataService.autenticado()&&roles.length===0;
  const content=!ready||wait?<Cargando/>:dataService.autenticado()?dataService.acceso().debe_cambiar_password?<ForcedPassword/>:unknown?<section className="space-y-5 px-4 py-10"><ClubCabecera etiqueta="Acceso"/><h1 className="club-title">Este email no está en el club todavía.</h1><UneteFamilia/><Button variant="ghost" onClick={()=>runAction(()=>dataService.cerrarSesion())}>Salir</Button></section>:!role?<EleccionRol/>:role==='directiva'||role==='super_admin'?<Directiva/>:role==='negocio'?<NegocioApp/>:sesion?.estado==='ok'?<SociaApp socio={sesion.socio}/>:<CarneMovido estado="desactivada"/>:<Bienvenida onEnter={()=>setPage('login')}/>;
- return <AppFrame>{page==='login'&&!dataService.autenticado()?<EmailAcceso onBack={()=>setPage('welcome')} onDone={()=>setPage('welcome')}/>:content}{ready&&!wait&&DEMO_MODE&&<RoleSwitcher role={demoRole} onChange={r=>{window.localStorage.setItem(ROLE_KEY,r);setDemoRole(r);}}/>}</AppFrame>;
+ const gestion=dataService.autenticado()&&(role==='directiva'||role==='super_admin');
+ return <AppFrame ancho={gestion}>{page==='login'&&!dataService.autenticado()?<EmailAcceso onBack={()=>setPage('welcome')} onDone={()=>setPage('welcome')}/>:content}{ready&&!wait&&DEMO_MODE&&<RoleSwitcher role={demoRole} onChange={r=>{window.localStorage.setItem(ROLE_KEY,r);setDemoRole(r);}}/>}</AppFrame>;
 }
 
 function Cargando() {
@@ -61,14 +68,32 @@ function Cargando() {
   );
 }
 
-export function AppFrame({ children, crema = false }: { children: React.ReactNode; crema?: boolean }) {
+export function AppFrame({ children, crema = false, ancho = false }: { children: React.ReactNode; crema?: boolean; ancho?: boolean }) {
+  // ancho: gestión del club, que en escritorio ocupa toda la pantalla. El resto (soci@, negocio, acceso) es una app de móvil:
+  // en escritorio se queda en su columna, con la marca del club al lado.
   return (
-    <div className="club-full-height bg-primary sm:py-6">
+    <div className={`club-full-height bg-primary sm:py-6 ${ancho ? "club-frame-ancho" : "club-frame-movil"}`}>
+      {!ancho && <MarcaEscritorio />}
       <main className={`relative mx-auto flex club-full-height w-full max-w-[430px] flex-col sm:club-full-height sm:overflow-clip sm:rounded-[2rem] ${crema ? "hero-crema" : "bg-background"}`}>
         {children}
       </main>
     </div>
   );
+}
+
+function MarcaEscritorio() {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => setUrl(window.location.origin), []);
+  return <aside className="club-marca-escritorio" aria-label="Real Unión Lucense F.S.">
+    <img src={escudoTransparente.url} alt="Escudo del Real Unión Lucense F.S." className="club-marca-escudo" />
+    <p className="club-marca-label">Real Unión Lucense F.S. · Guntín</p>
+    <p className="club-marca-lema">Más que un club, un grupo de amigos.</p>
+    <span className="club-marca-filete" aria-hidden="true" />
+    <div className="club-marca-movil">
+      {url && <QRCodeSVG value={url} size={112} marginSize={2} bgColor="#FFFFFF" fgColor="#0D4631" aria-label="Código QR para abrir la app en el móvil" />}
+      <div><p className="font-black">Llévala en el móvil</p><p className="text-body-sm text-muted-foreground">Escanea el código y añádela a tu pantalla de inicio. Para enseñar el carnet en un negocio, usa el móvil.</p></div>
+    </div>
+  </aside>;
 }
 
 function UneteFamilia(){return <div className="text-center text-body-sm">¿Aún no eres soci@? <Button asChild variant="link" className="h-auto p-0 text-body-sm underline"><Link to={UNETE_DESTINO}>¡Únete a la familia!</Link></Button></div>;}
@@ -91,10 +116,15 @@ function CarneMovido({ estado }: { estado: "movido" | "desactivada" }) {
   );
 }
 
+type SeccionGestion = "socias" | "patro" | "partidos" | "avisos" | "plantilla";
+const SECCIONES_ESCRITORIO = [["socias", "Soci@s", Users], ["patro", "Patrocinadores", Store], ["partidos", "Partidos", CalendarDays], ["avisos", "Avisos", Bell], ["plantilla", "Plantilla", Shirt]] as const;
+
 function Directiva() {
+  const escritorio = useEscritorio();
   const [page,setPage]=useState<"equipo"|"ajustes"|null>(null);
   const [t, setT] = useState<"socias" | "patro" | "club">("socias");
   if(page&&dataService.esSuper())return <ClubAdmin page={page} onClose={()=>setPage(null)}/>;
+  if(escritorio)return <DirectivaEscritorio onOpen={setPage}/>;
   return (
     <div className="flex flex-1 flex-col">
       <ClubCabecera><VerComo/><ClubAdminMenu onOpen={setPage}/></ClubCabecera>
@@ -107,6 +137,24 @@ function Directiva() {
       </div>
       {t === "socias" ? <SociasPanel /> : t === "patro" ? <PatrocinadoresPanel /> : <ClubPanel />}
 
+    </div>
+  );
+}
+
+function DirectivaEscritorio({ onOpen }: { onOpen: (p: "equipo" | "ajustes") => void }) {
+  const [s, setS] = useState<SeccionGestion>("socias");
+  return (
+    <div className="dir-escritorio">
+      <nav className="dir-nav" aria-label="Gestión del club">
+        <div className="dir-nav-club"><img src={escudoTransparente.url} alt="Escudo del R.U. Lucense" className="size-10 object-contain" /><div><p className="text-body-sm font-black">R.U. Lucense</p><p className="text-label uppercase text-muted-foreground">Club</p></div></div>
+        {SECCIONES_ESCRITORIO.map(([id, l, Icono]) => <button key={id} type="button" className="dir-nav-item" aria-current={s === id ? "page" : undefined} onClick={() => setS(id)}><Icono size={20} strokeWidth={1.75} aria-hidden="true" />{l}</button>)}
+        <div className="flex-1" />
+        <div className="dir-nav-extra"><VerComo /><ClubAdminMenu onOpen={onOpen} /></div>
+      </nav>
+      <section className="dir-main" aria-label={SECCIONES_ESCRITORIO.find(x => x[0] === s)?.[1]}>
+        {!dataService.ajustes().whatsapp_club && <p className="mx-4 mb-3 text-body-sm">Falta el WhatsApp del club en Ajustes</p>}
+        {s === "socias" ? <SociasPanel /> : s === "patro" ? <PatrocinadoresPanel /> : s === "partidos" ? <PartidosPanel /> : s === "avisos" ? <AvisosPanel /> : <PlantillaPanel />}
+      </section>
     </div>
   );
 }
