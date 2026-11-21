@@ -1,5 +1,6 @@
 import {Link} from "@tanstack/react-router";
 import { GoleadoresPartido } from "./GoleadoresPartido";
+import { LigaPestanas, abrirLiga } from "./LigaPestanas";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
 import { useEffect, useRef, useState } from "react";
@@ -97,6 +98,7 @@ export function Liga() {
   useClubData();
   return <section aria-label="Liga">
     <TemporadaCard/>
+    <LigaPestanas/>
   </section>;
 }
 
@@ -120,7 +122,6 @@ export function TemporadaCard(){
     <div className="sc-lower">
       <TablaResumen/>
       <ResultadosCarrusel partidos={db.partidos}/>
-      <ProximosEnCard partidos={db.partidos} siguienteId={partido?.id} ahora={ref}/>
       <Link to="/calendario" className="sc-calendar-link">Calendario completo<ArrowRight size={16} strokeWidth={2} aria-hidden="true"/></Link>
     </div>
   </article>;
@@ -176,7 +177,7 @@ function TablaResumen(){
   const nombre=(r:string|null)=>r==='V'?'Victoria':r==='E'?'Empate':r==='D'?'Derrota':'Sin resultado';
   const url=dataService.ajustes().url_clasificacion_futgal;
   return <section className="sc-league" aria-label="Nuestra liga">
-    <a className="sc-pos-tile" href={url} target="_blank" rel="noopener noreferrer" aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
+    <a className="sc-pos-tile" href="#liga-pestanas" onClick={e=>{e.preventDefault();abrirLiga('clasificacion');}} aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
       <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
       <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
     </a>
