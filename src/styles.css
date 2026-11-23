@@ -1548,20 +1548,35 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .liga-podio-escalon.is-1 .liga-podio-puesto { color: #fff; }
 .theme-noche .liga-podio-valor { color: var(--oro-claro); }
 
-/* ───────── Tarjeta de temporada: posición y puntos en dos recuadros iguales, el resto a la derecha, a todo el ancho ───────── */
-.sc-league { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
-.sc-league-tiles { display: flex; flex: none; gap: 8px; }
-.sc-pts-tile { flex-direction: column; gap: 2px; cursor: default; }
-.sc-pts-tile:hover { border-color: transparent; }
-.sc-pts-tile:active { transform: none; }
+/* ───────── Tarjeta de temporada: posición y puntos con la racha debajo; a la derecha, J G E P y GF GC DG ───────── */
+.sc-league { --pos-tile: 80px; display: flex; align-items: stretch; gap: 8px; }
+.sc-league-left { display: flex; flex: none; flex-direction: column; gap: 10px; }
+.sc-league-tiles { display: flex; gap: 8px; }
+.sc-league .sc-pos-tile { width: 72px; height: var(--pos-tile); }
 .sc-pos-tile .sc-pos-num { line-height: 1; padding-top: 2px; }
+.sc-pts-tile { flex-direction: column; gap: 2px; cursor: default; }
+.sc-pts-tile:hover, .sc-stats-tile:hover { border-color: transparent; }
+.sc-pts-tile:active, .sc-stats-tile:active { transform: none; }
 .sc-pts-tile .sc-pos-num { margin-left: 0; font-size: 40px; }
 .sc-tile-label { font-size: 11px; font-weight: 900; line-height: 1; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
 .theme-dia .sc-tile-label { color: var(--oro-texto); }
-.sc-league-body { flex: 1 1 auto; align-items: flex-end; text-align: right; }
-.sc-league-body > * { transform: none; }
-.sc-record { margin: 0; display: flex; gap: 8px; height: 20px; align-items: center; font-size: 15px; font-weight: 900; line-height: 1; color: var(--verde); white-space: nowrap; }
-.theme-noche .sc-record { color: #FFFFFF; }
-.sc-league-body .sc-goals { justify-content: flex-end; }
-.sc-league-body .sc-form { justify-content: flex-end; }
 .theme-noche .sc-tile-label { color: var(--verde); }
+.sc-racha { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.sc-racha-label { font-size: 10px; font-weight: 900; line-height: 1; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.theme-dia .sc-racha-label { color: var(--oro-texto); }
+.theme-noche .sc-racha-label { color: var(--oro-claro, #D9B77A); }
+.sc-racha .sc-form { margin: 0; height: auto; gap: 6px; transform: none; }
+.sc-racha .sc-form-dot { width: 24px; height: 24px; font-size: 12px; }
+.sc-league .sc-stats-tile { flex: 1 1 auto; width: auto; height: auto; min-width: 0; flex-direction: column; align-items: stretch; justify-content: center; padding: 0 8px; cursor: default; }
+.sc-stats { display: grid; text-align: center; padding: 10px 0; }
+.sc-stats.is-partidos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sc-stats.is-goles { grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid color-mix(in oklab, var(--oro) 45%, transparent); }
+.sc-stat { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.sc-stat abbr { text-decoration: none; font-size: 10px; font-weight: 900; line-height: 1; letter-spacing: .08em; color: var(--ink-soft); }
+.theme-dia .sc-stat abbr { color: var(--oro-texto); }
+.theme-noche .sc-stat abbr { color: var(--verde); }
+.sc-stat span { font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--verde); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sc-stat small { font-size: .65em; vertical-align: .22em; margin-right: 1px; }
+.sc-stat .sc-dg-pos { color: var(--esmeralda-texto); }
+.theme-noche .sc-stat .sc-dg-pos { color: var(--verde); }
+.theme-noche .sc-stats.is-goles { border-top-color: color-mix(in oklab, var(--verde) 30%, transparent); }
