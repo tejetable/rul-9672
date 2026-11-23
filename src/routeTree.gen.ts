@@ -14,6 +14,7 @@ import { Route as BienvenidaRouteImport } from './routes/bienvenida'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as CreatePasswordRouteImport } from './routes/create-password'
 import { Route as GaleriaRouteImport } from './routes/galeria'
+import { Route as LigaRouteImport } from './routes/liga'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as UneteRouteImport } from './routes/unete'
@@ -43,6 +44,11 @@ const CreatePasswordRoute = CreatePasswordRouteImport.update({
 const GaleriaRoute = GaleriaRouteImport.update({
   id: '/galeria',
   path: '/galeria',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LigaRoute = LigaRouteImport.update({
+  id: '/liga',
+  path: '/liga',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadRoute = PrivacidadRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/calendario': typeof CalendarioRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
+  '/liga': typeof LigaRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unete': typeof UneteRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/calendario': typeof CalendarioRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
+  '/liga': typeof LigaRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unete': typeof UneteRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/calendario': typeof CalendarioRoute
   '/create-password': typeof CreatePasswordRoute
   '/galeria': typeof GaleriaRoute
+  '/liga': typeof LigaRoute
   '/privacidad': typeof PrivacidadRoute
   '/reset-password': typeof ResetPasswordRoute
   '/unete': typeof UneteRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/calendario'
     | '/create-password'
     | '/galeria'
+    | '/liga'
     | '/privacidad'
     | '/reset-password'
     | '/unete'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/calendario'
     | '/create-password'
     | '/galeria'
+    | '/liga'
     | '/privacidad'
     | '/reset-password'
     | '/unete'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/calendario'
     | '/create-password'
     | '/galeria'
+    | '/liga'
     | '/privacidad'
     | '/reset-password'
     | '/unete'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   CalendarioRoute: typeof CalendarioRoute
   CreatePasswordRoute: typeof CreatePasswordRoute
   GaleriaRoute: typeof GaleriaRoute
+  LigaRoute: typeof LigaRoute
   PrivacidadRoute: typeof PrivacidadRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   UneteRoute: typeof UneteRoute
@@ -195,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/galeria'
       fullPath: '/galeria'
       preLoaderRoute: typeof GaleriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/liga': {
+      id: '/liga'
+      path: '/liga'
+      fullPath: '/liga'
+      preLoaderRoute: typeof LigaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidad': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarioRoute: CalendarioRoute,
   CreatePasswordRoute: CreatePasswordRoute,
   GaleriaRoute: GaleriaRoute,
+  LigaRoute: LigaRoute,
   PrivacidadRoute: PrivacidadRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   UneteRoute: UneteRoute,
