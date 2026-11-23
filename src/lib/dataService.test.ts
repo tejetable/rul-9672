@@ -5,6 +5,24 @@ vi.mock('./drive.functions',()=>({getDriveGallery:vi.fn().mockResolvedValue({alb
 import {dataService} from './dataService';
 beforeEach(()=>{vi.clearAllMocks();mocks.from.mockImplementation(()=>({select:()=>({maybeSingle:async()=>({data:null,error:null})})}));});
 describe('Cloud data boundary',()=>{
+ it.each(['ligaEquipos','ligaPartidos','ligaSanciones'] as const)('reads %s from Cloud for season 2026-27 without changing old standings',async(method)=>{
+   const rows=[{id:'fixture'}];const chain={select:vi.fn(),eq:vi.fn(),order:vi.fn(),range:vi.fn().mockResolvedValue({data:rows,error:null})};
+   chain.select.mockReturnValue(chain);chain.eq.mockReturnValue(chain);chain.order.mockReturnValue(chain);mocks.from.mockReturnValue(chain);
+   expect(await dataService[method]()).toEqual(rows);
+   const tables={ligaEquipos:'liga_equipos',ligaPartidos:'liga_partidos',ligaSanciones:'liga_sanciones'};
+   expect(mocks.from).toHaveBeenCalledWith(tables[method]);expect(chain.eq).toHaveBeenCalledWith('temporada','2026-27');expect(chain.range).toHaveBeenCalledWith(0,499);
+   expect(mocks.rpc).not.toHaveBeenCalled();expect(mocks.from).not.toHaveBeenCalledWith('clasificacion_equipos');
+ });
+ it('saves an entire jornada through the protected RPC, preserving zero scores and postponement',async()=>{
+   const partidos=[{local:'ru-lucense',visitante:'cubelas',goles_local:0,goles_visitante:0,aplazado:false},{local:'a',visitante:'b',goles_local:null,goles_visitante:null,aplazado:true}];
+   mocks.rpc.mockResolvedValue({data:null,error:null});await dataService.guardarJornada(8,partidos);
+   expect(mocks.rpc).toHaveBeenCalledWith('guardar_jornada',{p_temporada:'2026-27',p_jornada:8,p_partidos:partidos});expect(mocks.from).not.toHaveBeenCalled();
+ });
+ it('propagates a missing-match error without individual writes or changing old standings',async()=>{
+   mocks.rpc.mockResolvedValue({data:null,error:{message:'El partido a - b no existe en la jornada 8'}});
+   await expect(dataService.guardarJornada(8,[{local:'a',visitante:'b',goles_local:2,goles_visitante:1,aplazado:false}])).rejects.toThrow('no existe');
+   expect(mocks.rpc).toHaveBeenCalledTimes(1);expect(mocks.from).not.toHaveBeenCalled();
+ });
  it('Google clears transient password input and uses the verified access state',async()=>{dataService.recordarPasswordEntrada('12345678');mocks.rpc.mockResolvedValue({data:{tiene_password:true,debe_cambiar_password:false,ha_accedido:true,google:true},error:null});await dataService.cargarAcceso();expect(dataService.passwordEntrada()).toBe('');expect(dataService.acceso().debe_cambiar_password).toBe(false);});
  it('password access preserves the mandatory change returned by Cloud',async()=>{mocks.rpc.mockResolvedValue({data:{tiene_password:true,debe_cambiar_password:true,ha_accedido:true,google:false},error:null});await dataService.cargarAcceso();expect(dataService.acceso().debe_cambiar_password).toBe(true);});
  it('test access requires a successful protected RPC and cannot grant a role',async()=>{await dataService.init();mocks.rpc.mockResolvedValue({data:null,error:{message:'Solo Super admin'}});await expect(dataService.accederComoNegocio('p1')).rejects.toThrow('Solo Super admin');expect(dataService.negocioPrueba()).toBeNull();expect(dataService.rol()).toBeNull();expect(mocks.rpc).toHaveBeenCalledWith('acceder_como_negocio',{p_id:'p1'});});

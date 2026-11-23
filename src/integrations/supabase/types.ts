@@ -433,6 +433,184 @@ export type Database = {
           },
         ]
       }
+      liga_equipos: {
+        Row: {
+          club_id: string
+          corto: string
+          es_nuestro: boolean
+          id: string
+          nombre: string
+          temporada: string
+        }
+        Insert: {
+          club_id?: string
+          corto: string
+          es_nuestro?: boolean
+          id: string
+          nombre: string
+          temporada?: string
+        }
+        Update: {
+          club_id?: string
+          corto?: string
+          es_nuestro?: boolean
+          id?: string
+          nombre?: string
+          temporada?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liga_equipos_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      liga_partidos: {
+        Row: {
+          aplazado: boolean
+          club_id: string
+          fecha: string | null
+          goles_local: number | null
+          goles_visitante: number | null
+          hora: string | null
+          id: string
+          jornada: number
+          local: string
+          partido_id: string | null
+          temporada: string
+          updated_at: string
+          visitante: string
+        }
+        Insert: {
+          aplazado?: boolean
+          club_id?: string
+          fecha?: string | null
+          goles_local?: number | null
+          goles_visitante?: number | null
+          hora?: string | null
+          id?: string
+          jornada: number
+          local: string
+          partido_id?: string | null
+          temporada?: string
+          updated_at?: string
+          visitante: string
+        }
+        Update: {
+          aplazado?: boolean
+          club_id?: string
+          fecha?: string | null
+          goles_local?: number | null
+          goles_visitante?: number | null
+          hora?: string | null
+          id?: string
+          jornada?: number
+          local?: string
+          partido_id?: string | null
+          temporada?: string
+          updated_at?: string
+          visitante?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liga_partidos_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liga_partidos_local_club_id_temporada_fkey"
+            columns: ["local", "club_id", "temporada"]
+            isOneToOne: false
+            referencedRelation: "liga_equipos"
+            referencedColumns: ["id", "club_id", "temporada"]
+          },
+          {
+            foreignKeyName: "liga_partidos_local_fkey"
+            columns: ["local"]
+            isOneToOne: false
+            referencedRelation: "liga_equipos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liga_partidos_partido_id_fkey"
+            columns: ["partido_id"]
+            isOneToOne: false
+            referencedRelation: "partidos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liga_partidos_visitante_club_id_temporada_fkey"
+            columns: ["visitante", "club_id", "temporada"]
+            isOneToOne: false
+            referencedRelation: "liga_equipos"
+            referencedColumns: ["id", "club_id", "temporada"]
+          },
+          {
+            foreignKeyName: "liga_partidos_visitante_fkey"
+            columns: ["visitante"]
+            isOneToOne: false
+            referencedRelation: "liga_equipos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      liga_sanciones: {
+        Row: {
+          club_id: string
+          created_at: string
+          equipo: string
+          id: string
+          motivo: string
+          puntos: number
+          temporada: string
+        }
+        Insert: {
+          club_id?: string
+          created_at?: string
+          equipo: string
+          id?: string
+          motivo: string
+          puntos: number
+          temporada?: string
+        }
+        Update: {
+          club_id?: string
+          created_at?: string
+          equipo?: string
+          id?: string
+          motivo?: string
+          puntos?: number
+          temporada?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "liga_sanciones_club_id_fkey"
+            columns: ["club_id"]
+            isOneToOne: false
+            referencedRelation: "clubes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "liga_sanciones_equipo_club_id_temporada_fkey"
+            columns: ["equipo", "club_id", "temporada"]
+            isOneToOne: false
+            referencedRelation: "liga_equipos"
+            referencedColumns: ["id", "club_id", "temporada"]
+          },
+          {
+            foreignKeyName: "liga_sanciones_equipo_fkey"
+            columns: ["equipo"]
+            isOneToOne: false
+            referencedRelation: "liga_equipos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagos: {
         Row: {
           creado_at: string
@@ -1359,6 +1537,10 @@ export type Database = {
       }
       guardar_estadisticas: {
         Args: { p_filas: Json; p_partido: string }
+        Returns: undefined
+      }
+      guardar_jornada: {
+        Args: { p_jornada: number; p_partidos: Json; p_temporada: string }
         Returns: undefined
       }
       guardar_resultado_partido: {

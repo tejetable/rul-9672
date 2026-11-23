@@ -288,6 +288,13 @@
       "when": 1795270508044,
       "tag": "0040_patrocinadores_contacto_lectura",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1795434445650,
+      "tag": "0041_liga_results_tables_and_guardar_jornada",
+      "breakpoints": true
     }
   ]
 }
