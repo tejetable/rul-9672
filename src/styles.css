@@ -1629,3 +1629,19 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .liga-paneles { display: grid; }
 .liga-paneles > .liga-panel { grid-area: 1 / 1; }
 .liga-panel.is-oculto { visibility: hidden; }
+/* Podio de El Equipo: más grande y con más escalón entre puestos; con él la pestaña mide como la clasificación. */
+.liga-tabs:not(.is-completa) .liga-podio { margin: 12px 0 20px; }
+.liga-tabs:not(.is-completa) .liga-dorsal { width: 40px; height: 40px; font-size: 20px; }
+.liga-tabs:not(.is-completa) .liga-podio-escalon.is-1 .liga-dorsal { width: 50px; height: 50px; font-size: 25px; }
+.liga-tabs:not(.is-completa) .liga-podio-nombre { font-size: 16px; }
+.liga-tabs:not(.is-completa) .liga-podio-escalon.is-1 .liga-podio-bloque { height: 190px; }
+.liga-tabs:not(.is-completa) .liga-podio-escalon.is-2 .liga-podio-bloque { height: 142px; }
+.liga-tabs:not(.is-completa) .liga-podio-escalon.is-3 .liga-podio-bloque { height: 104px; }
+.liga-tabs:not(.is-completa) .liga-podio-valor { font-size: 40px; }
+.liga-tabs:not(.is-completa) .liga-podio-escalon.is-1 .liga-podio-valor { font-size: 58px; }
+/* Empates: con varios dorsales en el mismo escalón, más pequeños para que no se salgan de su columna. */
+.liga-tabs:not(.is-completa) .liga-podio-dorsales:has(> :nth-child(2)) .liga-dorsal { width: 34px; height: 34px; font-size: 17px; }
+.liga-tabs:not(.is-completa) .liga-podio-dorsales:has(> :nth-child(3)) .liga-dorsal { width: 28px; height: 28px; font-size: 14px; border-radius: 6px; }
+.liga-podio-dorsales { flex-wrap: wrap; justify-content: center; }
+.liga-tabs:not(.is-completa) .liga-podio-dorsales:has(> :nth-child(3)) { gap: 3px; }
+.liga-tabs:not(.is-completa) .liga-podio-dorsales:has(> :nth-child(3)) .liga-dorsal { width: 26px; height: 26px; font-size: 13px; }

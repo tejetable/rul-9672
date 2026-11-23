@@ -120,8 +120,8 @@ function Ranking({ campo, completa }: { campo: "goles" | "asistencias"; completa
   const grupos: Fila[][] = [];
   for (const f of filas) { const g = grupos.find((x) => x[0]!.puesto === f.puesto); if (g) g.push(f); else grupos.push([f]); }
   const podio = grupos.slice(0, 3);
-  // En El Equipo, el podio y un solo nombre más: así mide como la clasificación, que es la que fija el alto. En /liga, el resto del ranking.
-  const resto = completa ? grupos.slice(3).flat() : grupos.slice(3).flat().slice(0, 1);
+  // En El Equipo, solo el podio (más grande, a la altura de la clasificación); en /liga, el podio y el resto del ranking.
+  const resto = completa ? grupos.slice(3).flat() : [];
   return <>
     <Podio grupos={podio} campo={campo} />
     {resto.length > 0 && <ListaRanking filas={resto} campo={campo} etiqueta={`${etiqueta}, desde el ${resto[0]!.puesto}º`} />}
