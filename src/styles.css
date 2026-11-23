@@ -1588,3 +1588,29 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .sc-racha .sc-form-dot { width: 22px; height: 22px; font-size: 11px; }
 .theme-noche .sc-racha .sc-racha-label { color: var(--verde); }
 .sc-league-left { gap: 8px; }
+/* Rejilla 2×2 + columna: arriba posición y puntos, abajo la racha, cada fila con la misma altura; a la derecha las
+   estadísticas, con la línea que separa partidos y goles justo a la altura del hueco entre las dos filas de la izquierda. */
+.sc-league { --fila: 66px; --hueco: 8px; display: grid; grid-template-columns: 72px 72px minmax(0, 1fr); grid-template-rows: var(--fila) var(--fila); gap: var(--hueco); align-items: stretch; }
+.sc-league-left, .sc-league-tiles { display: contents; }
+.sc-league .sc-pos-tile { width: auto; height: auto; }
+.sc-league .sc-pos-tile:not(.sc-pts-tile):not(.sc-racha):not(.sc-stats-tile) { grid-column: 1; grid-row: 1; }
+.sc-league .sc-pts-tile { grid-column: 2; grid-row: 1; }
+.sc-league .sc-pts-tile .sc-pos-num { font-size: 36px; }
+.sc-league .sc-pos-tile .sc-pos-num { font-size: 42px; }
+.sc-league .sc-racha.sc-pos-tile { grid-column: 1 / 3; grid-row: 2; justify-content: center; padding: 0; gap: 6px; }
+.sc-racha .sc-form-dot { width: 24px; height: 24px; font-size: 12px; }
+.sc-racha .sc-form { gap: 6px; }
+.sc-league .sc-stats-tile { grid-column: 3; grid-row: 1 / 3; display: grid; grid-template-rows: 1fr 1fr; padding: 0 8px; }
+.sc-stats { padding: 0; align-content: center; height: 100%; }
+.sc-stats.is-goles { border-top: 1px solid color-mix(in oklab, var(--oro) 45%, transparent); }
+.sc-stat { gap: 4px; }
+.sc-stat span { font-size: 27px; }
+.sc-stat abbr { font-size: 10.5px; }
+.sc-league .sc-stats-tile { justify-content: stretch; align-items: stretch; }
+.sc-stats { width: 100%; }
+.sc-racha .sc-form-dot { width: 22px; height: 22px; font-size: 11px; }
+.sc-league .sc-pts-tile { gap: 3px; justify-content: center; }
+.sc-league .sc-pts-tile .sc-pos-num { font-size: 34px; padding-top: 0; }
+.sc-league .sc-pos-tile .sc-pos-num { line-height: .95; }
+.sc-league .sc-pos-tile:not(.sc-pts-tile):not(.sc-racha):not(.sc-stats-tile) .sc-pos-num { font-size: 40px; margin-left: 0; }
+.sc-league .sc-pos-go { top: 5px; right: 5px; }
