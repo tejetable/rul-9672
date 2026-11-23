@@ -1614,3 +1614,7 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .sc-league .sc-pos-tile .sc-pos-num { line-height: .95; }
 .sc-league .sc-pos-tile:not(.sc-pts-tile):not(.sc-racha):not(.sc-stats-tile) .sc-pos-num { font-size: 40px; margin-left: 0; }
 .sc-league .sc-pos-go { top: 5px; right: 5px; }
+/* Filas de 72 px: los puntos recuperan protagonismo frente a las estadísticas. */
+.sc-league { --fila: 72px; }
+.sc-league .sc-pts-tile .sc-pos-num { font-size: 40px; }
+.sc-league .sc-pos-tile:not(.sc-pts-tile):not(.sc-racha):not(.sc-stats-tile) .sc-pos-num { font-size: 44px; }
