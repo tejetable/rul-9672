@@ -1,5 +1,5 @@
 - [x] Añadir tablas liga_equipos, liga_partidos y liga_sanciones con permisos y guardado transaccional de jornadas; sin cambios de pantallas ni clasificaciones existentes.
-- [ ] Cargar y enlazar 16 equipos, 240 partidos, 62 resultados y una sanción (falta src/data/liga-2026-27.json, solicitado al usuario).
+- [x] Cargar JSON recibido: 16 equipos, 240 partidos, 62 resultados, sanción Friol B −3 y enlaces a las 30 fichas existentes; huella completa idéntica al archivo y 24 pruebas pasan, sin cambios de pantallas.
 - [x] Verificar restricciones, permisos y los cuatro métodos nuevos de dataService; 30 pruebas pasan, incluyendo guardado 2-1 y reversión real ante partido inexistente; datos temporales retirados.
 - [x] Corregir permisos de lectura de teléfono, horario y web de patrocinadores sin exponer pin_hash; cuatro comprobaciones contra Cloud pasan.
 - [x] Revisar permisos generales de tablas, columnas y funciones usadas por los tres roles; entrada real comprobada con nueve soci@s, cinco patrocinadores, Club, plantilla, ventajas y vista de negocio protegida, sin registrar visitas. Restricciones intencionadas de solicitudes retiradas y operaciones de servicio conservadas.
