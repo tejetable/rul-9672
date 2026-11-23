@@ -53,7 +53,7 @@ export function Galeria() {
   const ultimo=recienteAlbum?[recienteAlbum.titulo,recienteAlbum.resultado,recienteAlbum.fecha?fechaHumana(recienteAlbum.fecha):''].filter(Boolean).join(' · '):'';
   const mosaic=(selection:HighlightPhoto[],outgoing=false)=><div className={`gallery-mosaic gallery-highlight-layer ${outgoing?'is-outgoing':''}`}>{selection.map(({foto,albumId},index)=>{
     const album=albumes.find(a=>a.id===albumId);if(!album)return null;
-    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded sizes={index===0?TAMANO_FOTO.entera:TAMANO_FOTO.mitad}/></Link></Button>;
+    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id,desde:'inicio'}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded sizes={index===0?TAMANO_FOTO.entera:TAMANO_FOTO.mitad}/></Link></Button>;
   })}</div>;
   return <section className="mt-6" aria-label="Fotos del equipo">
     <div className="mb-3 flex items-center justify-between gap-3">

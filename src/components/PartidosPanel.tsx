@@ -9,12 +9,12 @@ import { fechaMadridCampos, fechaMadridISO, inicioPartido, proximoPartido, resul
 import { fechaHumana } from '@/lib/fechas';
 import { EstadisticasForm } from './EstadisticasForm';
 import { ConvocatoriaForm } from './ConvocatoriaForm';
-import { ClasificacionForm } from './ClasificacionForm';
+import { JornadaForm } from './JornadaForm';
 
 const PABELLON = 'Pavillón Municipal de Guntín';
 export function PartidosPanel() {
   const db=useClubData();const [edit,setEdit]=useState<Partido|'nuevo'|null>(null),[resultado,setResultado]=useState<string|null>(null),[selected,setSelected]=useState<Partido|null>(null);
-  const [clasif,setClasif]=useState<number|null>(null);const ultimaJornada=Math.max(0,...db.partidos.filter(p=>p.jugado).map(p=>p.jornada??0));
+  const [clasif,setClasif]=useState<number|null>(null);
   const ahora=new Date(),proximo=proximoPartido(db.partidos,ahora);
   const t=(p:Partido)=>inicioPartido(p)?.getTime()??Infinity;
   const proximos=db.partidos.filter(p=>!p.jugado).sort((a,b)=>t(a)-t(b));
@@ -23,8 +23,8 @@ export function PartidosPanel() {
     return <ListRow key={p.id} leading={p.jornada??<CircleDot/>} name={p.jugado?`${favor} – ${contra} · ${p.rival}`:`vs. ${p.rival}`} chip={r?(r==='V'?'VICTORIA':r==='E'?'EMPATE':'DERROTA'):(p.esLocal?'CASA':'FUERA')} subtitle={p.fechaConfirmada===false?'Fecha por confirmar':p.horaConfirmada===false?`Hora por confirmar · ${p.lugar}`:`${fechaMadridCampos(p).hora} · ${p.lugar}`} date={d?fechaHumana(d):''} dateTime={p.fechaHora} status={p.jugado?'off':pasado?'pending':'active'} statusLabel={p.jugado?'Jugado':pasado?'Falta el resultado':'Pendiente'} onClick={()=>setSelected(p)}/>;};
   return <section className="px-4 pt-4 pb-32">
     <article className="rounded-panel bg-surface p-4"><p className="label-club">Próximo partido</p><p className="mt-2 font-black">{proximo?`vs. ${proximo.rival}`:'Por confirmar'}</p>{proximo&&<><p className="text-body-sm">Jornada {proximo.jornada} · {inicioPartido(proximo)?fechaHumana(inicioPartido(proximo)!, proximo.horaConfirmada!==false):''}</p></>}</article>
-    <div className="mt-3"><Button variant="outline" onClick={()=>setClasif(ultimaJornada||1)}>Actualizar clasificación</Button></div>
-    <GestionSheet title="Actualizar clasificación" open={clasif!==null} onClose={()=>setClasif(null)}>{clasif!==null&&<ClasificacionForm jornada={clasif} onClose={()=>setClasif(null)}/>}</GestionSheet>
+    <div className="mt-3"><Button variant="outline" onClick={()=>setClasif(0)}>Resultados de la jornada</Button></div>
+    <GestionSheet title="Resultados de la jornada" open={clasif!==null} onClose={()=>setClasif(null)}>{clasif!==null&&<JornadaForm {...(clasif>0?{inicial:clasif}:{})} onClose={()=>setClasif(null)}/>}</GestionSheet>
     <DirectivaFab label="Editar próximo partido" onClick={()=>setEdit(proximo??'nuevo')}/>
     <GestionSheet title={edit==='nuevo'?'Añadir partido':edit&&edit.id===proximo?.id?'Editar próximo partido':'Editar partido'} open={!!edit} onClose={()=>setEdit(null)}>{edit&&<PartidoForm key={edit==='nuevo'?'nuevo':edit.id} partido={edit==='nuevo'?undefined:edit} onClose={()=>setEdit(null)}/>}</GestionSheet>
     {proximos.length>0&&<><h2 className="club-section-title mt-6">Próximos</h2><ListCard label="Próximos partidos">{proximos.map(fila)}</ListCard></>}
