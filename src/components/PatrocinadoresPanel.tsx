@@ -80,6 +80,8 @@ export function PatrocinadoresPanel() {
       <GestionSheet title="Nuevo patrocinador" open={form} onClose={()=>setForm(false)}>{form&&<NuevoPatrocinador onDone={() => { setForm(false); setV((x) => x + 1); }}/>}</GestionSheet>
       {!form&&!selected&&!baja&&<DirectivaFab label="Nuevo patrocinador" onClick={()=>setForm(true)}/>}
       {baja && <BajaForm negocio onCancel={() => setBaja(null)} onSave={async (fecha,motivo,detalle) => {await dataService.bajaPatrocinador(baja,fecha,motivo,detalle);setBaja(null);}} />}
+      {/* Atajo temporal: entrar directamente en el negocio de prueba (solo super admin). */}
+      {dataService.esSuper()&&(()=>{const prueba=db.patrocinadores.find(p=>p.esPrueba&&p.activo);return prueba?<Button variant="outline" className="mt-6 w-full" onClick={()=>enter(prueba.id)}>Entrar como «{prueba.nombre}»</Button>:null;})()}
       <h2 className="club-section-title mt-6">Negocios</h2>
       <p className="sponsor-list-note">Ordenados por el que va más lejos del objetivo: 5 personas nuevas con carnet en 90 días.</p>
       <ul className="surface-card sponsor-list" aria-label="Patrocinadores">{[...db.patrocinadores].sort((x,y)=>Number(!!x.esPrueba)-Number(!!y.esPrueba)||Number(y.activo)-Number(x.activo)||((summary.patrocinadores[x.id]?.objetivo_nuevas_90d??0)-(summary.patrocinadores[y.id]?.objetivo_nuevas_90d??0))||x.nombre.localeCompare(y.nombre)).map(p=>{const raw=summary.patrocinadores[p.id]??emptyStats;const prog=Math.min(5,raw.objetivo_nuevas_90d);return <li key={p.id}><button type="button" className={`sponsor-row ${p.activo?'':'is-off'}`} onClick={()=>setSelected(p.id)}>
