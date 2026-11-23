@@ -1618,3 +1618,10 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .sc-league { --fila: 72px; }
 .sc-league .sc-pts-tile .sc-pos-num { font-size: 40px; }
 .sc-league .sc-pos-tile:not(.sc-pts-tile):not(.sc-racha):not(.sc-stats-tile) .sc-pos-num { font-size: 44px; }
+/* Dos mitades iguales, con el mismo hueco que «Cómo llegar | Ver en Twitch»: el corte cae en el eje central de la tarjeta,
+   igual que los botones y la línea de medio campo de la pista. */
+.sc-league { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: auto; }
+.sc-league-left { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: var(--fila) var(--fila); gap: var(--hueco); }
+.sc-league .sc-stats-tile { grid-column: 2; grid-row: 1; }
+.sc-racha .sc-form { gap: 4px; }
+.sc-racha .sc-form-dot { width: 20px; height: 20px; font-size: 10.5px; }
