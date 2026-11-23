@@ -189,7 +189,7 @@ function TablaResumen(){
           <span className="sc-tile-label" aria-hidden="true">pts</span>
         </div>
       </div>
-      <div className="sc-racha">
+      <div className="sc-pos-tile sc-racha">
         <span className="sc-racha-label" aria-hidden="true">Últimos 5</span>
         <div className="sc-form" role="img" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
           {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}

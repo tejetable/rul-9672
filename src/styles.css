@@ -1580,3 +1580,11 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .sc-stat .sc-dg-pos { color: var(--esmeralda-texto); }
 .theme-noche .sc-stat .sc-dg-pos { color: var(--verde); }
 .theme-noche .sc-stats.is-goles { border-top-color: color-mix(in oklab, var(--verde) 30%, transparent); }
+/* La racha también va encuadrada, en su cuadro bajo posición y puntos; el rectángulo de la derecha mide lo mismo que todo el bloque. */
+.sc-league .sc-racha.sc-pos-tile { width: auto; height: auto; flex-direction: column; gap: 5px; padding: 7px 0 8px; cursor: default; }
+.sc-racha.sc-pos-tile:hover { border-color: transparent; }
+.sc-racha.sc-pos-tile:active { transform: none; }
+.sc-racha .sc-form { gap: 5px; }
+.sc-racha .sc-form-dot { width: 22px; height: 22px; font-size: 11px; }
+.theme-noche .sc-racha .sc-racha-label { color: var(--verde); }
+.sc-league-left { gap: 8px; }
