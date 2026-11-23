@@ -17,6 +17,20 @@ export interface FotoGaleria {
   video?: boolean;
   partido?: { id: string; rival: string; resultado?: string; fecha: string };
 }
+/** Anchos que pedimos a Drive: el navegador escoge el más pequeño que se vea nítido en esa pantalla (densidad incluida). */
+const ANCHOS_DRIVE = [480, 800, 1200, 1600, 2048];
+export function srcsetFoto(url: string): string | undefined {
+  if (!/drive\.google\.com\/thumbnail/.test(url)) return undefined;
+  return ANCHOS_DRIVE.map((w) => `${url.replace(/sz=w\d+/, `sz=w${w}`)} ${w}w`).join(", ");
+}
+/** Ancho con el que se pinta cada foto (la app de soci@ ocupa como mucho 430 px). */
+export const TAMANO_FOTO = {
+  entera: "(min-width: 480px) 430px, 100vw",
+  mitad: "(min-width: 480px) 215px, 50vw",
+  tercio: "(min-width: 480px) 143px, 33vw",
+  pantalla: "100vw",
+} as const;
+
 export interface AlbumGaleria {
   id: string;
   titulo: string;

@@ -5,6 +5,7 @@ import {Button} from '@/components/ui/button';
 import { claseVista, useVista } from "@/lib/vista";
 import { fechaHumana } from "@/lib/fechas";
 import {GaleriaFoto} from '@/components/GaleriaFoto';
+import {TAMANO_FOTO} from '@/lib/galeria';
 import {GaleriaVisor} from '@/components/GaleriaVisor';
 import {useDriveGallery} from '@/hooks/use-drive-gallery';
 export const Route=createFileRoute('/galeria_/$folderId')({
@@ -28,7 +29,7 @@ function AlbumPage(){
     </header>
     {isPending&&<div className="gallery-image is-loading aspect-square"/>}
     {!isPending&&!album&&<p className="px-4 py-8 text-muted-foreground">No hay fotos disponibles en este álbum.</p>}
-    <div className="gallery-complete-grid">{album?.fotos.map((f,i)=><Button key={f.id} variant="ghost" className="gallery-tile gallery-square" aria-label={`Ver foto ${i+1}`} onClick={()=>setVisor(i)}><GaleriaFoto foto={f} alt={album.titulo}/></Button>)}</div>
+    <div className="gallery-complete-grid">{album?.fotos.map((f,i)=><Button key={f.id} variant="ghost" className="gallery-tile gallery-square" aria-label={`Ver foto ${i+1}`} onClick={()=>setVisor(i)}><GaleriaFoto foto={f} alt={album.titulo} sizes={TAMANO_FOTO.tercio}/></Button>)}</div>
     {album&&visor!==null&&<GaleriaVisor album={album} inicial={visor} siguiente={next} onClose={()=>{setVisor(null);void navigate({to:'/galeria/$folderId',params:{folderId},search:{foto:''},replace:true});}}/>}
   </main></div>;
 }

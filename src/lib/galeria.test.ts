@@ -20,3 +20,14 @@ describe("Álbumes por partido", () => {
     expect(fotosMosaico(album).adicionales).toBe(7);
   });
 });
+describe("srcsetFoto", () => {
+  it("ofrece varios anchos de la miniatura de Drive", async () => {
+    const { srcsetFoto } = await import("./galeria");
+    const s = srcsetFoto("https://drive.google.com/thumbnail?id=abc&sz=w600")!;
+    expect(s.split(", ")).toEqual([480, 800, 1200, 1600, 2048].map((w) => `https://drive.google.com/thumbnail?id=abc&sz=w${w} ${w}w`));
+  });
+  it("no toca las fotos que no son de Drive", async () => {
+    const { srcsetFoto } = await import("./galeria");
+    expect(srcsetFoto("/assets/foto.webp")).toBeUndefined();
+  });
+});
