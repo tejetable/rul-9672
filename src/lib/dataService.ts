@@ -117,6 +117,8 @@ export interface DB {
 const emptyDB = (): DB => ({ socios: [], patrocinadores: [], ventajas: [], canjes: [], partidos: [], avisos: [], visitas: [], socioActualId: null });
 export interface LigaStats { pj:number; g:number; e:number; p:number; puntos:number; goles_favor:number; goles_contra:number; racha:string[] }
 let liga:LigaStats={pj:0,g:0,e:0,p:0,puntos:0,goles_favor:0,goles_contra:0,racha:[]};
+/** Sube cada vez que cambian resultados o estadísticas: las pestañas de la liga lo usan para no enseñar datos viejos. */
+let ligaVersion=0;
 let clasificacion:{jornada:number;posicion:number}|null=null;
 let settings=defaultSettings;
 let db = emptyDB();
@@ -171,10 +173,11 @@ export const dataService = {
   esDirectiva:()=>role==='directiva'||role==='super_admin',
   ajustes:()=>settings,
   liga:()=>liga,
+  ligaVersion:()=>ligaVersion,
   async ligaEquipos(){return allRows((a,b)=>supabase.from('liga_equipos').select('*').eq('temporada',settings.temporada_actual.replace('/','-')).order('id').range(a,b));},
   async ligaPartidos(){return allRows((a,b)=>supabase.from('liga_partidos').select('*').eq('temporada',settings.temporada_actual.replace('/','-')).order('jornada').order('id').range(a,b));},
   async ligaSanciones(){return allRows((a,b)=>supabase.from('liga_sanciones').select('*').eq('temporada',settings.temporada_actual.replace('/','-')).order('created_at').order('id').range(a,b));},
-  async guardarJornada(jornada:number,partidos:LigaResultado[]){const r=await supabase.rpc('guardar_jornada',{p_temporada:settings.temporada_actual.replace('/','-'),p_jornada:jornada,p_partidos:partidos.map(p=>({...p}))});check(r.error);},
+  async guardarJornada(jornada:number,partidos:LigaResultado[]){const r=await supabase.rpc('guardar_jornada',{p_temporada:settings.temporada_actual.replace('/','-'),p_jornada:jornada,p_partidos:partidos.map(p=>({...p}))});check(r.error);ligaVersion++;},
   clasificacion:()=>clasificacion,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
   async cargarAjustes(){
@@ -219,7 +222,7 @@ export const dataService = {
     const row={fecha_confirmada:true,hora_confirmada:input.horaConfirmada??true,jornada:input.jornada,rival:input.rival.trim(),fecha_hora:input.fechaHora,es_local:input.esLocal,pabellon:input.lugar.trim(),competicion:input.competicion,drive_folder_id:folder,rival_corto:input.rivalCorto?.trim()||null};
     const r=input.id?await supabase.from('partidos').update(row).eq('id',input.id).select('id').single():await supabase.from('partidos').insert(row).select('id').single();check(r.error);await this.refresh();
   },
-  async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);await this.refresh();},
+  async guardarResultado(id:string,favor:number,contra:number,posicion:number|null){const r=await supabase.rpc('guardar_resultado_partido',{p_id:id,p_favor:favor,p_contra:contra,...(posicion===null?{}:{p_posicion:posicion})});check(r.error);ligaVersion++;await this.refresh();},
   async jugadores(){const r=await supabase.from('jugadores').select('id,nombre,apodo,dorsal,activo').order('dorsal');check(r.error);return (r.data??[]).map(j=>({id:j.id,nombre:j.nombre,apodo:j.apodo,dorsal:j.dorsal,activo:j.activo})) as Jugador[];},
   async crearJugador(input:{nombre:string;apodo:string;dorsal:number|null}){const r=await supabase.from('jugadores').insert({nombre:input.nombre.trim(),apodo:input.apodo.trim(),dorsal:input.dorsal});check(r.error);},
   async subirPiezaResultado(partidoId:string,file:File){if(!['image/jpeg','image/png'].includes(file.type))throw new Error('Sube una imagen JPG o PNG.');const path=`${partidoId}/${Date.now()}.${file.type==='image/png'?'png':'jpg'}`;const up=await supabase.storage.from('piezas-resultado').upload(path,file,{contentType:file.type});check(up.error);const r=await supabase.from('partidos').update({imagen_resultado_url:path}).eq('id',partidoId);check(r.error);return path;},
@@ -242,7 +245,7 @@ export const dataService = {
   async clasificacionCopiada(){const u=await supabase.from('clasificacion_equipos').select('jornada').order('jornada',{ascending:false}).limit(1).maybeSingle();check(u.error);if(!u.data)return null;const r=await supabase.from('clasificacion_equipos').select('*').eq('jornada',u.data.jornada).order('posicion');check(r.error);return {jornada:u.data.jornada,filas:(r.data??[]).map(f=>({posicion:f.posicion,equipo:f.equipo,puntos:f.puntos,pj:f.pj,g:f.g,e:f.e,p:f.p,gf:f.gf,gc:f.gc,esNuestro:f.es_nuestro}))};},
   async guardarClasificacion(jornada:number,filas:import('./clasificacion').FilaClasificacion[]){const r=await supabase.rpc('guardar_clasificacion',{p_jornada:jornada,p_filas:filas as unknown as never});check(r.error);await this.refresh();},
   async estadisticasPartido(partidoId:string){const r=await supabase.from('estadisticas_partido').select('jugador_id,goles,asistencias,amarillas,rojas').eq('partido_id',partidoId);check(r.error);return (r.data??[]).map(e=>({jugadorId:e.jugador_id,goles:e.goles,asistencias:e.asistencias,amarillas:e.amarillas,rojas:e.rojas})) as EstadisticaJugador[];},
-  async guardarEstadisticas(partidoId:string,filas:EstadisticaJugador[]){const r=await supabase.rpc('guardar_estadisticas',{p_partido:partidoId,p_filas:filas as unknown as never});check(r.error);},
+  async guardarEstadisticas(partidoId:string,filas:EstadisticaJugador[]){const r=await supabase.rpc('guardar_estadisticas',{p_partido:partidoId,p_filas:filas as unknown as never});check(r.error);ligaVersion++;},
   async maximosGoleadores(){const r=await supabase.from('maximos_goleadores').select('*');check(r.error);return (r.data??[]).map(m=>({jugadorId:m.jugador_id!,apodo:m.apodo!,dorsal:m.dorsal,goles:m.goles??0,asistencias:m.asistencias??0}));},
   async guardarCarpetaPartido(id:string,enlace:string){const folder=folderIdFromUrl(enlace);if(enlace.trim()&&!folder)throw new Error('Pega un enlace válido de carpeta de Google Drive.');const r=await supabase.from('partidos').update({drive_folder_id:folder}).eq('id',id);check(r.error);await this.refresh();},
   async init() {

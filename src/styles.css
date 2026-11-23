@@ -1645,3 +1645,26 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .liga-podio-dorsales { flex-wrap: wrap; justify-content: center; }
 .liga-tabs:not(.is-completa) .liga-podio-dorsales:has(> :nth-child(3)) { gap: 3px; }
 .liga-tabs:not(.is-completa) .liga-podio-dorsales:has(> :nth-child(3)) .liga-dorsal { width: 26px; height: 26px; font-size: 13px; }
+/* Resultados de la jornada (directiva) */
+.jornada-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.jornada-nav p { margin: 0; display: flex; flex-direction: column; align-items: center; font-size: 18px; }
+.jornada-nav p span { font-size: 13px; color: var(--muted-foreground); }
+.jornada-lista { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.jornada-fila { display: grid; grid-template-columns: minmax(0, 1fr) 44px 8px 44px minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; column-gap: 6px; padding: 8px; border-radius: 12px; background: var(--card); }
+.jornada-fila.is-nuestro { box-shadow: inset 0 0 0 2px var(--oro); }
+.jornada-equipo { font-size: 14px; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
+.jornada-equipo.is-local { text-align: right; }
+.jornada-fila .club-input.jornada-goles { height: 44px; min-height: 44px; padding: 0; text-align: center; font-family: var(--font-display); font-size: 20px; }
+.jornada-aplazado { grid-column: 1 / -1; justify-self: center; display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12px; color: var(--muted-foreground); }
+.jornada-fila.is-aplazado .jornada-equipo { opacity: .55; }
+/* Podio con medallas: oro, plata y bronce, en las dos vistas (día y noche) y en El Equipo y /liga. */
+.liga-podio { --oro-medalla: linear-gradient(115deg,#8E6A2F 0%,#C9A160 18%,#F3E0B2 34%,#D2A862 48%,#9C7434 64%,#E2C48A 82%,#A57B3B 100%); --plata-medalla: linear-gradient(115deg,#7C8288 0%,#B9BEC3 20%,#F1F3F5 36%,#C3C8CC 50%,#8E9499 66%,#D9DDE0 84%,#9AA0A5 100%); --bronce-medalla: linear-gradient(115deg,#7A4A26 0%,#B07444 20%,#E8B98C 36%,#BD8050 50%,#8A552D 66%,#D49A69 84%,#93603A 100%); }
+.liga-podio .liga-podio-bloque { box-shadow: 0 6px 16px rgba(13, 70, 49, .22); }
+.theme-noche .liga-podio .liga-podio-bloque { box-shadow: 0 6px 18px rgba(0, 0, 0, .35); }
+.liga-podio .liga-podio-escalon.is-1 .liga-podio-bloque { background: var(--oro-medalla); box-shadow: 0 6px 16px rgba(13, 70, 49, .22); }
+.liga-podio .liga-podio-escalon.is-2 .liga-podio-bloque { background: var(--plata-medalla); }
+.liga-podio .liga-podio-escalon.is-3 .liga-podio-bloque { background: var(--bronce-medalla); }
+.liga-podio .liga-podio-valor, .theme-noche .liga-podio .liga-podio-valor, .liga-podio .liga-podio-puesto, .liga-podio .liga-podio-escalon.is-1 .liga-podio-valor, .liga-podio .liga-podio-escalon.is-1 .liga-podio-puesto { color: var(--verde); }
+.liga-podio .is-1 .liga-dorsal { background: var(--oro-medalla); color: var(--verde); box-shadow: none; }
+.liga-podio .is-2 .liga-dorsal { background: #C3C8CC; color: var(--verde); box-shadow: none; }
+.liga-podio .is-3 .liga-dorsal { background: #C98D5D; color: var(--verde); box-shadow: none; }

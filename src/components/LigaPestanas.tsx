@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { dataService } from "@/lib/dataService";
+import { dataService, useClubData } from "@/lib/dataService";
 import { IconoBalon, IconoBota } from "./GoleadoresPartido";
 
 /** Liga en El Equipo: tres pestañas (Clasificación, Goleadores, Asistencias) dentro de la propia pantalla.
@@ -37,16 +37,21 @@ type Clasificacion = Awaited<ReturnType<typeof dataService.clasificacionCompleta
 type Lider = Awaited<ReturnType<typeof dataService.maximosGoleadores>>[number];
 let clasificacion: Promise<Clasificacion> | null = null;
 let lideres: Promise<Lider[]> | null = null;
-const cargarClasificacion = () => (clasificacion ??= dataService.clasificacionCompleta().catch((e) => { clasificacion = null; throw e; }));
-const cargarLideres = () => (lideres ??= dataService.maximosGoleadores().catch((e) => { lideres = null; throw e; }));
+// Se guardan mientras no cambien los resultados (dataService.ligaVersion); al meter una jornada o goleadores se vuelven a pedir.
+let version = -1;
+const alDia = () => { if (version !== dataService.ligaVersion()) { version = dataService.ligaVersion(); clasificacion = null; lideres = null; } };
+const cargarClasificacion = () => { alDia(); return (clasificacion ??= dataService.clasificacionCompleta().catch((e) => { clasificacion = null; throw e; })); };
+const cargarLideres = () => { alDia(); return (lideres ??= dataService.maximosGoleadores().catch((e) => { lideres = null; throw e; })); };
 
 function useDatos<T>(cargar: () => Promise<T>) {
+  useClubData();
+  const v = dataService.ligaVersion();
   const [estado, setEstado] = useState<{ ok: boolean; error: boolean; datos?: T }>({ ok: false, error: false });
   useEffect(() => {
     let vivo = true;
     cargar().then((datos) => { if (vivo) setEstado({ ok: true, error: false, datos }); }).catch(() => { if (vivo) setEstado({ ok: false, error: true }); });
     return () => { vivo = false; };
-  }, [cargar]);
+  }, [cargar, v]);
   return estado;
 }
 
