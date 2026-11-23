@@ -41,8 +41,12 @@ async function sendClubEmail(clave:string,subject:string,html:string){
  const inserted=await supabaseAdmin.from('emails_log').upsert({clave,destinatario:to,asunto:subject},{onConflict:'clave',ignoreDuplicates:true});check(inserted.error);
  const key=process.env['RESEND_API_KEY'],lovable=process.env['LOVABLE_API_KEY'];
  try{
-  if(!key||!lovable)throw new Error('Resend no está conectado.');
-  const response=await fetch('https://connector-gateway.lovable.dev/resend/emails',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${lovable}`,'X-Connection-Api-Key':key,'Idempotency-Key':clave},body:JSON.stringify({from:'R.U. Lucense <onboarding@resend.dev>',to:[to],subject,html})});
+  if(!key)throw new Error('Resend no está conectado.');
+  // Con LOVABLE_API_KEY (Lovable Cloud) se pasa por su pasarela; sin ella (Cloudflare u otro servidor), directo a Resend con una clave propia.
+  // RESEND_FROM permite usar un remitente del dominio del club cuando esté verificado en Resend.
+  const from=process.env['RESEND_FROM']||'R.U. Lucense <onboarding@resend.dev>';
+  const [url,auth]=lovable?['https://connector-gateway.lovable.dev/resend/emails',{'Authorization':`Bearer ${lovable}`,'X-Connection-Api-Key':key}]:['https://api.resend.com/emails',{'Authorization':`Bearer ${key}`}];
+  const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...auth,'Idempotency-Key':clave},body:JSON.stringify({from,to:[to],subject,html})});
   if(!response.ok){const errorBody=await response.text();await supabaseAdmin.from('emails_log').update({estado:'error',error:`Resend [${response.status}]: ${errorBody}`}).eq('clave',clave);throw new Error(`El aviso no se ha enviado (Resend ${response.status}). Revisa el destinatario o el dominio de envío.`);}
   const result=await response.json() as {id?:string};const saved=await supabaseAdmin.from('emails_log').update({estado:'enviado',provider_id:result.id??null,enviado_at:new Date().toISOString(),error:null}).eq('clave',clave);check(saved.error);
  }catch(error){const detail=error instanceof Error?error.message:'No se pudo enviar el aviso.';const saved=await supabaseAdmin.from('emails_log').select('error').eq('clave',clave).maybeSingle();if(!saved.data?.error)await supabaseAdmin.from('emails_log').update({estado:'error',error:detail}).eq('clave',clave);throw error;}
