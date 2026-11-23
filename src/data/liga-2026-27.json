@@ -1,0 +1,2032 @@
+{
+ "temporada": "2026/27",
+ "competicion": "Primera FUTGAL F.S. · Grupo 2",
+ "fuente": "Calendario y clasificación de la Real Federación Galega de Fútbol (futgal.es), copiados a mano el 23/11/2026",
+ "equipos": [
+  {
+   "id": "cubelas",
+   "nombre": "CD Cubelas FS",
+   "corto": "Cubelas",
+   "esNuestro": false
+  },
+  {
+   "id": "begonte-b",
+   "nombre": "Concello de Begonte F.S. \"B\"",
+   "corto": "Begonte B",
+   "esNuestro": false
+  },
+  {
+   "id": "ru-lucense",
+   "nombre": "R.U. Lucense F.S.",
+   "corto": "R.U. Lucense",
+   "esNuestro": true
+  },
+  {
+   "id": "trabada",
+   "nombre": "Trabada Futsal",
+   "corto": "Trabada",
+   "esNuestro": false
+  },
+  {
+   "id": "castroverde",
+   "nombre": "Castroverde FS",
+   "corto": "Castroverde",
+   "esNuestro": false
+  },
+  {
+   "id": "pasarela-ribeira-b",
+   "nombre": "Pasarela Ribeira F.S. \"B\"",
+   "corto": "Ribeira B",
+   "esNuestro": false
+  },
+  {
+   "id": "samos",
+   "nombre": "Samos Fútbol Sala",
+   "corto": "Samos",
+   "esNuestro": false
+  },
+  {
+   "id": "luisitalia",
+   "nombre": "Luisitalia",
+   "corto": "Luisitalia",
+   "esNuestro": false
+  },
+  {
+   "id": "piringalla",
+   "nombre": "A.D.C. A Piringalla",
+   "corto": "A Piringalla",
+   "esNuestro": false
+  },
+  {
+   "id": "cospeito",
+   "nombre": "C.D. Cospeito",
+   "corto": "Cospeito",
+   "esNuestro": false
+  },
+  {
+   "id": "val-do-sil",
+   "nombre": "Val do Sil Futsal Quiroga",
+   "corto": "Val do Sil",
+   "esNuestro": false
+  },
+  {
+   "id": "abella",
+   "nombre": "Abella F.S.",
+   "corto": "Abella",
+   "esNuestro": false
+  },
+  {
+   "id": "outeiro-de-rei-b",
+   "nombre": "Outeiro de Rei S.D. \"B\"",
+   "corto": "Outeiro B",
+   "esNuestro": false
+  },
+  {
+   "id": "fonte-do-rei",
+   "nombre": "ADC Fonte do Rei",
+   "corto": "Fonte do Rei",
+   "esNuestro": false
+  },
+  {
+   "id": "pastoricense",
+   "nombre": "U.D. Pastoricense",
+   "corto": "Pastoricense",
+   "esNuestro": false
+  },
+  {
+   "id": "friol-b",
+   "nombre": "P.M. Friol FS \"B\"",
+   "corto": "Friol B",
+   "esNuestro": false
+  }
+ ],
+ "sanciones": [
+  {
+   "equipo": "friol-b",
+   "puntos": -3,
+   "motivo": "Sanción federativa (−3 puntos)"
+  }
+ ],
+ "partidos": [
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "outeiro-de-rei-b",
+   "visitante": "piringalla",
+   "golesLocal": 3,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "cubelas",
+   "visitante": "samos",
+   "golesLocal": 6,
+   "golesVisitante": 1
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "fonte-do-rei",
+   "visitante": "friol-b",
+   "golesLocal": 4,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "abella",
+   "visitante": "cospeito",
+   "golesLocal": 2,
+   "golesVisitante": 7
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "ru-lucense",
+   "visitante": "begonte-b",
+   "golesLocal": 5,
+   "golesVisitante": 6
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "trabada",
+   "visitante": "castroverde",
+   "golesLocal": 6,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "luisitalia",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": 0,
+   "golesVisitante": 8
+  },
+  {
+   "jornada": 1,
+   "fecha": "2026-09-27",
+   "local": "val-do-sil",
+   "visitante": "pastoricense",
+   "golesLocal": 8,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "ru-lucense",
+   "visitante": "piringalla",
+   "golesLocal": 12,
+   "golesVisitante": 9
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "begonte-b",
+   "visitante": "trabada",
+   "golesLocal": 7,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "castroverde",
+   "visitante": "abella",
+   "golesLocal": 7,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "pastoricense",
+   "visitante": "cubelas",
+   "golesLocal": 0,
+   "golesVisitante": 9
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "friol-b",
+   "visitante": "val-do-sil",
+   "golesLocal": 3,
+   "golesVisitante": 9
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "cospeito",
+   "visitante": "fonte-do-rei",
+   "golesLocal": 2,
+   "golesVisitante": 1
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "samos",
+   "visitante": "luisitalia",
+   "golesLocal": 6,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 2,
+   "fecha": "2026-10-04",
+   "local": "pasarela-ribeira-b",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": 9,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "trabada",
+   "visitante": "piringalla",
+   "golesLocal": 4,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "outeiro-de-rei-b",
+   "visitante": "samos",
+   "golesLocal": 4,
+   "golesVisitante": 6
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "ru-lucense",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": 7,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "cospeito",
+   "visitante": "castroverde",
+   "golesLocal": 5,
+   "golesVisitante": 7
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "luisitalia",
+   "visitante": "pastoricense",
+   "golesLocal": 9,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "cubelas",
+   "visitante": "friol-b",
+   "golesLocal": 6,
+   "golesVisitante": 0
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "fonte-do-rei",
+   "visitante": "val-do-sil",
+   "golesLocal": 1,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 3,
+   "fecha": "2026-10-11",
+   "local": "abella",
+   "visitante": "begonte-b",
+   "golesLocal": 5,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "piringalla",
+   "visitante": "abella",
+   "golesLocal": 11,
+   "golesVisitante": 7
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "castroverde",
+   "visitante": "fonte-do-rei",
+   "golesLocal": 6,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "begonte-b",
+   "visitante": "cospeito",
+   "golesLocal": 5,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "friol-b",
+   "visitante": "luisitalia",
+   "golesLocal": 4,
+   "golesVisitante": 8
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "pasarela-ribeira-b",
+   "visitante": "trabada",
+   "golesLocal": 7,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "pastoricense",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": 9,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "val-do-sil",
+   "visitante": "cubelas",
+   "golesLocal": 1,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 4,
+   "fecha": "2026-10-18",
+   "local": "samos",
+   "visitante": "ru-lucense",
+   "golesLocal": 6,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "ru-lucense",
+   "visitante": "pastoricense",
+   "golesLocal": 9,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "cospeito",
+   "visitante": "piringalla",
+   "golesLocal": 2,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "luisitalia",
+   "visitante": "val-do-sil",
+   "golesLocal": 9,
+   "golesVisitante": 1
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "castroverde",
+   "visitante": "begonte-b",
+   "golesLocal": 3,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "fonte-do-rei",
+   "visitante": "cubelas",
+   "golesLocal": 0,
+   "golesVisitante": 7
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "abella",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": 2,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "trabada",
+   "visitante": "samos",
+   "golesLocal": 8,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 5,
+   "fecha": "2026-10-25",
+   "local": "outeiro-de-rei-b",
+   "visitante": "friol-b",
+   "golesLocal": 11,
+   "golesVisitante": 9
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "val-do-sil",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": 3,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "begonte-b",
+   "visitante": "fonte-do-rei",
+   "golesLocal": 6,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "pastoricense",
+   "visitante": "trabada",
+   "golesLocal": 4,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "friol-b",
+   "visitante": "ru-lucense",
+   "golesLocal": 6,
+   "golesVisitante": 10
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "piringalla",
+   "visitante": "castroverde",
+   "golesLocal": 2,
+   "golesVisitante": 6
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "cubelas",
+   "visitante": "luisitalia",
+   "golesLocal": 7,
+   "golesVisitante": 0
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "pasarela-ribeira-b",
+   "visitante": "cospeito",
+   "golesLocal": 5,
+   "golesVisitante": 0
+  },
+  {
+   "jornada": 6,
+   "fecha": "2026-11-08",
+   "local": "samos",
+   "visitante": "abella",
+   "golesLocal": 4,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "begonte-b",
+   "visitante": "piringalla",
+   "golesLocal": 2,
+   "golesVisitante": 0
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "castroverde",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": 4,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "cospeito",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "outeiro-de-rei-b",
+   "visitante": "cubelas",
+   "golesLocal": 3,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "ru-lucense",
+   "visitante": "val-do-sil",
+   "golesLocal": 8,
+   "golesVisitante": 4
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "trabada",
+   "visitante": "friol-b",
+   "golesLocal": 7,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "fonte-do-rei",
+   "visitante": "luisitalia",
+   "golesLocal": 7,
+   "golesVisitante": 3
+  },
+  {
+   "jornada": 7,
+   "fecha": "2026-11-15",
+   "local": "abella",
+   "visitante": "pastoricense",
+   "golesLocal": 10,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "samos",
+   "visitante": "castroverde",
+   "golesLocal": 3,
+   "golesVisitante": 2
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "friol-b",
+   "visitante": "abella",
+   "golesLocal": 2,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "val-do-sil",
+   "visitante": "trabada",
+   "golesLocal": 4,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "cubelas",
+   "visitante": "ru-lucense",
+   "golesLocal": 4,
+   "golesVisitante": 7
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "luisitalia",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": 13,
+   "golesVisitante": 5
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "pastoricense",
+   "visitante": "cospeito",
+   "golesLocal": 1,
+   "golesVisitante": 9
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "piringalla",
+   "visitante": "fonte-do-rei",
+   "golesLocal": 5,
+   "golesVisitante": 1
+  },
+  {
+   "jornada": 8,
+   "fecha": "2026-11-22",
+   "local": "pasarela-ribeira-b",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "piringalla",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "begonte-b",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "castroverde",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "cospeito",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "abella",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "ru-lucense",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "fonte-do-rei",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 9,
+   "fecha": "2026-11-29",
+   "local": "trabada",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "pasarela-ribeira-b",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "samos",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "pastoricense",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "friol-b",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "val-do-sil",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "cubelas",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "luisitalia",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 10,
+   "fecha": "2026-12-13",
+   "local": "outeiro-de-rei-b",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "pasarela-ribeira-b",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "piringalla",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "begonte-b",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "castroverde",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "cospeito",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "abella",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "trabada",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 11,
+   "fecha": "2026-12-20",
+   "local": "fonte-do-rei",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "samos",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "pastoricense",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "friol-b",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "val-do-sil",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "cubelas",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "luisitalia",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "outeiro-de-rei-b",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 12,
+   "fecha": "2027-01-10",
+   "local": "ru-lucense",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "samos",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "pasarela-ribeira-b",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "piringalla",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "begonte-b",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "castroverde",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "cospeito",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "abella",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 13,
+   "fecha": "2027-01-17",
+   "local": "fonte-do-rei",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "fonte-do-rei",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "friol-b",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "val-do-sil",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "cubelas",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "luisitalia",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "outeiro-de-rei-b",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "ru-lucense",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 14,
+   "fecha": "2027-01-24",
+   "local": "trabada",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "pastoricense",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "samos",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "pasarela-ribeira-b",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "piringalla",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "begonte-b",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "castroverde",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "cospeito",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 15,
+   "fecha": "2027-01-31",
+   "local": "abella",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "cospeito",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "castroverde",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "begonte-b",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "piringalla",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "pasarela-ribeira-b",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "samos",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "pastoricense",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 16,
+   "fecha": "2027-02-07",
+   "local": "friol-b",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "fonte-do-rei",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "abella",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "trabada",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "piringalla",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "outeiro-de-rei-b",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "luisitalia",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "cubelas",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 17,
+   "fecha": "2027-02-14",
+   "local": "val-do-sil",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "castroverde",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "begonte-b",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "piringalla",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "pasarela-ribeira-b",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "samos",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "pastoricense",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "friol-b",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 18,
+   "fecha": "2027-02-21",
+   "local": "val-do-sil",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "fonte-do-rei",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "cospeito",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "abella",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "trabada",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "ru-lucense",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "outeiro-de-rei-b",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "luisitalia",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 19,
+   "fecha": "2027-02-28",
+   "local": "cubelas",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "begonte-b",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "piringalla",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "pasarela-ribeira-b",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "samos",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "pastoricense",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "friol-b",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "val-do-sil",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 20,
+   "fecha": "2027-03-07",
+   "local": "cubelas",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "fonte-do-rei",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "castroverde",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "cospeito",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "abella",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "trabada",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "ru-lucense",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "outeiro-de-rei-b",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 21,
+   "fecha": "2027-03-14",
+   "local": "luisitalia",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "piringalla",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "pasarela-ribeira-b",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "samos",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "pastoricense",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "friol-b",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "val-do-sil",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "cubelas",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 22,
+   "fecha": "2027-03-21",
+   "local": "luisitalia",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "fonte-do-rei",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "begonte-b",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "castroverde",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "cospeito",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "abella",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "trabada",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "ru-lucense",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 23,
+   "fecha": "2027-04-04",
+   "local": "outeiro-de-rei-b",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "pasarela-ribeira-b",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "samos",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "pastoricense",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "friol-b",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "val-do-sil",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "cubelas",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "luisitalia",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 24,
+   "fecha": "2027-04-11",
+   "local": "outeiro-de-rei-b",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "fonte-do-rei",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "piringalla",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "begonte-b",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "castroverde",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "cospeito",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "abella",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "trabada",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 25,
+   "fecha": "2027-04-18",
+   "local": "ru-lucense",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "samos",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "pastoricense",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "friol-b",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "val-do-sil",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "cubelas",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "luisitalia",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "outeiro-de-rei-b",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 26,
+   "fecha": "2027-04-25",
+   "local": "ru-lucense",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "fonte-do-rei",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "pasarela-ribeira-b",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "piringalla",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "begonte-b",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "castroverde",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "cospeito",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "abella",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 27,
+   "fecha": "2027-05-02",
+   "local": "trabada",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "pastoricense",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "friol-b",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "val-do-sil",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "cubelas",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "luisitalia",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "outeiro-de-rei-b",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "ru-lucense",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 28,
+   "fecha": "2027-05-09",
+   "local": "trabada",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "pastoricense",
+   "visitante": "fonte-do-rei",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "samos",
+   "visitante": "friol-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "pasarela-ribeira-b",
+   "visitante": "val-do-sil",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "piringalla",
+   "visitante": "cubelas",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "begonte-b",
+   "visitante": "luisitalia",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "castroverde",
+   "visitante": "outeiro-de-rei-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "cospeito",
+   "visitante": "ru-lucense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 29,
+   "fecha": "2027-05-16",
+   "local": "abella",
+   "visitante": "trabada",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "friol-b",
+   "visitante": "pastoricense",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "val-do-sil",
+   "visitante": "samos",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "cubelas",
+   "visitante": "pasarela-ribeira-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "luisitalia",
+   "visitante": "piringalla",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "outeiro-de-rei-b",
+   "visitante": "begonte-b",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "ru-lucense",
+   "visitante": "castroverde",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "trabada",
+   "visitante": "cospeito",
+   "golesLocal": null,
+   "golesVisitante": null
+  },
+  {
+   "jornada": 30,
+   "fecha": "2027-05-23",
+   "local": "fonte-do-rei",
+   "visitante": "abella",
+   "golesLocal": null,
+   "golesVisitante": null
+  }
+ ]
+}

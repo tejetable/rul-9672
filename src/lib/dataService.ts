@@ -100,6 +100,7 @@ export interface Aviso {
 }
 export interface Jugador {id:string;nombre:string;apodo:string;dorsal:number|null;activo:boolean}
 export interface EstadisticaJugador {jugadorId:string;goles:number;asistencias:number;amarillas:number;rojas:number}
+export interface LigaResultado {local:string;visitante:string;goles_local:number|null;goles_visitante:number|null;aplazado:boolean}
 export interface DB {
   socios: Socio[];
   patrocinadores: Patrocinador[];
@@ -167,6 +168,10 @@ export const dataService = {
   esDirectiva:()=>role==='directiva'||role==='super_admin',
   ajustes:()=>settings,
   liga:()=>liga,
+  async ligaEquipos(){return allRows((a,b)=>supabase.from('liga_equipos').select('*').eq('temporada',settings.temporada_actual.replace('/','-')).order('id').range(a,b));},
+  async ligaPartidos(){return allRows((a,b)=>supabase.from('liga_partidos').select('*').eq('temporada',settings.temporada_actual.replace('/','-')).order('jornada').order('id').range(a,b));},
+  async ligaSanciones(){return allRows((a,b)=>supabase.from('liga_sanciones').select('*').eq('temporada',settings.temporada_actual.replace('/','-')).order('created_at').order('id').range(a,b));},
+  async guardarJornada(jornada:number,partidos:LigaResultado[]){const r=await supabase.rpc('guardar_jornada',{p_temporada:settings.temporada_actual.replace('/','-'),p_jornada:jornada,p_partidos:partidos.map(p=>({...p}))});check(r.error);},
   clasificacion:()=>clasificacion,
   whatsapp:(texto:string)=>clubWhatsapp(texto,settings.whatsapp_club),
   async cargarAjustes(){
