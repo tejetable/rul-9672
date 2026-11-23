@@ -1,4 +1,4 @@
-import {createFileRoute,Link,useNavigate} from '@tanstack/react-router';
+import {createFileRoute,Link,useCanGoBack,useNavigate,useRouter} from '@tanstack/react-router';
 import {useEffect,useState} from 'react';
 import {ArrowLeft,ChevronLeft,ChevronRight} from 'lucide-react';
 import {Button} from '@/components/ui/button';
@@ -9,13 +9,14 @@ import {TAMANO_FOTO} from '@/lib/galeria';
 import {GaleriaVisor} from '@/components/GaleriaVisor';
 import {useDriveGallery} from '@/hooks/use-drive-gallery';
 export const Route=createFileRoute('/galeria_/$folderId')({
-  validateSearch:(s:Record<string,unknown>)=>({foto:typeof s['foto']==='string'?s['foto']:''}),
+  // desde=inicio: la foto se abrió desde El Equipo; al cerrarla se vuelve allí, no a la rejilla del álbum.
+  validateSearch:(s:Record<string,unknown>)=>({foto:typeof s['foto']==='string'?s['foto']:'',...(s['desde']==='inicio'?{desde:'inicio' as const}:{})}),
   head:()=>({meta:[{title:'Álbum del partido · R.U. Lucense'},{name:'description',content:'Fotos y vídeos de nuestros partidos, desde el álbum del club.'},{property:'og:title',content:'Álbum del partido · R.U. Lucense'},{property:'og:description',content:'Las fotos y vídeos de la familia del Real Unión Lucense.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),
   component:AlbumPage,
 });
 function AlbumPage(){
   const vista = useVista();
-  const {folderId}=Route.useParams();const {foto}=Route.useSearch();const navigate=useNavigate();const {data,isPending}=useDriveGallery();
+  const {folderId}=Route.useParams();const {foto,desde}=Route.useSearch();const navigate=useNavigate();const router=useRouter();const puedeVolver=useCanGoBack();const {data,isPending}=useDriveGallery();
   const albums=data?.albumes??[];const current=albums.findIndex(a=>a.id===folderId);const album=albums[current];
   const [visor,setVisor]=useState<number|null>(null);const [start,setStart]=useState<number|null>(null);
   useEffect(()=>{if(foto&&album){const i=album.fotos.findIndex(f=>f.id===foto);if(i>=0)setVisor(i);}else setVisor(null);},[folderId,foto,album]);
@@ -30,6 +31,6 @@ function AlbumPage(){
     {isPending&&<div className="gallery-image is-loading aspect-square"/>}
     {!isPending&&!album&&<p className="px-4 py-8 text-muted-foreground">No hay fotos disponibles en este álbum.</p>}
     <div className="gallery-complete-grid">{album?.fotos.map((f,i)=><Button key={f.id} variant="ghost" className="gallery-tile gallery-square" aria-label={`Ver foto ${i+1}`} onClick={()=>setVisor(i)}><GaleriaFoto foto={f} alt={album.titulo} sizes={TAMANO_FOTO.tercio}/></Button>)}</div>
-    {album&&visor!==null&&<GaleriaVisor album={album} inicial={visor} siguiente={next} onClose={()=>{setVisor(null);void navigate({to:'/galeria/$folderId',params:{folderId},search:{foto:''},replace:true});}}/>}
+    {album&&visor!==null&&<GaleriaVisor album={album} inicial={visor} siguiente={next} onClose={()=>{setVisor(null);if(desde==='inicio'){if(puedeVolver)router.history.back();else void navigate({to:'/',replace:true});return;}void navigate({to:'/galeria/$folderId',params:{folderId},search:{foto:''},replace:true});}}/>}
   </main></div>;
 }
