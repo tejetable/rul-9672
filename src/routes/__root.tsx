@@ -136,8 +136,15 @@ function RootComponent() {
   },[]);
   useEffect(() => { registrarServiceWorker(); }, []);
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    // Supabase vuelve a lanzar SIGNED_IN cada vez que la pestaña recupera el foco. Si es el mismo usuario
+    // no hay que recargar nada: antes se reiniciaba la app y se perdía lo que se estaba escribiendo.
+    let usuario: string | null | undefined;
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      const id = session?.user?.id ?? null;
+      if (event === "INITIAL_SESSION") { usuario = id; return; }
+      if (event === "SIGNED_IN" && usuario !== undefined && id === usuario) return;
       if (!["SIGNED_IN","SIGNED_OUT","USER_UPDATED"].includes(event)) return;
+      usuario = id;
       if (event === "SIGNED_OUT") { void queryClient.cancelQueries(); queryClient.clear(); }
       setTimeout(() => { void dataService.init().catch(()=>{}); void router.invalidate(); if(event!=="SIGNED_OUT")void queryClient.invalidateQueries(); }, 0);
     });
