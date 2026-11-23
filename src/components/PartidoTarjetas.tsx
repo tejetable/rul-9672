@@ -3,7 +3,7 @@ import { GoleadoresPartido } from "./GoleadoresPartido";
 import { LigaPestanas, abrirLiga } from "./LigaPestanas";
 import {useDriveGallery} from "@/hooks/use-drive-gallery";
 import {dataService,useClubData} from "@/lib/dataService";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Twitch, MapPin, Navigation } from "lucide-react";
 import { escudo } from "@/assets/recursos";
 import { BotonDos, iconosCasa } from "@/components/SwitchVista";
@@ -176,17 +176,29 @@ function TablaResumen(){
   const stats=dataService.liga(),tabla=dataService.clasificacion(),racha=rachaCronologica(stats.racha),goles=golesLiga(db.partidos);
   const nombre=(r:string|null)=>r==='V'?'Victoria':r==='E'?'Empate':r==='D'?'Derrota':'Sin resultado';
   const url=dataService.ajustes().url_clasificacion_futgal;
+  const stat=(k:string,t:string,v:ReactNode,cls='')=><p key={k} className="sc-stat"><abbr title={t}>{k}</abbr><span className={cls}>{v}</span></p>;
   return <section className="sc-league" aria-label="Nuestra liga">
-    <a className="sc-pos-tile" href="#liga-pestanas" onClick={e=>{e.preventDefault();abrirLiga('clasificacion');}} aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
-      <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
-      <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
-    </a>
-    <div className="sc-league-body">
-      <p className="sc-points"><strong>{stats.puntos}</strong> pts <span className="sc-sep">·</span> {stats.g}G {stats.e}E {stats.p}P</p>
-      <p className="sc-goals">Goles {goles.gf}–{goles.gc} <span className="sc-sep">·</span> <span className={goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p>
-      <div className="sc-form" role="img" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
-        {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}
+    <div className="sc-league-left">
+      <div className="sc-league-tiles">
+        <a className="sc-pos-tile" href="#liga-pestanas" onClick={e=>{e.preventDefault();abrirLiga('clasificacion');}} aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
+          <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
+          <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
+        </a>
+        <div className="sc-pos-tile sc-pts-tile" role="img" aria-label={`${stats.puntos} puntos`}>
+          <span className="sc-pos-num">{stats.puntos}</span>
+          <span className="sc-tile-label" aria-hidden="true">pts</span>
+        </div>
       </div>
+      <div className="sc-pos-tile sc-racha">
+        <span className="sc-racha-label" aria-hidden="true">Últimos 5</span>
+        <div className="sc-form" role="img" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
+          {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}
+        </div>
+      </div>
+    </div>
+    <div className="sc-pos-tile sc-stats-tile">
+      <div className="sc-stats is-partidos">{stat('J','Jugados',stats.pj)}{stat('G','Ganados',stats.g)}{stat('E','Empatados',stats.e)}{stat('P','Perdidos',stats.p)}</div>
+      <div className="sc-stats is-goles">{stat('GF','Goles a favor',goles.gf)}{stat('GC','Goles en contra',goles.gc)}{stat('DG','Diferencia de goles',<>{goles.dg!==0&&<small>{goles.dg>0?'+':'−'}</small>}{Math.abs(goles.dg)}</>,goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':'')}</div>
     </div>
   </section>;
 }
