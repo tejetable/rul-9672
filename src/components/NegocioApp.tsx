@@ -3,7 +3,7 @@ import {ListCard,ListRow} from './ListRow';
 import {VerComo} from "@/components/VerComo";
 import { ClubCabecera } from "@/components/ClubCabecera";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, MessageCircle, QrCode } from "lucide-react";
+import { Check, MessageCircle, QrCode, RefreshCw } from "lucide-react";
 import { ContactarClub } from "@/components/ContactarClub";
 import { AvisosCampana } from "@/components/AvisosCampana";
 import { Button } from "@/components/ui/button";
@@ -180,10 +180,11 @@ function Registrar({ neg }: { neg: Patrocinador }) {
 
 function TuMes({ neg }: { neg: Patrocinador }) {
   const [incluir,setIncluir]=useState(false);
-  const [rango, setRango] = useState<"mes" | "90" | "temporada">("mes");
+  const [regenerando,setRegenerando]=useState(false);
+  const [rango, setRango] = useState<"mes" | "90" | "temporada">(neg.esPrueba?'90':'mes');
   const db = useClubData();
   const [stats, setStats] = useState<ClubStats>(emptyStats);
-  useEffect(() => {if(incluir&&!dataService.negocioPrueba())return;let alive=true;runAction(async () => {const result=await dataService.statsPatrocinador(neg.id, rango,incluir);if(alive)setStats(result);});return()=>{alive=false;};}, [neg.id, rango, db,incluir]);
+  useEffect(() => {if((incluir||neg.esPrueba)&&!dataService.negocioPrueba())return;let alive=true;runAction(async () => {const result=await dataService.statsPatrocinador(neg.id, rango,incluir||!!neg.esPrueba);if(alive)setStats(result);});return()=>{alive=false;};}, [neg.id, neg.esPrueba, rango, db,incluir]);
   const s = adaptarStats(stats);
   const prog = { nuevas: stats.objetivo_nuevas_90d, objetivo: 5, pct: Math.min(100, stats.objetivo_nuevas_90d * 20) };
   const sem = stats.serie;
@@ -240,7 +241,8 @@ function TuMes({ neg }: { neg: Patrocinador }) {
       <a href={waLink(share, "")} target="_blank" rel="noreferrer" className="mt-4 flex h-auto min-h-11 items-center justify-center gap-2 rounded-control bg-primary font-black text-primary-foreground">
         <MessageCircle size={20} strokeWidth={1.75} /> Compartir por WhatsApp
       </a>
-      {dataService.negocioPrueba()&&<div className="surface-card mt-6 px-4"><label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label></div>}
+      {dataService.negocioPrueba()&&!neg.esPrueba&&<div className="surface-card mt-6 px-4"><label className="state-role-row">Incluir visitas de prueba<Switch checked={incluir} onCheckedChange={setIncluir} aria-label="Incluir visitas de prueba"/></label></div>}
+      {dataService.esSuper()&&neg.esPrueba&&dataService.negocioPrueba()===neg.id&&<Button variant="outline" className="mt-6" disabled={regenerando} onClick={()=>runAction(async()=>{setRegenerando(true);try{await dataService.regenerarVisitasPrueba(neg.id);}finally{setRegenerando(false);}})}><RefreshCw size={18}/>Regenerar visitas de prueba</Button>}
     </section>
   );
 }

@@ -754,6 +754,7 @@ export type Database = {
           detalle_baja: string | null
           direccion: string
           email_acceso: string | null
+          es_prueba: boolean
           fecha_alta: string
           fecha_baja: string | null
           horario: string | null
@@ -772,6 +773,7 @@ export type Database = {
           detalle_baja?: string | null
           direccion?: string
           email_acceso?: string | null
+          es_prueba?: boolean
           fecha_alta?: string
           fecha_baja?: string | null
           horario?: string | null
@@ -790,6 +792,7 @@ export type Database = {
           detalle_baja?: string | null
           direccion?: string
           email_acceso?: string | null
+          es_prueba?: boolean
           fecha_alta?: string
           fecha_baja?: string | null
           horario?: string | null
@@ -1603,6 +1606,7 @@ export type Database = {
         Args: { p_motivo: string; p_user: string }
         Returns: undefined
       }
+      regenerar_visitas_prueba: { Args: { p_negocio: string }; Returns: number }
       registrar_pago_socio: {
         Args: { p_pago: Json; p_socio: string }
         Returns: string

@@ -52,7 +52,7 @@ use the editor.
 - Member number proposals use the lowest positive unused number; PostgreSQL serializes allocations and edits, rejects conflicts by owner name and audits number changes without resetting the sequence. Relations stay id-bound; QR refreshes with the number.
 - Match played state is derived by a PostgreSQL trigger from both scores; unconfirmed kickoff times never generate calendar events or live-match states.
 
-- Business test access keeps the administrator identity and stores session-scoped targets in usuario_vista; guarded RPCs force test visits and real statistics exclude them, so previewing cannot affect production metrics.
+- Business test access retains admin identity in usuario_vista; PostgreSQL isolates test entities, excludes them from real totals and guards regeneration, so previews never affect production.
 - Shared Button and Switch states and control dimensions are defined centrally, so screen-level hover rules cannot change text contrast or alignment.
 
 - Member access metadata comes from the guarded gestion_socios RPC using Auth last_sign_in_at, independently of password readiness, so Google users count as having accessed.
