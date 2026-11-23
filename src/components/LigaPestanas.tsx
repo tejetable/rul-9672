@@ -5,9 +5,9 @@ import { dataService } from "@/lib/dataService";
 import { IconoBalon, IconoBota } from "./GoleadoresPartido";
 
 /** Liga en El Equipo: tres pestañas (Clasificación, Goleadores, Asistencias) dentro de la propia pantalla.
- *  Al cambiar de pestaña solo se carga y se pinta su contenido. */
+ *  En El Equipo las tres se pintan apiladas para que el recuadro mida siempre lo mismo. */
 export type Pestana = "clasificacion" | "goles" | "asistencias";
-export const PESTANAS_LIGA: Pestana[] = ["clasificacion", "goles", "asistencias"];
+export const PESTANAS_LIGA: Pestana[] = ["goles", "asistencias", "clasificacion"];
 const EVENTO = "rul:liga";
 
 /** La ficha del 4º abre la pestaña Clasificación y baja hasta ella. */
@@ -28,9 +28,9 @@ export function IconoTabla() {
 }
 
 const PESTANAS: { id: Pestana; texto: string; Icono: ComponentType }[] = [
-  { id: "clasificacion", texto: "Clasificación", Icono: IconoTabla },
   { id: "goles", texto: "Goleadores", Icono: IconoBalon },
   { id: "asistencias", texto: "Asistencias", Icono: IconoBota },
+  { id: "clasificacion", texto: "Clasificación", Icono: IconoTabla },
 ];
 
 type Clasificacion = Awaited<ReturnType<typeof dataService.clasificacionCompleta>>;
@@ -51,7 +51,7 @@ function useDatos<T>(cargar: () => Promise<T>) {
 }
 
 /** compacta (El Equipo): un trozo de cada lista y «Ver … completa». completa (/liga): todo, con podio. */
-export function LigaPestanas({ completa = false, inicial = "clasificacion" }: { completa?: boolean; inicial?: Pestana }) {
+export function LigaPestanas({ completa = false, inicial = "goles" }: { completa?: boolean; inicial?: Pestana }) {
   const [activa, setActiva] = useState<Pestana>(inicial);
   const refs = useRef<Record<Pestana, HTMLButtonElement | null>>({ clasificacion: null, goles: null, asistencias: null });
   useEffect(() => {
@@ -69,10 +69,17 @@ export function LigaPestanas({ completa = false, inicial = "clasificacion" }: { 
   };
   return <section id={completa ? undefined : "liga-pestanas"} className={`liga-tabs surface-card ${completa ? "is-completa" : ""}`} aria-label="Liga">
     <div role="tablist" aria-label="Liga" className="liga-tablist" onKeyDown={teclado}>
-      {PESTANAS.map(({ id, texto, Icono }) => <button key={id} ref={(el) => { refs.current[id] = el; }} type="button" role="tab" id={`liga-tab-${id}`} aria-controls="liga-panel" aria-selected={activa === id} tabIndex={activa === id ? 0 : -1} className="liga-tab" onClick={() => setActiva(id)}><Icono />{texto}</button>)}
+      {PESTANAS.map(({ id, texto, Icono }) => <button key={id} ref={(el) => { refs.current[id] = el; }} type="button" role="tab" id={`liga-tab-${id}`} aria-controls={`liga-panel-${id}`} aria-selected={activa === id} tabIndex={activa === id ? 0 : -1} className="liga-tab" onClick={() => setActiva(id)}><Icono />{texto}</button>)}
     </div>
-    <div role="tabpanel" id="liga-panel" aria-labelledby={`liga-tab-${activa}`} className="liga-panel">
-      {activa === "clasificacion" ? <TablaLiga completa={completa} /> : <Ranking campo={activa} completa={completa} />}
+    {/* En El Equipo las tres pestañas se pintan apiladas en la misma celda (solo se ve la activa): así el recuadro mide lo
+        mismo en las tres y no salta al cambiar. En /liga, solo la activa, a su altura. */}
+    <div className={completa ? undefined : "liga-paneles"}>
+      {PESTANAS.filter(({ id }) => !completa || id === activa).map(({ id }) => {
+        const visible = id === activa;
+        return <div key={id} role="tabpanel" id={`liga-panel-${id}`} aria-labelledby={`liga-tab-${id}`} aria-hidden={!visible} inert={!visible} className={`liga-panel ${visible ? "" : "is-oculto"}`}>
+          {id === "clasificacion" ? <TablaLiga completa={completa} /> : <Ranking campo={id} completa={completa} />}
+        </div>;
+      })}
       {!completa && <Link to="/liga" search={{ vista: activa }} className="liga-mas">{activa === "clasificacion" ? "Ver la clasificación completa" : activa === "goles" ? "Ver todos los goleadores" : "Ver todos los asistentes"}<ArrowRight size={16} strokeWidth={2} aria-hidden="true" /></Link>}
     </div>
   </section>;
@@ -113,9 +120,8 @@ function Ranking({ campo, completa }: { campo: "goles" | "asistencias"; completa
   const grupos: Fila[][] = [];
   for (const f of filas) { const g = grupos.find((x) => x[0]!.puesto === f.puesto); if (g) g.push(f); else grupos.push([f]); }
   const podio = grupos.slice(0, 3);
-  // En El Equipo, solo el podio; en /liga, el podio y el resto del ranking.
-  if (!completa) return <Podio grupos={podio} campo={campo} />;
-  const resto = grupos.slice(3).flat();
+  // En El Equipo, el podio y el 4º puesto (con su altura queda como la clasificación); en /liga, el podio y el resto del ranking.
+  const resto = completa ? grupos.slice(3).flat() : (grupos[3] ?? []).slice(0, 2);
   return <>
     <Podio grupos={podio} campo={campo} />
     {resto.length > 0 && <ListaRanking filas={resto} campo={campo} etiqueta={`${etiqueta}, desde el ${resto[0]!.puesto}º`} />}

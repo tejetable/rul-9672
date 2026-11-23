@@ -24,7 +24,7 @@ function Liga() {
   return <div className="min-h-dvh bg-primary"><main className={`${claseVista(vista)} mx-auto min-h-dvh max-w-[430px] bg-background pb-8`}>
     <header className="club-header"><Button asChild variant="ghost" size="icon"><Link to="/" aria-label="Volver a El Equipo"><ArrowLeft /></Link></Button><h1 className="club-section-title mb-0 flex-1">Liga</h1></header>
     <div className="px-4 pt-2">
-      <LigaPestanas completa inicial={(pestana as "clasificacion" | "goles" | "asistencias" | undefined) ?? "clasificacion"} />
+      <LigaPestanas completa inicial={(pestana as "clasificacion" | "goles" | "asistencias" | undefined) ?? "goles"} />
     </div>
   </main></div>;
 }
