@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { GaleriaFoto } from "@/components/GaleriaFoto";
 import { useDriveGallery } from '@/hooks/use-drive-gallery';
 import {randomHighlights,type HighlightPhoto} from '@/lib/drive-gallery';
+import { srcsetFoto, TAMANO_FOTO } from '@/lib/galeria';
 import { fechaHumana } from '@/lib/fechas';
 
 async function preloadPhotos(photos:HighlightPhoto[]):Promise<HighlightPhoto[]> {
-  const loaded=await Promise.all(photos.map(async item=>{
-    const image=new Image();image.src=item.foto.thumb;
+  const loaded=await Promise.all(photos.map(async (item,index)=>{
+    // Mismo srcset y sizes que la foto pintada, para que el navegador descargue aquí la misma versión.
+    const image=new Image();image.sizes=index===0?TAMANO_FOTO.entera:TAMANO_FOTO.mitad;image.srcset=srcsetFoto(item.foto.thumb)??'';image.src=item.foto.thumb;
     try {await image.decode();return item;}catch{return null;}
   }));
   return loaded.filter((item):item is HighlightPhoto=>item!==null);
@@ -51,7 +53,7 @@ export function Galeria() {
   const ultimo=recienteAlbum?[recienteAlbum.titulo,recienteAlbum.resultado,recienteAlbum.fecha?fechaHumana(recienteAlbum.fecha):''].filter(Boolean).join(' · '):'';
   const mosaic=(selection:HighlightPhoto[],outgoing=false)=><div className={`gallery-mosaic gallery-highlight-layer ${outgoing?'is-outgoing':''}`}>{selection.map(({foto,albumId},index)=>{
     const album=albumes.find(a=>a.id===albumId);if(!album)return null;
-    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded/></Link></Button>;
+    return <Button asChild key={foto.id} variant="ghost" className={`gallery-tile ${index===0?'gallery-hero':'gallery-square'}`}><Link to="/galeria/$folderId" params={{folderId:albumId}} search={{foto:foto.id}} aria-label={`Ver foto: ${album.titulo}`} tabIndex={outgoing?-1:undefined}><GaleriaFoto foto={foto} alt={album.titulo} preloaded sizes={index===0?TAMANO_FOTO.entera:TAMANO_FOTO.mitad}/></Link></Button>;
   })}</div>;
   return <section className="mt-6" aria-label="Fotos del equipo">
     <div className="mb-3 flex items-center justify-between gap-3">

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GaleriaFoto } from "@/components/GaleriaFoto";
+import { TAMANO_FOTO } from "@/lib/galeria";
 import { GaleriaVisor } from "@/components/GaleriaVisor";
 import { dataService } from "@/lib/dataService";
 import type { AlbumGaleria } from "@/lib/galeria";
@@ -31,7 +32,7 @@ function GaleriaCompleta() {
     <section className="space-y-3 px-4 py-6">
       {isPending && <div className="gallery-image is-loading aspect-[16/10]"/>}
       {!isPending && !albumes.length && <p className="py-8 text-muted-foreground">Todavía no hay álbumes disponibles.</p>}
-      {albumes.map(album=><Button asChild key={album.id} variant="ghost" className="h-auto w-full flex-col overflow-hidden rounded-panel bg-surface p-0"><Link to="/galeria/$folderId" params={{folderId:album.id}} search={{foto:''}}>{album.fotos[0] && <span className="gallery-hero w-full"><GaleriaFoto foto={album.fotos[0]} alt={album.titulo}/></span>}<span className="w-full p-4 text-left"><strong className="block text-item">{album.titulo}</strong><span className="text-body-sm">{album.detalle} · {album.fotos.length} fotos/vídeos</span></span></Link></Button>)}
+      {albumes.map(album=><Button asChild key={album.id} variant="ghost" className="h-auto w-full flex-col overflow-hidden rounded-panel bg-surface p-0"><Link to="/galeria/$folderId" params={{folderId:album.id}} search={{foto:''}}>{album.fotos[0] && <span className="gallery-hero w-full"><GaleriaFoto foto={album.fotos[0]} alt={album.titulo} sizes={TAMANO_FOTO.entera}/></span>}<span className="w-full p-4 text-left"><strong className="block text-item">{album.titulo}</strong><span className="text-body-sm">{album.detalle} · {album.fotos.length} fotos/vídeos</span></span></Link></Button>)}
     </section>
   </main></div>;
 }
