@@ -1,4 +1,4 @@
-- [ ] Aislar negocio y soci@s de prueba en Cloud, generar 150 visitas y añadir regeneración solo Super admin; comprobar estadísticas reales y panel sin cambiar estilos.
+- [x] Aislar negocio y seis soci@s de prueba en Cloud; 150 visitas (cinco anuladas), regeneración Super admin y 30 pruebas pasan; panel y Ventajas comprobados con sesiones reales, cifras del club idénticas, sin cambios de estilos.
 - [x] Añadir tablas liga_equipos, liga_partidos y liga_sanciones con permisos y guardado transaccional de jornadas; sin cambios de pantallas ni clasificaciones existentes.
 - [x] Cargar JSON recibido: 16 equipos, 240 partidos, 62 resultados, sanción Friol B −3 y enlaces a las 30 fichas existentes; huella completa idéntica al archivo y 24 pruebas pasan, sin cambios de pantallas.
 - [x] Verificar restricciones, permisos y los cuatro métodos nuevos de dataService; 30 pruebas pasan, incluyendo guardado 2-1 y reversión real ante partido inexistente; datos temporales retirados.
