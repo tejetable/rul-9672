@@ -295,6 +295,20 @@
       "when": 1795434445650,
       "tag": "0041_liga_results_tables_and_guardar_jornada",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1795441002828,
+      "tag": "0042_isolated_test_business_and_regeneration",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1795441204533,
+      "tag": "0043_test_entity_trigger_table_guards",
+      "breakpoints": true
     }
   ]
 }

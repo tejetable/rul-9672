@@ -38,6 +38,7 @@ export interface Socio {
 }
 export interface Patrocinador {
   id: string;
+  esPrueba?: boolean;
   nombre: string;
   categoria: string;
   logoUrl: string;
@@ -158,9 +159,10 @@ export const dataService = {
   nombreVisita:(id:string)=>visitNames[id]?.nombre ?? 'Sin carnet',
   rol: () => role,
   negocioPrueba:()=>negocioPrueba,
-  async accederComoNegocio(id:string){const r=await supabase.rpc('acceder_como_negocio',{p_id:id});check(r.error);negocioPrueba=id;notify();},
+  async accederComoNegocio(id:string){const r=await supabase.rpc('acceder_como_negocio',{p_id:id});check(r.error);negocioPrueba=id;await this.refresh();},
   async salirNegocioPrueba(){const r=await supabase.rpc('salir_negocio_prueba');check(r.error);negocioPrueba=null;await this.refresh();},
   async borrarVisitasPrueba(id:string){const r=await supabase.rpc('borrar_visitas_prueba',{p_negocio:id});check(r.error);await this.refresh();},
+  async regenerarVisitasPrueba(id:string){const r=await supabase.rpc('regenerar_visitas_prueba',{p_negocio:id});check(r.error);await this.refresh();return r.data;},
   roles:()=>roles,
   rolSeleccionado:()=>selectedRole,
   autenticado:()=>!!userId,
@@ -253,7 +255,10 @@ export const dataService = {
     if (!userId || !role) { db = emptyDB(); notify(); return; }
     const [socios, pats, ventajas, visitas, partidos, avisos, leidos, stats, tabla] = await Promise.all([
       allRows((a,b) => supabase.from('socios').select('*').order('numero_socio').range(a,b)),
-      allRows((a,b) => supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,importe_patrocinio,fecha_baja,motivo_baja,email_acceso,telefono,horario,web').order('fecha_alta').range(a,b)),
+      allRows((a,b) => {
+        const q=supabase.from('patrocinadores').select('id,nombre,categoria,logo_url,direccion,activo,es_prueba,importe_patrocinio,fecha_baja,motivo_baja,email_acceso,telefono,horario,web').order('fecha_alta');
+        return (role==='socia'||role==='negocio'?q.eq('es_prueba',false):q).range(a,b);
+      }),
       allRows((a,b) => supabase.from('ventajas').select('*').order('id').range(a,b)),
       role === 'socia' ? Promise.resolve([]) : allRows((a,b) => {
         const q=supabase.from('visitas').select('*').order('fecha_hora');
@@ -267,7 +272,7 @@ export const dataService = {
     ]);
     check(stats.error);check(tabla.error);
     liga={pj:stats.data?.pj??0,g:stats.data?.g??0,e:stats.data?.e??0,p:stats.data?.p??0,puntos:stats.data?.puntos??0,goles_favor:stats.data?.goles_favor??0,goles_contra:stats.data?.goles_contra??0,racha:stats.data?.racha??[]};clasificacion=tabla.data;
-    db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja,telefono:p.telefono,horario:p.horario,web:p.web })),
+    db = { socios: socios.map(socioFrom), patrocinadores: pats.map(p => ({ id:p.id,esPrueba:p.es_prueba,nombre:p.nombre,categoria:p.categoria,logoUrl:p.logo_url,emailAcceso:p.email_acceso??'',direccion:p.direccion,activo:p.activo,importePatrocinio:Number(p.importe_patrocinio),fechaBaja:p.fecha_baja,motivoBaja:p.motivo_baja,telefono:p.telefono,horario:p.horario,web:p.web })),
       ventajas: ventajas.map(v => ({id:v.id,patrocinadorId:v.patrocinador_id,titulo:textoMiembros(v.titulo),descripcion:textoMiembros(v.descripcion),condiciones:textoMiembros(v.condiciones),activa:v.activa,fechaInicio:v.fecha_inicio,fechaFin:v.fecha_fin,...(v.destacado ? {destacado:v.destacado}:{}),...(v.tarifas ? {tarifas:v.tarifas as unknown as NonNullable<Ventaja['tarifas']>}: {})})),
       visitas: visitas.map(v => ({id:v.id,esPrueba:v.es_prueba,socioId:v.socio_id ?? undefined,patrocinadorId:v.patrocinador_id,ventajaId:v.ventaja_id ?? undefined,fechaHora:v.fecha_hora,origen:v.origen === 'sin_carnet' ? 'sin_carne' : v.origen as Visita['origen'],tipoCliente:v.tipo_cliente as Visita['tipoCliente'],repiteViaClub:v.repite_via_club,verificada:v.verificada,anulada:v.anulada,numeroSocio:socios.find(s=>s.id===v.socio_id)?.numero_socio})),
       partidos: partidos.map(p=>({id:p.id,horaConfirmada:p.hora_confirmada,fechaConfirmada:p.fecha_confirmada,jornada:p.jornada,rival:p.rival,fechaHora:p.fecha_hora ?? '',lugar:p.pabellon,esLocal:p.es_local,competicion:p.competicion ?? undefined,golesLocal:p.es_local ? p.goles_favor : p.goles_contra,golesVisitante:p.es_local ? p.goles_contra : p.goles_favor,jugado:p.jugado,driveFolderId:p.drive_folder_id,rivalCorto:p.rival_corto})),

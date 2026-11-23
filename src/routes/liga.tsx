@@ -11,7 +11,9 @@ export const Route = createFileRoute("/liga")({
     { title: "Liga · R.U. Lucense" },
     { name: "description", content: "Clasificación, máximos goleadores y asistentes del Real Unión Lucense F.S." },
     { property: "og:title", content: "Liga · R.U. Lucense" },
+    { property: "og:description", content: "Clasificación, máximos goleadores y asistentes del Real Unión Lucense F.S." },
     { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   component: Liga,
 });

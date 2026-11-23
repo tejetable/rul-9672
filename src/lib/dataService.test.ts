@@ -5,6 +5,12 @@ vi.mock('./drive.functions',()=>({getDriveGallery:vi.fn().mockResolvedValue({alb
 import {dataService} from './dataService';
 beforeEach(()=>{vi.clearAllMocks();mocks.from.mockImplementation(()=>({select:()=>({maybeSingle:async()=>({data:null,error:null})})}));});
 describe('Cloud data boundary',()=>{
+ it('regenerates only through the guarded test RPC and preserves authorization errors',async()=>{
+   mocks.rpc.mockResolvedValue({data:null,error:{message:'Solo Super admin'}});
+   await expect(dataService.regenerarVisitasPrueba('test-business')).rejects.toThrow('Solo Super admin');
+   expect(mocks.rpc).toHaveBeenCalledWith('regenerar_visitas_prueba',{p_negocio:'test-business'});
+   expect(mocks.from).not.toHaveBeenCalled();
+ });
  it.each(['ligaEquipos','ligaPartidos','ligaSanciones'] as const)('reads %s from Cloud for season 2026-27 without changing old standings',async(method)=>{
    const rows=[{id:'fixture'}];const chain={select:vi.fn(),eq:vi.fn(),order:vi.fn(),range:vi.fn().mockResolvedValue({data:rows,error:null})};
    chain.select.mockReturnValue(chain);chain.eq.mockReturnValue(chain);chain.order.mockReturnValue(chain);mocks.from.mockReturnValue(chain);
