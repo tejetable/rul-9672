@@ -309,6 +309,13 @@
       "when": 1795441204533,
       "tag": "0043_test_entity_trigger_table_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1795441525855,
+      "tag": "0044_restrict_selected_league_and_lineup_reads",
+      "breakpoints": true
     }
   ]
 }
