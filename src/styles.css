@@ -1625,3 +1625,7 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .sc-league .sc-stats-tile { grid-column: 2; grid-row: 1; }
 .sc-racha .sc-form { gap: 4px; }
 .sc-racha .sc-form-dot { width: 20px; height: 20px; font-size: 10.5px; }
+/* Pestañas de la liga en El Equipo: las tres en la misma celda; manda la más alta y no salta al cambiar. */
+.liga-paneles { display: grid; }
+.liga-paneles > .liga-panel { grid-area: 1 / 1; }
+.liga-panel.is-oculto { visibility: hidden; }
