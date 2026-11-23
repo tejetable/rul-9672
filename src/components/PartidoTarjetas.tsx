@@ -177,12 +177,18 @@ function TablaResumen(){
   const nombre=(r:string|null)=>r==='V'?'Victoria':r==='E'?'Empate':r==='D'?'Derrota':'Sin resultado';
   const url=dataService.ajustes().url_clasificacion_futgal;
   return <section className="sc-league" aria-label="Nuestra liga">
-    <a className="sc-pos-tile" href="#liga-pestanas" onClick={e=>{e.preventDefault();abrirLiga('clasificacion');}} aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
-      <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
-      <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
-    </a>
+    <div className="sc-league-tiles">
+      <a className="sc-pos-tile" href="#liga-pestanas" onClick={e=>{e.preventDefault();abrirLiga('clasificacion');}} aria-label={tabla?`${tabla.posicion}º en la liga. Ver la clasificación completa`:'Ver la clasificación'}>
+        <span className="sc-pos-num">{tabla?tabla.posicion:'—'}<sup>{tabla?'º':''}</sup></span>
+        <ArrowUpRight className="sc-pos-go" size={14} strokeWidth={2.25} aria-hidden="true"/>
+      </a>
+      <div className="sc-pos-tile sc-pts-tile" role="img" aria-label={`${stats.puntos} puntos`}>
+        <span className="sc-pos-num">{stats.puntos}</span>
+        <span className="sc-tile-label" aria-hidden="true">pts</span>
+      </div>
+    </div>
     <div className="sc-league-body">
-      <p className="sc-points"><strong>{stats.puntos}</strong> pts <span className="sc-sep">·</span> {stats.g}G {stats.e}E {stats.p}P</p>
+      <p className="sc-record"><span>{stats.g}G</span> <span>{stats.e}E</span> <span>{stats.p}P</span></p>
       <p className="sc-goals">Goles {goles.gf}–{goles.gc} <span className="sc-sep">·</span> <span className={goles.dg>0?'sc-dg-pos':goles.dg<0?'sc-dg-neg':''}>{textoDiferencia(goles.dg)}</span></p>
       <div className="sc-form" role="img" aria-label={`Últimos cinco, del más antiguo al más reciente: ${racha.filter(Boolean).map(nombre).join(', ')||'sin resultados'}`}>
         {racha.map((r,i)=><span key={i} title={nombre(r)} className={`sc-form-dot ${r?`is-${r}`:''}`}>{r??''}</span>)}

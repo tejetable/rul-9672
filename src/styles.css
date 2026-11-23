@@ -1547,3 +1547,21 @@ main .gallery-refresh.club-interactive { width: 44px; height: 44px; min-height: 
 .liga-podio-puesto { margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--muted-foreground); }
 .liga-podio-escalon.is-1 .liga-podio-puesto { color: #fff; }
 .theme-noche .liga-podio-valor { color: var(--oro-claro); }
+
+/* ───────── Tarjeta de temporada: posición y puntos en dos recuadros iguales, el resto a la derecha, a todo el ancho ───────── */
+.sc-league { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
+.sc-league-tiles { display: flex; flex: none; gap: 8px; }
+.sc-pts-tile { flex-direction: column; gap: 2px; cursor: default; }
+.sc-pts-tile:hover { border-color: transparent; }
+.sc-pts-tile:active { transform: none; }
+.sc-pos-tile .sc-pos-num { line-height: 1; padding-top: 2px; }
+.sc-pts-tile .sc-pos-num { margin-left: 0; font-size: 40px; }
+.sc-tile-label { font-size: 11px; font-weight: 900; line-height: 1; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.theme-dia .sc-tile-label { color: var(--oro-texto); }
+.sc-league-body { flex: 1 1 auto; align-items: flex-end; text-align: right; }
+.sc-league-body > * { transform: none; }
+.sc-record { margin: 0; display: flex; gap: 8px; height: 20px; align-items: center; font-size: 15px; font-weight: 900; line-height: 1; color: var(--verde); white-space: nowrap; }
+.theme-noche .sc-record { color: #FFFFFF; }
+.sc-league-body .sc-goals { justify-content: flex-end; }
+.sc-league-body .sc-form { justify-content: flex-end; }
+.theme-noche .sc-tile-label { color: var(--verde); }
