@@ -1,3 +1,4 @@
+import { calcularClasificacion, ultimaJornadaJugada, type PartidoLiga } from './liga';
 import {getMembershipConfig} from './membership-payment.functions';
 import {textoMiembros} from './member-language';
 import {normalizarEmail} from './email-validation';
@@ -226,7 +227,19 @@ export const dataService = {
   async convocatoriaGestion(partidoId:string){const r=await supabase.from('convocatorias').select('jugadores,imagen_url,publicada').eq('partido_id',partidoId).maybeSingle();check(r.error);return r.data?{jugadores:r.data.jugadores,imagenPath:r.data.imagen_url,publicada:r.data.publicada}:{jugadores:[] as string[],imagenPath:null as string|null,publicada:false};},
   async subirPiezaConvocatoria(partidoId:string,file:File){if(!['image/jpeg','image/png'].includes(file.type))throw new Error('Sube una imagen JPG o PNG.');const path=`${partidoId}/${Date.now()}.${file.type==='image/png'?'png':'jpg'}`;const up=await supabase.storage.from('piezas-convocatoria').upload(path,file,{contentType:file.type});check(up.error);return path;},
   async guardarConvocatoria(partidoId:string,input:{jugadores:string[];imagenPath:string|null;publicada:boolean}){const r=await supabase.from('convocatorias').upsert({partido_id:partidoId,jugadores:input.jugadores,imagen_url:input.imagenPath,publicada:input.publicada});check(r.error);},
-  async clasificacionCompleta(){const u=await supabase.from('clasificacion_equipos').select('jornada').order('jornada',{ascending:false}).limit(1).maybeSingle();check(u.error);if(!u.data)return null;const r=await supabase.from('clasificacion_equipos').select('*').eq('jornada',u.data.jornada).order('posicion');check(r.error);return {jornada:u.data.jornada,filas:(r.data??[]).map(f=>({posicion:f.posicion,equipo:f.equipo,puntos:f.puntos,pj:f.pj,g:f.g,e:f.e,p:f.p,gf:f.gf,gc:f.gc,esNuestro:f.es_nuestro}))};},
+  /** Clasificación calculada con los resultados de liga_partidos (la que mete la directiva jornada a jornada).
+   *  Si todavía no hay resultados cargados, la última copiada a mano en clasificacion_equipos. */
+  async clasificacionCompleta(){
+    const [equipos,partidos,sanciones]=await Promise.all([this.ligaEquipos(),this.ligaPartidos(),this.ligaSanciones()]);
+    const jugados:PartidoLiga[]=partidos.map(p=>({jornada:p.jornada,fecha:p.fecha,local:p.local,visitante:p.visitante,golesLocal:p.goles_local,golesVisitante:p.goles_visitante,aplazado:p.aplazado}));
+    const jornada=ultimaJornadaJugada(jugados);
+    if(equipos.length&&jornada>0){
+      const tabla=calcularClasificacion(equipos.map(e=>({id:e.id,nombre:e.nombre,corto:e.corto,esNuestro:e.es_nuestro})),jugados,sanciones.map(s=>({equipo:s.equipo,puntos:s.puntos,motivo:s.motivo??undefined})));
+      return {jornada,filas:tabla.map(f=>({posicion:f.posicion,equipo:f.equipo.corto||f.equipo.nombre,puntos:f.puntos,pj:f.pj,g:f.g,e:f.e,p:f.p,gf:f.gf,gc:f.gc,esNuestro:!!f.equipo.esNuestro}))};
+    }
+    return this.clasificacionCopiada();
+  },
+  async clasificacionCopiada(){const u=await supabase.from('clasificacion_equipos').select('jornada').order('jornada',{ascending:false}).limit(1).maybeSingle();check(u.error);if(!u.data)return null;const r=await supabase.from('clasificacion_equipos').select('*').eq('jornada',u.data.jornada).order('posicion');check(r.error);return {jornada:u.data.jornada,filas:(r.data??[]).map(f=>({posicion:f.posicion,equipo:f.equipo,puntos:f.puntos,pj:f.pj,g:f.g,e:f.e,p:f.p,gf:f.gf,gc:f.gc,esNuestro:f.es_nuestro}))};},
   async guardarClasificacion(jornada:number,filas:import('./clasificacion').FilaClasificacion[]){const r=await supabase.rpc('guardar_clasificacion',{p_jornada:jornada,p_filas:filas as unknown as never});check(r.error);await this.refresh();},
   async estadisticasPartido(partidoId:string){const r=await supabase.from('estadisticas_partido').select('jugador_id,goles,asistencias,amarillas,rojas').eq('partido_id',partidoId);check(r.error);return (r.data??[]).map(e=>({jugadorId:e.jugador_id,goles:e.goles,asistencias:e.asistencias,amarillas:e.amarillas,rojas:e.rojas})) as EstadisticaJugador[];},
   async guardarEstadisticas(partidoId:string,filas:EstadisticaJugador[]){const r=await supabase.rpc('guardar_estadisticas',{p_partido:partidoId,p_filas:filas as unknown as never});check(r.error);},

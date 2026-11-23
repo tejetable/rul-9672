@@ -11,7 +11,7 @@ export function ClasificacionForm({ jornada: inicial, onClose }: { jornada: numb
   const [texto, setTexto] = useState('');
   const [filas, setFilas] = useState<FilaClasificacion[]>([]);
   const [aviso, setAviso] = useState(''), [busy, setBusy] = useState(false);
-  useEffect(() => { void runAction(async () => { const c = await dataService.clasificacionCompleta(); if (c) setFilas(c.filas); }); }, []);
+  useEffect(() => { void runAction(async () => { const c = await dataService.clasificacionCopiada(); if (c) setFilas(c.filas); }); }, []);
   const set = (i: number, patch: Partial<FilaClasificacion>) => setFilas(f => f.map((x, k) => k === i ? { ...x, ...patch } : patch.esNuestro ? { ...x, esNuestro: false } : x));
   const nuestros = filas.filter(f => f.esNuestro).length;
   return <div className="space-y-3">
